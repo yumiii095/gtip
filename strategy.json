@@ -1,0 +1,132 @@
+{
+  "strategy": [
+    {
+      "id": "strat-money",
+      "title": "💰 賺錢小技巧",
+      "titleColor": "text-purple-900",
+      "tips": [
+        {
+          "step": 1,
+          "heading": "解冰果",
+          "content": "按C開啟選單➡️ 左方點選最新資訊➡️ 打開冰果任務（或 /ob open）"
+        },
+        {
+          "step": 2,
+          "heading": "投票賺金幣",
+          "content": "在主城輸入 /vote，到網站後輸入ID驗證就可以拿投票積分。1點積分可以兌換300金幣或其他好物（百變怪）。每日都可以投1票。"
+        },
+        {
+          "step": 3,
+          "heading": "線上獎勵賺金幣",
+          "content": "輸入 /pm 可以觀看線上獎勵，點擊領取到郵箱領出來就可以了。"
+        },
+        {
+          "step": 4,
+          "heading": "全球市場（GTS）",
+          "content": "可以把自己的寶可夢或物品出售上去。（有毅力可以找個村莊刷個修補村民）"
+        },
+        {
+          "step": 5,
+          "heading": "幫工",
+          "content": "伺服器有時會有玩家招工人（可能幫忙蓋房子挖石頭）。"
+        },
+        {
+          "step": 6,
+          "heading": "商店收購",
+          "content": "有些玩家商店會收購材料或方塊，可以蒐集需要的物品至玩家商店販售。"
+        },
+        {
+          "step": 7,
+          "heading": "設置箱子商店",
+          "content": "可以透過「箱子商店」建立自己的自動化店面。",
+          "relatedId": "strat-chestshop"
+        }
+      ]
+    },
+    {
+      "id": "strat-chestshop",
+      "title": "📦 如何設置箱子商店？",
+      "titleColor": "text-purple-900",
+      "steps": [
+        "放置一個箱子或木桶。",
+        "右手拿著想要販售的物品，對著箱子按左鍵，聊天欄會跑出提示，依照提示直接輸入價格數字就設置完成了。"
+      ],
+      "warning": "⚠️ 如果還沒設置完跑開會自動取消設置"
+    },
+    {
+      "id": "strat-breeding",
+      "title": "🥚 孵蛋教學",
+      "titleColor": "text-purple-900",
+      "sections": [
+        {
+          "heading": "繁殖基本條件",
+          "conditions": [
+            "必須有一隻公寶可夢＋一隻母寶可夢",
+            "兩隻寶可夢需屬於相同蛋群（蛋種）",
+            "蛋群查詢網站：https://wiki.52poke.com/wiki/怪獸（蛋群）",
+            "將兩隻寶可夢放入牧場（點開牧場介面將一公一母放進去即可開始生蛋）",
+            "⚠️ 要記得牧場介面右上角孵蛋開關要打開（預設為關閉）"
+          ]
+        },
+        {
+          "heading": "繁殖知識說明",
+          "eggGeneration": {
+            "desc": "每 10 分鐘有 50% 機率生成 1 顆蛋",
+            "note": "有機率生出壞蛋，所以有些蛋孵出來數值會莫名很低。"
+          },
+          "items": [
+            {
+              "item": "🔴 紅線",
+              "effect": "子代 6 項個體值中，會隨機繼承父母的 5 項。"
+            },
+            {
+              "item": "⚪ 不變之石",
+              "effect": "子代性格 100% 繼承該攜帶者的性格。"
+            }
+          ]
+        },
+        {
+          "heading": "六大「鎖V」道具（個體值繼承）",
+          "lockVItems": [
+            { "name": "力量負重", "inherit": "HP" },
+            { "name": "力量護腕", "inherit": "攻擊" },
+            { "name": "力量腰帶", "inherit": "防禦" },
+            { "name": "力量鏡", "inherit": "特攻" },
+            { "name": "力量束帶", "inherit": "特防" },
+            { "name": "力量護踝", "inherit": "速度" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "strat-stats",
+      "title": "📊 個體值 (IVs) 與努力值 (EVs)",
+      "titleColor": "text-blue-900",
+      "sections": [
+        {
+          "heading": "個體值 (IVs) - 天生潛力",
+          "desc": "每項數值最高為 31，也就是俗稱的「V」。6項全部31即為 6V。",
+          "howToCheck": "在隊伍選單中對寶可夢點擊 M 查看詳細資訊，切換至「數值」分頁即可看到 0~31 的數字。"
+        },
+        {
+          "heading": "努力值 (EVs) - 後天訓練",
+          "desc": "單項上限 252，全項總計上限 510。每 4 點努力值可增加 1 點實質數值。",
+          "tip": "按 C 選擇 EVS 訓練可至訓練場練等級及努力值。"
+        }
+      ]
+    },
+    {
+      "id": "strat-nature",
+      "title": "🎭 性格加成對照表",
+      "titleColor": "text-green-900",
+      "desc": "性格會影響兩項數值，一項增加 10%（紅色），一項減少 10%（藍色）。",
+      "table": [
+        { "nature": "固執 (Adamant)", "boost": "攻擊", "reduce": "特攻", "usage": "物攻手" },
+        { "nature": "內斂 (Modest)", "boost": "特攻", "reduce": "攻擊", "usage": "特攻手" },
+        { "nature": "爽朗 (Jolly)", "boost": "速度", "reduce": "特攻", "usage": "高速物攻手" },
+        { "nature": "膽小 (Timid)", "boost": "速度", "reduce": "攻擊", "usage": "高速特攻手" },
+        { "nature": "大膽 (Bold)", "boost": "防禦", "reduce": "攻擊", "usage": "物理肉盾" }
+      ]
+    }
+  ]
+}

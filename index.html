@@ -504,142 +504,7 @@
         <div class="bg-purple-50 py-12 border-b border-purple-100 edit-ignore" contenteditable="false"><div class="container mx-auto px-4 flex justify-between items-center"><h2 class="text-3xl font-bold text-purple-900">⚔️ 專業攻略區</h2><button class="edit-ui admin-btn" onclick="addNewSection('strategy-container', 'strategy')" contenteditable="false">[+] 新增攻略章節</button></div></div>
         <main class="container mx-auto py-12 px-4">
             <div id="strategy-container" class="max-w-4xl mx-auto space-y-8">
-                
-                <div id="strat-money" class="bg-white border shadow-sm p-8 relative">
-                    <button class="edit-ui admin-btn admin-btn-delete absolute top-2 right-2" onclick="this.parentElement.remove()" contenteditable="false">[x] 刪除</button>
-                    <h3 class="text-2xl font-bold text-purple-900 mb-6 flex items-center">💰 賺錢小技巧</h3>
-                    <div class="space-y-6 text-gray-700 leading-relaxed">
-                        <div>
-                            <p class="font-bold text-blue-800 mb-1">1. 解冰果</p>
-                            <p>按C開啟選單➡️ 左方點選最新資訊➡️ 打開冰果任務（或/ob open ）</p>
-                        </div>
-                        <div>
-                            <p class="font-bold text-blue-800 mb-1">2. 投票赚金幣</p>
-                            <p>在主城輸入/vote 到網站後輸入ID驗證就可以拿投票積分 1點積分可以兌換300 或是兌換其他好物（百變怪）每日都可以投1票</p>
-                        </div>
-                        <div>
-                            <p class="font-bold text-blue-800 mb-1">3.線上獎勵赚金幣</p>
-                            <p>輸入/pm 可以觀看線上獎勵 點擊領取到郵箱領出來就可以了</p>
-                        </div>
-                        <div>
-                            <p class="font-bold text-blue-800 mb-1">4.全球市場（GTS)</p>
-                            <p>可以把自己的寶可夢或物品出售上去<br>（有毅力可以找個村莊刷個修補村民）</p>
-                        </div>
-                        <div>
-                            <p class="font-bold text-blue-800 mb-1">5.幫工</p>
-                            <p>伺服器有時會有玩家招工人（可能幫忙蓋房子挖石頭）</p>
-                        </div>
-                        <div>
-                            <p class="font-bold text-blue-800 mb-1">6.商店收購</p>
-                            <p>有些玩家商店會收購材料或方塊，可以蒐集需要的物品至玩家商店販售</p>
-                        </div>
-                        <div>
-                            <p class="font-bold text-blue-800 mb-1">7.設置箱子商店</p>
-                            <p>可以透過「<a href="javascript:void(0)" onclick="navigateToResult('strategy', 'strat-chestshop', false)" class="text-blue-500 underline hover:text-blue-700 font-bold">箱子商店</a>」建立自己的自動化店面。</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="strat-chestshop" class="bg-white border shadow-sm p-8 relative">
-                    <button class="edit-ui admin-btn admin-btn-delete absolute top-2 right-2" onclick="this.parentElement.remove()" contenteditable="false">[x] 刪除</button>
-                    <h3 class="text-2xl font-bold text-purple-900 mb-6 flex items-center">📦 如何設置箱子商店？</h3>
-                    <div class="space-y-4 text-gray-700 leading-relaxed">
-                        <p>放置一個箱子或木桶</p>
-                        <p>右手拿著想要販售的物品，對著箱子按左鍵，聊天欄會跑出提示，依照提示直接輸入價格數字就設置完成了。</p>
-                        <p class="bg-red-50 p-4 border-l-4 border-red-500 text-red-700 font-bold">⚠️ 如果還沒設置完跑開會自動取消設置</p>
-                    </div>
-                </div>
-
-                <div id="strat-breeding" class="bg-white border shadow-sm p-8 relative">
-                    <button class="edit-ui admin-btn admin-btn-delete absolute top-2 right-2" onclick="this.parentElement.remove()" contenteditable="false">[x] 刪除</button>
-                    <h3 class="text-2xl font-bold text-purple-900 mb-6 flex items-center">🥚 孵蛋教學</h3>
-                    <div class="mb-8">
-                        <h4 class="text-lg font-bold text-blue-800 border-l-4 border-blue-500 pl-3 mb-4">繁殖基本條件</h4>
-                        <div class="space-y-3 text-gray-700 leading-relaxed">
-                            <p>進行寶可夢繁殖前，請先確認以下條件：</p>
-                            <ul class="list-disc ml-6 space-y-2">
-                                <li>必須有一隻公寶可夢＋一隻母寶可夢</li>
-                                <li>兩隻寶可夢需屬於 相同蛋群（蛋種）</li>
-                                <li>蛋群查詢網站：<a href="https://wiki.52poke.com/wiki/%E6%80%AA%E5%85%BD%EF%BC%88%E8%9B%8B%E7%BE%A4%EF%BC%89" target="_blank" class="text-blue-500 underline hover:text-blue-700">神奇寶貝百科</a></li>
-                                <li>將兩隻寶可夢放入 牧場（點開牧場介面將一公一母放進去即可開始生蛋）</li>
-                                <li class="text-red-600 font-bold">⚠️ 要記得牧場介面右上角孵蛋開關要打開（預設為關閉）</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="mb-8">
-                        <h4 class="text-lg font-bold text-blue-800 border-l-4 border-blue-500 pl-3 mb-4">繁殖知識說明</h4>
-                        <div class="space-y-4">
-                            <div class="bg-gray-50 p-4 rounded border">
-                                <p class="font-bold text-gray-800 mb-1">蛋生成時間</p>
-                                <p class="text-gray-600">• 每 10 分鐘有 <strong>50% 機率</strong> 生成 1 顆蛋</p>
-                                <p class="text-gray-600">• 有機率生出壞蛋，所以有些蛋孵出來數值會莫名很低。</p>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="border p-4">
-                                    <p class="font-bold text-red-600 mb-2">🔴 紅線</p>
-                                    <p class="text-sm text-gray-600">子代 6 項個體值中，會隨機繼承父母的 <strong>5 項</strong>。</p>
-                                </div>
-                                <div class="border p-4">
-                                    <p class="font-bold text-gray-600 mb-2">⚪ 不變之石</p>
-                                    <p class="text-sm text-gray-600">子代 <strong>性格 100% 繼承</strong> 該攜帶者的性格。</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <h4 class="text-lg font-bold text-blue-800 border-l-4 border-blue-500 pl-3 mb-4">六大「鎖V」道具（個體值繼承）</h4>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                            <div class="p-3 bg-blue-50 border border-blue-100 rounded text-center"><p class="font-bold text-blue-900">力量負重</p><p class="text-xs">遺傳 HP</p></div>
-                            <div class="p-3 bg-blue-50 border border-blue-100 rounded text-center"><p class="font-bold text-blue-900">力量護腕</p><p class="text-xs">遺傳 攻擊</p></div>
-                            <div class="p-3 bg-blue-50 border border-blue-100 rounded text-center"><p class="font-bold text-blue-900">力量腰帶</p><p class="text-xs">遺傳 防禦</p></div>
-                            <div class="p-3 bg-blue-50 border border-blue-100 rounded text-center"><p class="font-bold text-blue-900">力量鏡</p><p class="text-xs">遺傳 特攻</p></div>
-                            <div class="p-3 bg-blue-50 border border-blue-100 rounded text-center"><p class="font-bold text-blue-900">力量束帶</p><p class="text-xs">遺傳 特防</p></div>
-                            <div class="p-3 bg-blue-50 border border-blue-100 rounded text-center"><p class="font-bold text-blue-900">力量護踝</p><p class="text-xs">遺傳 速度</p></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="strat-stats" class="bg-white border shadow-sm p-8 relative">
-                    <button class="edit-ui admin-btn admin-btn-delete absolute top-2 right-2" onclick="this.parentElement.remove()" contenteditable="false">[x] 刪除</button>
-                    <h3 class="text-2xl font-bold text-blue-900 mb-6 flex items-center">📊 個體值 (IVs) 與努力值 (EVs)</h3>
-                    <div class="mb-8">
-                        <h4 class="text-lg font-bold text-blue-800 border-l-4 border-blue-500 pl-3 mb-4">個體值 (IVs) - 天生潛力</h4>
-                        <p class="text-gray-700 mb-4">每項數值最高為 31，也就是俗稱的 <strong>"V"</strong>。6項全部31即為 6V。</p>
-                        <div class="bg-blue-50 p-4 border rounded">
-                            <p class="font-bold mb-2">如何查看？</p>
-                            <p class="text-sm">在隊伍選單中對寶可夢點擊 <kbd contenteditable="false">M</kbd> 查看詳細資訊，切換至「數值」分頁即可看到 0~31 的數字。</p>
-                        </div>
-                    </div>
-                    <div>
-                        <h4 class="text-lg font-bold text-blue-800 border-l-4 border-blue-500 pl-3 mb-4">努力值 (EVs) - 後天訓練</h4>
-                        <p class="text-gray-700 mb-2">單項上限 252，全項總計上限 510。每 4 點努力值可增加 1 點實質數值。</p>
-                        <div class="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400">
-                            <p class="text-gray-800 font-bold">💡 小提醒：</p>
-                            <p class="text-gray-700 mt-1 text-lg">按 <kbd class="bg-white px-2 border" contenteditable="false">C</kbd> 選擇 EVS 訓練可至訓練場練<span class="text-red-600 bg-yellow-200 px-1 font-black">等級</span>及<span class="text-blue-700 bg-yellow-200 px-1 font-black">努力值</span>。</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="strat-nature" class="bg-white border shadow-sm p-8 relative">
-                    <button class="edit-ui admin-btn admin-btn-delete absolute top-2 right-2" onclick="this.parentElement.remove()" contenteditable="false">[x] 刪除</button>
-                    <h3 class="text-2xl font-bold text-green-900 mb-6 flex items-center">🎭 性格加成對照表</h3>
-                    <p class="text-gray-700 mb-4">性格會影響兩項數值，一項增加 10% (紅色)，一項減少 10% (藍色)。</p>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-center text-sm border-collapse border border-gray-200">
-                            <thead><tr class="bg-green-100 font-bold">
-                                <th class="border p-2">性格</th><th class="border p-2">增加 (1.1x)</th><th class="border p-2">減少 (0.9x)</th><th class="border p-2">推薦用途</th>
-                            </tr></thead>
-                            <tbody>
-                                <tr><td class="border p-2 font-bold">固執 (Adamant)</td><td class="border p-2 text-red-600">攻擊</td><td class="border p-2 text-blue-600">特攻</td><td class="border p-2">物攻手</td></tr>
-                                <tr><td class="border p-2 font-bold">內斂 (Modest)</td><td class="border p-2 text-red-600">特攻</td><td class="border p-2 text-blue-600">攻擊</td><td class="border p-2">特攻手</td></tr>
-                                <tr><td class="border p-2 font-bold">爽朗 (Jolly)</td><td class="border p-2 text-red-600">速度</td><td class="border p-2 text-blue-600">特攻</td><td class="border p-2">高速物攻手</td></tr>
-                                <tr><td class="border p-2 font-bold">膽小 (Timid)</td><td class="border p-2 text-red-600">速度</td><td class="border p-2 text-blue-600">攻擊</td><td class="border p-2">高速特攻手</td></tr>
-                                <tr><td class="border p-2 font-bold">大膽 (Bold)</td><td class="border p-2 text-red-600">防禦</td><td class="border p-2 text-blue-600">攻擊</td><td class="border p-2">物理肉盾</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
+                <div class="text-center text-gray-400 py-12">載入中...</div>
             </div>
         </main>
     </div>
@@ -650,22 +515,182 @@
     </footer>
 
     <script>
-        // --- 資料由 data.json 載入，請勿在此直接修改 ---
+        // ── 從外部 JSON 載入資料 ──────────────────────────────
         let COMMANDS_DATA = [];
-        let ALL_DATA      = [];
+        let ALL_DATA = [];
 
         async function loadData() {
             try {
-                const res = await fetch('data.json');
-                if (!res.ok) throw new Error('無法載入 data.json');
-                const json = await res.json();
-                COMMANDS_DATA = json.commands    || [];
-                ALL_DATA      = json.searchIndex || [];
-            } catch (e) {
-                console.error('[data.json]', e);
-                const c = document.getElementById('accordion-container');
-                if (c) c.innerHTML = '<p class="text-red-500 p-4 font-bold">⚠️ 無法載入 data.json，請透過伺服器開啟此頁面（不可直接用 file:// 開啟）。</p>';
+                const [cmdRes, stratRes] = await Promise.all([
+                    fetch('commands.json'),
+                    fetch('strategy.json')
+                ]);
+                const cmdJson = await cmdRes.json();
+                const stratJson = await stratRes.json();
+
+                COMMANDS_DATA = cmdJson.commands;
+
+                // 重建 ALL_DATA（搜尋索引）
+                ALL_DATA = [
+                    { type: 'strategy', target: 'strat-money', keywords: '賺錢 金幣 收入 GTS 冰果 投票 幫工 商店 領取', title: '賺錢小技巧', desc: '包含冰果、投票、線上獎勵、GTS、幫工與商店收購等技巧。' },
+                    { type: 'strategy', target: 'strat-chestshop', keywords: '箱子商店 設置商店 買賣 賺錢 箱子 木桶 價格 銷售', title: '如何設置箱子商店？', desc: '手拿物品左鍵箱子輸入價格即可完成設置。' },
+                    { type: 'faq', target: 'faq-1', keywords: '回血 治療 生命 補血 恢復', title: '幫寶可夢回血', desc: '主選單 C/F ➜ 點擊「治療」' },
+                    { type: 'faq', target: 'faq-2', keywords: '搜尋 找 哪裡 生成 wiki 座標 地圖', title: '尋找特定的寶可夢', desc: '利用導航、蒐尋器 or /wiki 指令' },
+                    { type: 'faq', target: 'faq-3', keywords: '薄荷 釣竿 幽靈之淚 種子 釣魚 耿鬼 獲取', title: '常見物品獲取方式', desc: '薄荷種植、釣竿模板、幽靈之淚來源' },
+                    { type: 'faq', target: 'faq-4', keywords: '傳奇 神獸 幻獸 生成 倒數 時間 二區 3V', title: '二區傳奇寶可夢生成規則', desc: '隨機玩家腳下生成，必定 3V' },
+                    { type: 'faq', target: 'faq-5', keywords: '傳說 神獸 精靈方塊 冰果 ob open 線上獎勵 獲得 刷神 stattrak', title: '獲得傳說寶可夢的其他方式', desc: '敲精靈方塊 (64次保底) 或完成冰果任務' },
+                    { type: 'faq', target: 'faq-6', keywords: '給別人 交換 照片 轉移 傳送 道具 交易', title: '把寶可夢給別人', desc: '透過交換系統 or 照片功能（目前失效）' },
+                    { type: 'faq', target: 'faq-7', keywords: '蓋家 建築 家園世界 領地 洗白 世界 住 房子', title: '我可以去哪裡蓋家？', desc: '前往家園世界設置領地，該世界不洗白' },
+                    { type: 'newbie', target: 'kb-m', keywords: 'M 御三家 夥伴 隊伍 資訊', title: '快捷鍵 M', desc: '領夥伴/查看隊伍資訊' },
+                    { type: 'newbie', target: 'kb-r', keywords: 'R 叫出 收回 召喚', title: '快捷鍵 R', desc: '叫出或收回寶可夢' },
+                    { type: 'tutorial', target: 'tut-newbie-guide', keywords: '開局 福利 御三家 冒險 新手福利', title: '新手開局指南', desc: '領取福利、選擇御三家與升級指南。' },
+                    { type: 'tutorial', target: 'tut-server-info', keywords: '區域 世界 主城 家園 冒險 地獄 終界 洗白 神獸', title: '伺服器五大區域', desc: '各個世界的規則與神獸刷新機制。' },
+                    { type: 'tutorial', target: 'tut-3', keywords: '領地 鋤頭 保護 圈地 房子 洗白 蓋家 家園世界', title: '保護你的家園 (領地)', desc: '只能在家園世界建立領地' },
+                    { type: 'strategy', target: 'strat-breeding', keywords: '孵蛋 繁殖 牧場 蛋群 紅線 性格 遺傳 鎖V 力量', title: '孵蛋教學', desc: '寶可夢繁殖條件、遺傳規則與道具介紹' },
+                    { type: 'strategy', target: 'strat-stats', keywords: '個體值 努力值 IV EV 31 V 數值 訓練場 等級 練功', title: '個體與努力值', desc: '查詢IV與努力值練習場指南' },
+                    { type: 'strategy', target: 'strat-nature', keywords: '性格 性格表 加成 性格用途 性格推薦', title: '性格對照表', desc: '性格加成與推薦用途' }
+                ];
+
+                initCommands();
+                renderStrategy(stratJson.strategy);
+                addCopyButtons();
+            } catch (err) {
+                console.error('資料載入失敗，嘗試使用備用靜態資料：', err);
+                initCommands();
+                addCopyButtons();
             }
+        }
+
+        // ── 攻略區動態渲染 ───────────────────────────────────
+        function renderStrategy(strategies) {
+            const container = document.getElementById('strategy-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            strategies.forEach(s => {
+                let html = '';
+
+                if (s.id === 'strat-money') {
+                    const tipsHtml = s.tips.map(t => `
+                        <div>
+                            <p class="font-bold text-blue-800 mb-1">${t.step}. ${t.heading}</p>
+                            <p>${t.content}</p>
+                        </div>`).join('');
+                    html = `<div id="${s.id}" class="bg-white border shadow-sm p-8 relative">
+                        <button class="edit-ui admin-btn admin-btn-delete absolute top-2 right-2" onclick="this.parentElement.remove()" contenteditable="false">[x] 刪除</button>
+                        <h3 class="text-2xl font-bold ${s.titleColor} mb-6 flex items-center">${s.title}</h3>
+                        <div class="space-y-6 text-gray-700 leading-relaxed">${tipsHtml}</div>
+                    </div>`;
+
+                } else if (s.id === 'strat-chestshop') {
+                    const stepsHtml = s.steps.map(step => `<p>${step}</p>`).join('');
+                    html = `<div id="${s.id}" class="bg-white border shadow-sm p-8 relative">
+                        <button class="edit-ui admin-btn admin-btn-delete absolute top-2 right-2" onclick="this.parentElement.remove()" contenteditable="false">[x] 刪除</button>
+                        <h3 class="text-2xl font-bold ${s.titleColor} mb-6 flex items-center">${s.title}</h3>
+                        <div class="space-y-4 text-gray-700 leading-relaxed">
+                            ${stepsHtml}
+                            <p class="bg-red-50 p-4 border-l-4 border-red-500 text-red-700 font-bold">${s.warning}</p>
+                        </div>
+                    </div>`;
+
+                } else if (s.id === 'strat-breeding') {
+                    const sec0 = s.sections[0];
+                    const conditionsHtml = sec0.conditions.map((c, i) =>
+                        i === sec0.conditions.length - 1
+                            ? `<li class="text-red-600 font-bold">${c}</li>`
+                            : `<li>${c}</li>`
+                    ).join('');
+                    const sec1 = s.sections[1];
+                    const inheritItemsHtml = sec1.items.map(it => `
+                        <div class="border p-4">
+                            <p class="font-bold ${it.item.includes('🔴') ? 'text-red-600' : 'text-gray-600'} mb-2">${it.item}</p>
+                            <p class="text-sm text-gray-600">${it.effect}</p>
+                        </div>`).join('');
+                    const sec2 = s.sections[2];
+                    const lockVHtml = sec2.lockVItems.map(v => `
+                        <div class="p-3 bg-blue-50 border border-blue-100 rounded text-center">
+                            <p class="font-bold text-blue-900">${v.name}</p>
+                            <p class="text-xs">遺傳 ${v.inherit}</p>
+                        </div>`).join('');
+                    html = `<div id="${s.id}" class="bg-white border shadow-sm p-8 relative">
+                        <button class="edit-ui admin-btn admin-btn-delete absolute top-2 right-2" onclick="this.parentElement.remove()" contenteditable="false">[x] 刪除</button>
+                        <h3 class="text-2xl font-bold ${s.titleColor} mb-6 flex items-center">${s.title}</h3>
+                        <div class="mb-8">
+                            <h4 class="text-lg font-bold text-blue-800 border-l-4 border-blue-500 pl-3 mb-4">${sec0.heading}</h4>
+                            <div class="space-y-3 text-gray-700 leading-relaxed">
+                                <p>進行寶可夢繁殖前，請先確認以下條件：</p>
+                                <ul class="list-disc ml-6 space-y-2">${conditionsHtml}</ul>
+                            </div>
+                        </div>
+                        <div class="mb-8">
+                            <h4 class="text-lg font-bold text-blue-800 border-l-4 border-blue-500 pl-3 mb-4">${sec1.heading}</h4>
+                            <div class="space-y-4">
+                                <div class="bg-gray-50 p-4 rounded border">
+                                    <p class="font-bold text-gray-800 mb-1">蛋生成時間</p>
+                                    <p class="text-gray-600">• 每 10 分鐘有 <strong>50% 機率</strong> 生成 1 顆蛋</p>
+                                    <p class="text-gray-600">• ${sec1.eggGeneration.note}</p>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">${inheritItemsHtml}</div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-blue-800 border-l-4 border-blue-500 pl-3 mb-4">${sec2.heading}</h4>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">${lockVHtml}</div>
+                        </div>
+                    </div>`;
+
+                } else if (s.id === 'strat-stats') {
+                    const sec0 = s.sections[0];
+                    const sec1 = s.sections[1];
+                    html = `<div id="${s.id}" class="bg-white border shadow-sm p-8 relative">
+                        <button class="edit-ui admin-btn admin-btn-delete absolute top-2 right-2" onclick="this.parentElement.remove()" contenteditable="false">[x] 刪除</button>
+                        <h3 class="text-2xl font-bold ${s.titleColor} mb-6 flex items-center">${s.title}</h3>
+                        <div class="mb-8">
+                            <h4 class="text-lg font-bold text-blue-800 border-l-4 border-blue-500 pl-3 mb-4">${sec0.heading}</h4>
+                            <p class="text-gray-700 mb-4">${sec0.desc}</p>
+                            <div class="bg-blue-50 p-4 border rounded">
+                                <p class="font-bold mb-2">如何查看？</p>
+                                <p class="text-sm">${sec0.howToCheck}</p>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-blue-800 border-l-4 border-blue-500 pl-3 mb-4">${sec1.heading}</h4>
+                            <p class="text-gray-700 mb-2">${sec1.desc}</p>
+                            <div class="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400">
+                                <p class="text-gray-800 font-bold">💡 小提醒：</p>
+                                <p class="text-gray-700 mt-1 text-lg">${sec1.tip}</p>
+                            </div>
+                        </div>
+                    </div>`;
+
+                } else if (s.id === 'strat-nature') {
+                    const rowsHtml = s.table.map(r => `
+                        <tr>
+                            <td class="border p-2 font-bold">${r.nature}</td>
+                            <td class="border p-2 text-red-600">${r.boost}</td>
+                            <td class="border p-2 text-blue-600">${r.reduce}</td>
+                            <td class="border p-2">${r.usage}</td>
+                        </tr>`).join('');
+                    html = `<div id="${s.id}" class="bg-white border shadow-sm p-8 relative">
+                        <button class="edit-ui admin-btn admin-btn-delete absolute top-2 right-2" onclick="this.parentElement.remove()" contenteditable="false">[x] 刪除</button>
+                        <h3 class="text-2xl font-bold ${s.titleColor} mb-6 flex items-center">${s.title}</h3>
+                        <p class="text-gray-700 mb-4">${s.desc}</p>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-center text-sm border-collapse border border-gray-200">
+                                <thead><tr class="bg-green-100 font-bold">
+                                    <th class="border p-2">性格</th>
+                                    <th class="border p-2">增加 (1.1x)</th>
+                                    <th class="border p-2">減少 (0.9x)</th>
+                                    <th class="border p-2">推薦用途</th>
+                                </tr></thead>
+                                <tbody>${rowsHtml}</tbody>
+                            </table>
+                        </div>
+                    </div>`;
+                }
+
+                container.innerHTML += html;
+            });
         }
 
 
@@ -677,7 +702,7 @@
 
         function initCommands() {
             const container = document.getElementById('accordion-container');
-            if(!container || container.children.length > 0) return; 
+            if(!container || !COMMANDS_DATA.length) return;
             container.innerHTML = '';
             COMMANDS_DATA.forEach((cat) => {
                 let itemsHtml = cat.isResidence ? `<div class="mb-4 p-3 bg-orange-50 border border-orange-200 text-sm font-bold text-orange-800">🛠️ 工具：木鋤頭<br>🖱️ 左鍵點擊：第 1 點 / 右鍵點擊：第 2 點</div>` : '';
@@ -907,7 +932,7 @@
             }
         });
 
-        window.onload = async function() { await loadData(); initCommands(); addCopyButtons(); };
+        window.onload = function() { loadData(); };
     </script>
 
 </body></html>
