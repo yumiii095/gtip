@@ -834,6 +834,172 @@
             document.getElementById('confirm-modal').style.display = 'none';
         }
 
+        // ── 從 DOM 萃取指令集 JSON ─────────────────────────────
+        function extractCommandsFromDOM() {
+            const groups = [];
+            document.querySelectorAll('#accordion-container .accordion-item').forEach(item => {
+                const headerEl = item.querySelector('.accordion-header');
+                if (!headerEl) return;
+                const title = headerEl.innerText.trim();
+                // 推斷 color class
+                const colorMatch = headerEl.className.match(/text-\w+-\d+/);
+                const color = colorMatch ? colorMatch[0] : 'text-blue-900';
+                const isResidence = title.includes('領地');
+                const items = [];
+                item.querySelectorAll('.cmd-box').forEach(box => {
+                    const cmdEl = box.querySelector('.cmd-text');
+                    const descEl = box.querySelector('.cmd-desc');
+                    if (cmdEl && descEl) {
+                        items.push({ cmd: cmdEl.innerText.trim(), desc: descEl.innerText.trim() });
+                    }
+                });
+                const group = { title, color, items };
+                if (isResidence) group.isResidence = true;
+                groups.push(group);
+            });
+            return { commands: groups };
+        }
+
+        // ── 從 DOM 萃取攻略區 JSON ─────────────────────────────
+        function extractStrategyFromDOM() {
+            const strategies = [];
+            document.querySelectorAll('#strategy-container > div[id]').forEach(card => {
+                const id = card.id;
+                const titleEl = card.querySelector('h3');
+                const title = titleEl ? titleEl.innerText.trim() : '';
+                const titleColorMatch = titleEl ? titleEl.className.match(/text-\w+-\d+/) : null;
+                const titleColor = titleColorMatch ? titleColorMatch[0] : 'text-purple-900';
+
+                if (id === 'strat-money') {
+                    const tips = [];
+                    card.querySelectorAll('.space-y-6 > div').forEach((div, i) => {
+                        const headingEl = div.querySelector('p.font-bold');
+                        const contentEl = div.querySelector('p:not(.font-bold)');
+                        const headingRaw = headingEl ? headingEl.innerText.trim() : '';
+                        // strip leading "N. " prefix
+                        const heading = headingRaw.replace(/^\d+\.\s*/, '');
+                        tips.push({
+                            step: i + 1,
+                            heading,
+                            content: contentEl ? contentEl.innerText.trim() : ''
+                        });
+                    });
+                    strategies.push({ id, title, titleColor, tips });
+
+                } else if (id === 'strat-chestshop') {
+                    const steps = [];
+                    card.querySelectorAll('.space-y-4 > p:not(.bg-red-50)').forEach(p => {
+                        steps.push(p.innerText.trim());
+                    });
+                    const warnEl = card.querySelector('.bg-red-50');
+                    strategies.push({ id, title, titleColor, steps, warning: warnEl ? warnEl.innerText.trim() : '' });
+
+                } else if (id === 'strat-breeding') {
+                    // Keep structure minimal – store raw HTML content per section
+                    const sectionEls = card.querySelectorAll('div.mb-8, div:last-child:not(.mb-8)');
+                    const sections = [];
+                    card.querySelectorAll('h4').forEach((h4, idx) => {
+                        sections.push({ heading: h4.innerText.trim() });
+                    });
+                    // Lock-V items
+                    const lockVItems = [];
+                    card.querySelectorAll('.grid .text-center').forEach(el => {
+                        const nameEl = el.querySelector('p.font-bold');
+                        const inheritEl = el.querySelector('p.text-xs');
+                        if (nameEl && inheritEl) {
+                            lockVItems.push({
+                                name: nameEl.innerText.trim(),
+                                inherit: inheritEl.innerText.replace('遺傳 ', '').trim()
+                            });
+                        }
+                    });
+                    // Inherit items (紅線/不變之石)
+                    const inheritItems = [];
+                    card.querySelectorAll('.grid.grid-cols-1 .border.p-4').forEach(el => {
+                        const labelEl = el.querySelector('p.font-bold');
+                        const descEl = el.querySelector('p.text-sm');
+                        if (labelEl && descEl) {
+                            inheritItems.push({ item: labelEl.innerText.trim(), effect: descEl.innerText.trim() });
+                        }
+                    });
+                    // Egg generation note
+                    const eggBox = card.querySelector('.bg-gray-50');
+                    const eggLines = eggBox ? eggBox.querySelectorAll('p.text-gray-600') : [];
+                    const eggGeneration = {
+                        desc: eggLines[0] ? eggLines[0].innerText.replace('• ', '').trim() : '',
+                        note: eggLines[1] ? eggLines[1].innerText.replace('• ', '').trim() : ''
+                    };
+                    // Conditions
+                    const conditions = [];
+                    card.querySelectorAll('ul.list-disc.ml-6.space-y-2 li').forEach(li => {
+                        conditions.push(li.innerText.trim());
+                    });
+                    strategies.push({
+                        id, title, titleColor,
+                        sections: [
+                            { heading: sections[0] ? sections[0].heading : '繁殖基本條件', conditions },
+                            { heading: sections[1] ? sections[1].heading : '繁殖知識說明', eggGeneration, items: inheritItems },
+                            { heading: sections[2] ? sections[2].heading : '六大「鎖V」道具（個體值繼承）', lockVItems }
+                        ]
+                    });
+
+                } else if (id === 'strat-stats') {
+                    const h4s = card.querySelectorAll('h4');
+                    const descEls = card.querySelectorAll('p.text-gray-700');
+                    const checkEl = card.querySelector('.bg-blue-50 p.text-sm');
+                    const tipEl = card.querySelector('.bg-yellow-50 p.text-gray-700');
+                    strategies.push({
+                        id, title, titleColor,
+                        sections: [
+                            {
+                                heading: h4s[0] ? h4s[0].innerText.trim() : '個體值 (IVs) - 天生潛力',
+                                desc: descEls[0] ? descEls[0].innerText.trim() : '',
+                                howToCheck: checkEl ? checkEl.innerText.trim() : ''
+                            },
+                            {
+                                heading: h4s[1] ? h4s[1].innerText.trim() : '努力值 (EVs) - 後天訓練',
+                                desc: descEls[1] ? descEls[1].innerText.trim() : '',
+                                tip: tipEl ? tipEl.innerText.trim() : ''
+                            }
+                        ]
+                    });
+
+                } else if (id === 'strat-nature') {
+                    const rows = [];
+                    card.querySelectorAll('tbody tr').forEach(tr => {
+                        const tds = tr.querySelectorAll('td');
+                        if (tds.length === 4) {
+                            rows.push({
+                                nature: tds[0].innerText.trim(),
+                                boost:  tds[1].innerText.trim(),
+                                reduce: tds[2].innerText.trim(),
+                                usage:  tds[3].innerText.trim()
+                            });
+                        }
+                    });
+                    const descEl = card.querySelector('p.text-gray-700');
+                    strategies.push({ id, title, titleColor, desc: descEl ? descEl.innerText.trim() : '', table: rows });
+
+                } else {
+                    // 新增的自由格式攻略 – 儲存 id, title, 及 innerHTML 備用
+                    strategies.push({
+                        id, title, titleColor,
+                        _rawHTML: card.querySelector('.text-gray-700') ? card.querySelector('.text-gray-700').innerHTML : ''
+                    });
+                }
+            });
+            return { strategy: strategies };
+        }
+
+        // ── 下載輔助 ──────────────────────────────────────────
+        function downloadJSON(obj, filename) {
+            const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = filename;
+            a.click();
+        }
+
         function executeFinalSave() {
             const summary = document.getElementById('modal-summary').value || "攻略站內容更新";
             const detail = document.getElementById('modal-detail').value;
@@ -864,13 +1030,24 @@
             container.prepend(newLog);
             closeModal();
             toggleEditMode(false);
-            
-            const fullContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
-            const blob = new Blob([fullContent], { type: 'text/html' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'index.html';
-            a.click();
+
+            // ── 同步匯出 JSON ──────────────────────────────────
+            const cmdJSON  = extractCommandsFromDOM();
+            const stratJSON = extractStrategyFromDOM();
+
+            // 更新記憶體內資料（供搜尋使用）
+            COMMANDS_DATA = cmdJSON.commands;
+
+            // 下載三個檔案
+            const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+            const htmlBlob = new Blob([htmlContent], { type: 'text/html' });
+            const htmlA = document.createElement('a');
+            htmlA.href = URL.createObjectURL(htmlBlob);
+            htmlA.download = 'index.html';
+            htmlA.click();
+
+            setTimeout(() => downloadJSON(cmdJSON,  'commands.json'),  400);
+            setTimeout(() => downloadJSON(stratJSON, 'strategy.json'), 800);
         }
 
         function addNewSection(containerId, type) {
