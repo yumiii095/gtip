@@ -1,48 +1,6 @@
 {
   "strategy": [
     {
-      "id": "strat-money",
-      "title": "💰 賺錢小技巧",
-      "titleColor": "text-purple-900",
-      "tips": [
-        {
-          "step": 1,
-          "heading": "解冰果",
-          "content": "按C開啟選單➡️ 左方點選最新資訊➡️ 打開冰果任務（或 /ob open）"
-        },
-        {
-          "step": 2,
-          "heading": "投票賺金幣",
-          "content": "在主城輸入 /vote，到網站後輸入ID驗證就可以拿投票積分。1點積分可以兌換300金幣或其他好物（百變怪）。每日都可以投1票。"
-        },
-        {
-          "step": 3,
-          "heading": "線上獎勵賺金幣",
-          "content": "輸入 /pm 可以觀看線上獎勵，點擊領取到郵箱領出來就可以了。"
-        },
-        {
-          "step": 4,
-          "heading": "全球市場（GTS）",
-          "content": "可以把自己的寶可夢或物品出售上去。（有毅力可以找個村莊刷個修補村民）"
-        },
-        {
-          "step": 5,
-          "heading": "幫工",
-          "content": "伺服器有時會有玩家招工人（可能幫忙蓋房子挖石頭）。"
-        },
-        {
-          "step": 6,
-          "heading": "商店收購",
-          "content": "有些玩家商店會收購材料或方塊，可以蒐集需要的物品至玩家商店販售。"
-        },
-        {
-          "step": 7,
-          "heading": "設置箱子商店",
-          "content": "可以透過「箱子商店」建立自己的自動化店面。"
-        }
-      ]
-    },
-    {
       "id": "strat-chestshop",
       "title": "📦 如何設置箱子商店？",
       "titleColor": "text-purple-900",
