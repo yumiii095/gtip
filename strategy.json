@@ -1,6 +1,19 @@
 {
   "strategy": [
     {
+      "id": "strat-custom-1772576266913",
+      "title": "新攻略標題0101010101",
+      "titleColor": "text-purple-900",
+      "type": "custom",
+      "paragraphs": [
+        {
+          "tag": "p",
+          "text": "內容填寫...0101010101010"
+        }
+      ],
+      "_rawHTML": "<p contenteditable=\"true\">內容填寫...0101010101010</p>"
+    },
+    {
       "id": "strat-chestshop",
       "title": "📦 如何設置箱子商店？",
       "titleColor": "text-purple-900",
