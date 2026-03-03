@@ -1,93 +1,212 @@
 {
   "commands": [
     {
-      "id": "group-display",
+      "title": "新指令群組01",
+      "color": "text-blue-900",
+      "items": [
+        {
+          "cmd": "/指令01010101",
+          "desc": "01010101述"
+        }
+      ]
+    },
+    {
       "title": "展示寶可夢 / 展示物品",
       "color": "text-purple-700",
       "items": [
-        { "cmd": "寶可夢展示", "desc": "按鍵 C ➜ 寶可夢訊息 ➜ 右鍵寶可夢" },
-        { "cmd": "[i]", "desc": "展示手上拿著的物品" },
-        { "cmd": "[inv]", "desc": "展示個人背包內容" },
-        { "cmd": "[ender]", "desc": "展示末影箱內容" },
-        { "cmd": "@[玩家ID]", "desc": "標記並提醒在線的玩家" }
+        {
+          "cmd": "寶可夢展示",
+          "desc": "按鍵 C ➜ 寶可夢訊息 ➜ 右鍵寶可夢"
+        },
+        {
+          "cmd": "[i]",
+          "desc": "展示手上拿著的物品"
+        },
+        {
+          "cmd": "[inv]",
+          "desc": "展示個人背包內容"
+        },
+        {
+          "cmd": "[ender]",
+          "desc": "展示末影箱內容"
+        },
+        {
+          "cmd": "@[玩家ID]",
+          "desc": "標記並提醒在線的玩家"
+        }
       ]
     },
     {
-      "id": "group-teleport",
       "title": "傳送 / 系統功能",
       "color": "text-blue-900",
       "items": [
-        { "cmd": "/back", "desc": "返回上一個紀錄點或死亡地點" },
-        { "cmd": "/dp", "desc": "開啟地標傳送選單" },
-        { "cmd": "/warps", "desc": "列出伺服器所有公共地標" },
-        { "cmd": "/spawn", "desc": "回到主城 / 重生點" },
-        { "cmd": "/tpa [玩家ID]", "desc": "請求傳送到該玩家位置" },
-        { "cmd": "/tpahere [玩家ID]", "desc": "請求將玩家傳送至自己身旁" }
+        {
+          "cmd": "/back",
+          "desc": "返回上一個紀錄點或死亡地點"
+        },
+        {
+          "cmd": "/dp",
+          "desc": "開啟地標傳送選單"
+        },
+        {
+          "cmd": "/warps",
+          "desc": "列出伺服器所有公共地標"
+        },
+        {
+          "cmd": "/spawn",
+          "desc": "回到主城 / 重生點"
+        },
+        {
+          "cmd": "/tpa [玩家ID]",
+          "desc": "請求傳送到該玩家位置"
+        },
+        {
+          "cmd": "/tpahere [玩家ID]",
+          "desc": "請求將玩家傳送至自己身旁"
+        }
       ]
     },
     {
-      "id": "group-home",
       "title": "HOME 家園紀錄點",
       "color": "text-blue-900",
       "items": [
-        { "cmd": "/sethome [名稱]", "desc": "設置一個家園點" },
-        { "cmd": "/home [名稱]", "desc": "傳送至指定家園點" },
-        { "cmd": "/home delete [名稱]", "desc": "刪除指定家園點" },
-        { "cmd": "/homelist", "desc": "查看所有家園點" }
+        {
+          "cmd": "/sethome [名稱]",
+          "desc": "設置一個家園點"
+        },
+        {
+          "cmd": "/home [名稱]",
+          "desc": "傳送至指定家園點"
+        },
+        {
+          "cmd": "/home delete [名稱]",
+          "desc": "刪除指定家園點"
+        },
+        {
+          "cmd": "/homelist",
+          "desc": "查看所有家園點"
+        }
       ]
     },
     {
-      "id": "group-quest",
       "title": "任務 / 獎勵系統",
       "color": "text-blue-900",
       "items": [
-        { "cmd": "/days", "desc": "查看每日任務" },
-        { "cmd": "/vote", "desc": "投票指令" },
-        { "cmd": "/pm", "desc": "線上獎勵" },
-        { "cmd": "/pex", "desc": "圖鑑系統（收集獎勵）" },
-        { "cmd": "/stattrak", "desc": "查看閃光方塊保底次數" },
-        { "cmd": "/ob open", "desc": "打開冰果任務介面" }
+        {
+          "cmd": "/days",
+          "desc": "查看每日任務"
+        },
+        {
+          "cmd": "/vote",
+          "desc": "投票指令"
+        },
+        {
+          "cmd": "/pm",
+          "desc": "線上獎勵"
+        },
+        {
+          "cmd": "/pex",
+          "desc": "圖鑑系統（收集獎勵）"
+        },
+        {
+          "cmd": "/stattrak",
+          "desc": "查看閃光方塊保底次數"
+        },
+        {
+          "cmd": "/ob open",
+          "desc": "打開冰果任務介面"
+        }
       ]
     },
     {
-      "id": "group-player",
       "title": "玩家 / 基礎指令",
       "color": "text-blue-900",
       "items": [
-        { "cmd": "/wiki [英文名]", "desc": "查看寶可夢資訊與生態域" },
-        { "cmd": "/cos", "desc": "時裝系統" },
-        { "cmd": "/playerinv", "desc": "開啟隨身倉庫" },
-        { "cmd": "/baltop", "desc": "查看金錢排行榜" },
-        { "cmd": "/pvp", "desc": "開關 PvP 功能" },
-        { "cmd": "/suicide", "desc": "角色自殺（脫困用）" },
-        { "cmd": "/banlist", "desc": "查看禁用物品名單" }
+        {
+          "cmd": "/wiki [英文名]",
+          "desc": "查看寶可夢資訊與生態域"
+        },
+        {
+          "cmd": "/cos",
+          "desc": "時裝系統"
+        },
+        {
+          "cmd": "/playerinv",
+          "desc": "開啟隨身倉庫"
+        },
+        {
+          "cmd": "/baltop",
+          "desc": "查看金錢排行榜"
+        },
+        {
+          "cmd": "/pvp",
+          "desc": "開關 PvP 功能"
+        },
+        {
+          "cmd": "/suicide",
+          "desc": "角色自殺（脫困用）"
+        },
+        {
+          "cmd": "/banlist",
+          "desc": "查看禁用物品名單"
+        }
       ]
     },
     {
-      "id": "group-residence",
       "title": "🏠 領地系統指令",
       "color": "text-green-700",
-      "isResidence": true,
-      "residenceNote": "🛠️ 工具：木鋤頭｜🖱️ 左鍵點擊：第 1 點 / 右鍵點擊：第 2 點",
       "items": [
-        { "cmd": "/res create [名稱]", "desc": "建立領地" },
-        { "cmd": "/res remove [名稱]", "desc": "移除所選領地" },
-        { "cmd": "/res tp [名稱]", "desc": "回到領地" },
-        { "cmd": "/res tpset", "desc": "設置傳送位置" },
-        { "cmd": "/res expand [格數]", "desc": "擴張領地" },
-        { "cmd": "/res padd [玩家ID]", "desc": "給予該玩家全部權限" },
-        { "cmd": "/res pset [玩家ID]", "desc": "單獨設置該玩家權限" }
-      ]
+        {
+          "cmd": "/res create [名稱]",
+          "desc": "建立領地"
+        },
+        {
+          "cmd": "/res remove [名稱]",
+          "desc": "移除所選領地"
+        },
+        {
+          "cmd": "/res tp [名稱]",
+          "desc": "回到領地"
+        },
+        {
+          "cmd": "/res tpset",
+          "desc": "設置傳送位置"
+        },
+        {
+          "cmd": "/res expand [格數]",
+          "desc": "擴張領地"
+        },
+        {
+          "cmd": "/res padd [玩家ID]",
+          "desc": "給予該玩家全部權限"
+        },
+        {
+          "cmd": "/res pset [玩家ID]",
+          "desc": "單獨設置該玩家權限"
+        }
+      ],
+      "isResidence": true
     },
     {
-      "id": "group-social",
       "title": "社交系統指令",
       "color": "text-blue-900",
       "items": [
-        { "cmd": "/m [ID] [訊息]", "desc": "私密訊息" },
-        { "cmd": "/r [訊息]", "desc": "回覆最近密語" },
-        { "cmd": "/ignore [ID] [t|f]", "desc": "屏蔽/解除屏蔽" },
-        { "cmd": "/ignorelist", "desc": "查看屏蔽名單" }
+        {
+          "cmd": "/m [ID] [訊息]",
+          "desc": "私密訊息"
+        },
+        {
+          "cmd": "/r [訊息]",
+          "desc": "回覆最近密語"
+        },
+        {
+          "cmd": "/ignore [ID] [t|f]",
+          "desc": "屏蔽/解除屏蔽"
+        },
+        {
+          "cmd": "/ignorelist",
+          "desc": "查看屏蔽名單"
+        }
       ]
     }
   ]
