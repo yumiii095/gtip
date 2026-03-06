@@ -72,25 +72,68 @@
         .suggestion-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #eee; }
         .suggestion-item:hover { background-color: #f0f9ff; }
 
-        /* Updated Dark Mode Styles (Google Style High Contrast) */
-        body.dark-mode { background-color: #121212; color: #e8eaed; }
-        .dark-mode header, .dark-mode .bg-white { background-color: #1e1e1e !important; border-color: #3c4043 !important; }
-        .dark-mode .text-gray-800, .dark-mode .text-gray-700, .dark-mode .text-blue-900, .dark-mode .text-purple-900 { color: #e8eaed !important; }
-        .dark-mode .section-title { color: #8ab4f8; border-color: #8ab4f8; }
-        .dark-mode .cmd-box { background-color: #202124; border-left-color: #8ab4f8; border-top: 1px solid #3c4043; border-right: 1px solid #3c4043; border-bottom: 1px solid #3c4043; }
-        .dark-mode .cmd-desc { color: #bdc1c6; }
-        .dark-mode .suggestion-box { background-color: #202124; border-color: #3c4043; }
-        .dark-mode .suggestion-item { border-bottom-color: #3c4043; color: #e8eaed; }
-        .dark-mode .suggestion-item:hover { background-color: #303134; }
-        .dark-mode .bg-purple-50, .dark-mode .bg-orange-50, .dark-mode .bg-blue-50, .dark-mode .bg-green-50, .dark-mode .bg-gray-50, .dark-mode .bg-red-50 { background-color: #202124 !important; border-color: #3c4043 !important; }
-        .dark-mode kbd { background-color: #3c4043; color: #e8eaed; border-color: #5f6368; box-shadow: none; }
-        .dark-mode .text-blue-700, .dark-mode .text-blue-800 { color: #8ab4f8 !important; }
-        .dark-mode .text-red-600, .dark-mode .text-red-700 { color: #f28b82 !important; }
-        .dark-mode .text-green-700, .dark-mode .text-green-900 { color: #81c995 !important; }
-        .dark-mode .text-orange-600, .dark-mode .text-orange-900 { color: #ffbb6c !important; }
-        .dark-mode .text-purple-700 { color: #d7aefb !important; }
-        .dark-mode table, .dark-mode th, .dark-mode td { border-color: #3c4043 !important; }
-        .dark-mode tr.bg-green-100 { background-color: #1e1e1e !important; }
+        /* ── Page hero (fix: was missing CSS) ─────────── */
+        .page-hero { padding: 48px 0; position: relative; overflow: hidden; }
+        .page-hero h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; letter-spacing: -0.02em; }
+        .page-hero-faq      { background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border-bottom: 2px solid #fed7aa; }
+        .page-hero-commands { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-bottom: 2px solid #bfdbfe; }
+        .page-hero-newbie   { background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); border-bottom: 2px solid #fecdd3; }
+        .page-hero-tutorial { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-bottom: 2px solid #bbf7d0; }
+        .page-hero-strategy { background: linear-gradient(135deg, #faf5ff 0%, #ede9fe 100%); border-bottom: 2px solid #ddd6fe; }
+
+        /* ── Dark Mode ───────────────────────────────── */
+        /* 色彩系統：bg=#111827  card=#1f2937  surface=#283448  border=#374151 */
+        body.dark-mode          { background-color: #111827; color: #f3f4f6; }
+        .dark-mode header       { background-color: #1f2937 !important; border-color: #374151 !important; }
+        .dark-mode .bg-white    { background-color: #1f2937 !important; border-color: #374151 !important; }
+        .dark-mode .border      { border-color: #374151 !important; }
+        .dark-mode .border-b, .dark-mode .border-t { border-color: #374151 !important; }
+
+        /* Text */
+        .dark-mode .text-gray-800, .dark-mode .text-gray-700, .dark-mode .text-gray-600 { color: #e5e7eb !important; }
+        .dark-mode .text-gray-500, .dark-mode .text-gray-400 { color: #9ca3af !important; }
+        .dark-mode .text-blue-900, .dark-mode .text-blue-800 { color: #93c5fd !important; }
+        .dark-mode .text-blue-700                            { color: #60a5fa !important; }
+        .dark-mode .text-blue-600, .dark-mode .text-blue-500 { color: #38bdf8 !important; }
+        .dark-mode .text-purple-900, .dark-mode .text-purple-800 { color: #d8b4fe !important; }
+        .dark-mode .text-purple-700                              { color: #c084fc !important; }
+        .dark-mode .text-red-900, .dark-mode .text-red-700      { color: #fca5a5 !important; }
+        .dark-mode .text-red-600, .dark-mode .text-red-500      { color: #f87171 !important; }
+        .dark-mode .text-green-900, .dark-mode .text-green-800  { color: #86efac !important; }
+        .dark-mode .text-green-700, .dark-mode .text-green-600  { color: #4ade80 !important; }
+        .dark-mode .text-orange-900, .dark-mode .text-orange-800 { color: #fdba74 !important; }
+        .dark-mode .text-orange-600                              { color: #fb923c !important; }
+        .dark-mode .text-yellow-200 { color: #fef08a !important; }
+
+        /* Backgrounds */
+        .dark-mode .section-title { color: #60a5fa; border-color: #374151; }
+        .dark-mode .bg-gray-50, .dark-mode .bg-gray-100  { background-color: #283448 !important; }
+        .dark-mode .bg-blue-50, .dark-mode .bg-blue-100  { background-color: #1e3a5f !important; border-color: #2d5a8e !important; }
+        .dark-mode .bg-purple-50, .dark-mode .bg-purple-100 { background-color: #2d1f4a !important; border-color: #4c3580 !important; }
+        .dark-mode .bg-orange-50, .dark-mode .bg-orange-100 { background-color: #3d2000 !important; border-color: #7c3d00 !important; }
+        .dark-mode .bg-red-50, .dark-mode .bg-red-100    { background-color: #3d1010 !important; border-color: #7c2020 !important; }
+        .dark-mode .bg-green-50, .dark-mode .bg-green-100 { background-color: #0f2d1f !important; border-color: #1a5c3a !important; }
+        .dark-mode .bg-yellow-50, .dark-mode .bg-yellow-200 { background-color: #2d2000 !important; border-color: #5c4000 !important; }
+
+        /* Components */
+        .dark-mode .cmd-box    { background-color: #283448; border-color: #374151; border-left-color: #60a5fa; }
+        .dark-mode .cmd-box:hover { background-color: #2d3d58; }
+        .dark-mode .cmd-text   { color: #fca5a5; }
+        .dark-mode .cmd-desc   { color: #d1d5db; }
+        .dark-mode .suggestion-box { background-color: #1f2937; border-color: #374151; }
+        .dark-mode .suggestion-item { border-bottom-color: #374151; color: #f3f4f6; }
+        .dark-mode .suggestion-item:hover { background-color: #283448; }
+        .dark-mode kbd         { background-color: #283448; color: #f3f4f6; border-color: #4b5563; box-shadow: 0 2px 0 #4b5563; }
+        .dark-mode table, .dark-mode th, .dark-mode td { border-color: #374151 !important; }
+        .dark-mode tr.bg-green-100 { background-color: #0f2d1f !important; }
+
+        /* Page heroes dark */
+        .dark-mode .page-hero-faq      { background: linear-gradient(135deg, #1a0800, #2d1400); border-color: #5c2800; }
+        .dark-mode .page-hero-commands { background: linear-gradient(135deg, #050e1f, #0a1e3d); border-color: #0e3060; }
+        .dark-mode .page-hero-newbie   { background: linear-gradient(135deg, #1a0508, #2d0d15); border-color: #5c1a2a; }
+        .dark-mode .page-hero-tutorial { background: linear-gradient(135deg, #051408, #0a2814); border-color: #0f4020; }
+        .dark-mode .page-hero-strategy { background: linear-gradient(135deg, #0d0320, #1a0840); border-color: #300a6a; }
+        .dark-mode .page-hero h2       { color: #f3f4f6 !important; }
 
         .mode-switch {
             position: relative; width: 60px; height: 30px;
@@ -234,9 +277,9 @@
     </div>
 
     <!-- Strategy detail modal -->
-    <div id="strat-modal" class="edit-ignore" contenteditable="false" onclick="if(event.target===this)closeStratModal()">
+    <div id="strat-modal" contenteditable="false" onclick="if(event.target===this)closeStratModal()">
         <div class="strat-modal-box">
-            <button class="strat-modal-close" onclick="closeStratModal()" contenteditable="false">✕</button>
+            <button class="strat-modal-close" onclick="closeStratModal()">✕</button>
             <div id="strat-modal-body"></div>
         </div>
     </div>
@@ -245,21 +288,21 @@
         <div class="flex items-center gap-4">
             <span class="font-bold">🛠️ 管理模式</span>
             <div class="format-toolbar" contenteditable="false">
-                <button class="format-btn" onclick="applyFormat('bold')" title="粗體" contenteditable="false"><b>B</b></button>
-                <button class="format-btn" onclick="applyFormat('italic')" title="斜體" contenteditable="false"><i>I</i></button>
-                <button class="format-btn" onclick="applyFormat('strikethrough')" title="刪除線" contenteditable="false"><s>S</s></button>
+                <button class="format-btn" onmousedown="event.preventDefault();applyFormat('bold')" title="粗體" contenteditable="false"><b>B</b></button>
+                <button class="format-btn" onmousedown="event.preventDefault();applyFormat('italic')" title="斜體" contenteditable="false"><i>I</i></button>
+                <button class="format-btn" onmousedown="event.preventDefault();applyFormat('strikethrough')" title="刪除線" contenteditable="false"><s>S</s></button>
                 <div class="format-divider" contenteditable="false"></div>
                 <span style="font-size:11px;opacity:0.7;margin-right:2px" contenteditable="false">顏色：</span>
-                <div class="color-swatch" style="background:#e11d48" onclick="applyFormat('foreColor','#e11d48')" title="紅色" contenteditable="false"></div>
-                <div class="color-swatch" style="background:#f97316" onclick="applyFormat('foreColor','#f97316')" title="橘色" contenteditable="false"></div>
-                <div class="color-swatch" style="background:#eab308" onclick="applyFormat('foreColor','#eab308')" title="黃色" contenteditable="false"></div>
-                <div class="color-swatch" style="background:#22c55e" onclick="applyFormat('foreColor','#22c55e')" title="綠色" contenteditable="false"></div>
-                <div class="color-swatch" style="background:#3b82f6" onclick="applyFormat('foreColor','#3b82f6')" title="藍色" contenteditable="false"></div>
-                <div class="color-swatch" style="background:#a855f7" onclick="applyFormat('foreColor','#a855f7')" title="紫色" contenteditable="false"></div>
-                <div class="color-swatch" style="background:#94a3b8" onclick="applyFormat('foreColor','#94a3b8')" title="灰色" contenteditable="false"></div>
+                <div class="color-swatch" style="background:#e11d48" onmousedown="event.preventDefault();applyFormat('foreColor','#e11d48')" title="紅色" contenteditable="false"></div>
+                <div class="color-swatch" style="background:#f97316" onmousedown="event.preventDefault();applyFormat('foreColor','#f97316')" title="橘色" contenteditable="false"></div>
+                <div class="color-swatch" style="background:#eab308" onmousedown="event.preventDefault();applyFormat('foreColor','#eab308')" title="黃色" contenteditable="false"></div>
+                <div class="color-swatch" style="background:#22c55e" onmousedown="event.preventDefault();applyFormat('foreColor','#22c55e')" title="綠色" contenteditable="false"></div>
+                <div class="color-swatch" style="background:#3b82f6" onmousedown="event.preventDefault();applyFormat('foreColor','#3b82f6')" title="藍色" contenteditable="false"></div>
+                <div class="color-swatch" style="background:#a855f7" onmousedown="event.preventDefault();applyFormat('foreColor','#a855f7')" title="紫色" contenteditable="false"></div>
+                <div class="color-swatch" style="background:#94a3b8" onmousedown="event.preventDefault();applyFormat('foreColor','#94a3b8')" title="灰色" contenteditable="false"></div>
                 <div class="format-divider" contenteditable="false"></div>
-                <button class="format-btn" onclick="insertTip()" title="插入小提醒框" contenteditable="false">💡 提醒</button>
-                <button class="format-btn" onclick="insertNotice()" title="插入注意事項框" contenteditable="false">⚠️ 注意</button>
+                <button class="format-btn" onmousedown="event.preventDefault();insertTip()" title="插入小提醒框" contenteditable="false">💡 提醒</button>
+                <button class="format-btn" onmousedown="event.preventDefault();insertNotice()" title="插入注意事項框" contenteditable="false">⚠️ 注意</button>
             </div>
             <button onclick="openPublishModal()" class="bg-white text-red-600 px-6 py-1.5 font-black rounded-full hover:bg-gray-100 transition-colors shadow-lg" contenteditable="false">儲存並發佈新檔案</button>
             <button onclick="toggleEditMode(false)" class="bg-gray-800 text-white px-4 py-1.5 rounded-full hover:bg-gray-700 transition-colors" contenteditable="false">取消</button>
@@ -642,16 +685,66 @@
         }
 
         // ── 攻略詳情 Modal ────────────────────────────────────────
+        // 目前正在 modal 中編輯的 strat 物件
+        let _activeStrat = null;
+
         function openStratModal(strat) {
+            _activeStrat = strat;
             const modal = document.getElementById('strat-modal');
             const body  = document.getElementById('strat-modal-body');
-            body.innerHTML = `<button class="edit-ui admin-btn admin-btn-delete" style="margin-bottom:16px" onclick="closeStratModal()" contenteditable="false">[x] 關閉</button>` + strat.html;
+            const isEditing = document.body.classList.contains('editing-active');
+
+            // 編輯模式專用工具列
+            const editBar = isEditing ? `
+                <div class="edit-ui" style="display:flex;align-items:center;gap:8px;background:#1e3a5f;padding:10px 14px;border-radius:8px;margin-bottom:16px;flex-wrap:wrap">
+                    <span style="font-size:0.8rem;font-weight:700;color:#93c5fd">✏️ 攻略編輯中</span>
+                    <button class="format-btn" onmousedown="event.preventDefault();applyFormat('bold')" contenteditable="false"><b>B</b></button>
+                    <button class="format-btn" onmousedown="event.preventDefault();applyFormat('italic')" contenteditable="false"><i>I</i></button>
+                    <button class="format-btn" onmousedown="event.preventDefault();applyFormat('strikethrough')" contenteditable="false"><s>S</s></button>
+                    <div class="color-swatch" style="background:#f87171;width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid rgba(255,255,255,0.4)" onmousedown="event.preventDefault();applyFormat('foreColor','#f87171')" title="紅" contenteditable="false"></div>
+                    <div class="color-swatch" style="background:#fb923c;width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid rgba(255,255,255,0.4)" onmousedown="event.preventDefault();applyFormat('foreColor','#fb923c')" title="橘" contenteditable="false"></div>
+                    <div class="color-swatch" style="background:#facc15;width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid rgba(255,255,255,0.4)" onmousedown="event.preventDefault();applyFormat('foreColor','#facc15')" title="黃" contenteditable="false"></div>
+                    <div class="color-swatch" style="background:#4ade80;width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid rgba(255,255,255,0.4)" onmousedown="event.preventDefault();applyFormat('foreColor','#4ade80')" title="綠" contenteditable="false"></div>
+                    <div class="color-swatch" style="background:#60a5fa;width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid rgba(255,255,255,0.4)" onmousedown="event.preventDefault();applyFormat('foreColor','#60a5fa')" title="藍" contenteditable="false"></div>
+                    <div class="color-swatch" style="background:#c084fc;width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid rgba(255,255,255,0.4)" onmousedown="event.preventDefault();applyFormat('foreColor','#c084fc')" title="紫" contenteditable="false"></div>
+                    <button onmousedown="event.preventDefault();insertTip()" class="format-btn" contenteditable="false">💡</button>
+                    <button onmousedown="event.preventDefault();insertNotice()" class="format-btn" contenteditable="false">⚠️</button>
+                    <button onclick="saveStratEdits()" style="background:#16a34a;color:white;border:none;padding:5px 14px;border-radius:6px;font-weight:700;cursor:pointer;margin-left:auto" contenteditable="false">💾 儲存修改</button>
+                </div>` : '';
+
+            body.innerHTML = editBar + strat.html;
+            // 讓內文在編輯模式下可以直接改
+            if (isEditing) {
+                body.setAttribute('contenteditable', 'true');
+                // 不可編輯的 UI 元素 lock
+                body.querySelectorAll('button, input, .edit-ui').forEach(el => el.setAttribute('contenteditable', 'false'));
+            } else {
+                body.removeAttribute('contenteditable');
+            }
             modal.classList.add('open');
             document.body.style.overflow = 'hidden';
         }
+
+        function saveStratEdits() {
+            if (!_activeStrat) return;
+            const body = document.getElementById('strat-modal-body');
+            // Clone body, remove edit UI
+            const clone = body.cloneNode(true);
+            clone.querySelectorAll('.edit-ui').forEach(el => el.remove());
+            const h3 = clone.querySelector('h3');
+            _activeStrat.title = h3 ? h3.innerText.trim() : _activeStrat.title;
+            _activeStrat.html  = clone.innerHTML.trim();
+            // Re-render card in grid
+            initStrategies();
+            const btn = document.querySelector('[onclick="saveStratEdits()"]');
+            if (btn) { btn.textContent = '✅ 已儲存'; setTimeout(() => { if(btn) btn.textContent = '💾 儲存修改'; }, 1500); }
+        }
+
         function closeStratModal() {
             document.getElementById('strat-modal').classList.remove('open');
+            document.getElementById('strat-modal-body').removeAttribute('contenteditable');
             document.body.style.overflow = '';
+            _activeStrat = null;
         }
 
         // ── 初始化指令集 ──────────────────────────────────────────
