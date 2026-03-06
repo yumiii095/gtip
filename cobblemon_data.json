@@ -1,0 +1,743 @@
+{
+  "commands": [
+    {
+      "title": "展示寶可夢 / 展示物品",
+      "color": "text-purple-700",
+      "items": [
+        {
+          "cmd": "寶可夢展示",
+          "desc": "按鍵 C ➜ 寶可夢訊息 ➜ 右鍵寶可夢"
+        },
+        {
+          "cmd": "[i]",
+          "desc": "展示手上拿著的物品"
+        },
+        {
+          "cmd": "[inv]",
+          "desc": "展示個人背包內容"
+        },
+        {
+          "cmd": "[ender]",
+          "desc": "展示末影箱內容"
+        },
+        {
+          "cmd": "@[玩家ID]",
+          "desc": "標記並提醒在線的玩家"
+        }
+      ]
+    },
+    {
+      "title": "傳送 / 系統功能",
+      "color": "text-blue-900",
+      "items": [
+        {
+          "cmd": "/back",
+          "desc": "返回上一個紀錄點或死亡地點"
+        },
+        {
+          "cmd": "/dp",
+          "desc": "開啟地標傳送選單"
+        },
+        {
+          "cmd": "/warps",
+          "desc": "列出伺服器所有公共地標"
+        },
+        {
+          "cmd": "/spawn",
+          "desc": "回到主城 / 重生點"
+        },
+        {
+          "cmd": "/tpa [玩家ID]",
+          "desc": "請求傳送到該玩家位置"
+        },
+        {
+          "cmd": "/tpahere [玩家ID]",
+          "desc": "請求將玩家傳送至自己身旁"
+        }
+      ]
+    },
+    {
+      "title": "HOME 家園紀錄點",
+      "color": "text-blue-900",
+      "items": [
+        {
+          "cmd": "/sethome [名稱]",
+          "desc": "設置一個家園點"
+        },
+        {
+          "cmd": "/home [名稱]",
+          "desc": "傳送至指定家園點"
+        },
+        {
+          "cmd": "/home delete [名稱]",
+          "desc": "刪除指定家園點"
+        },
+        {
+          "cmd": "/homelist",
+          "desc": "查看所有家園點"
+        }
+      ]
+    },
+    {
+      "title": "任務 / 獎勵系統",
+      "color": "text-blue-900",
+      "items": [
+        {
+          "cmd": "/days",
+          "desc": "查看每日任務"
+        },
+        {
+          "cmd": "/vote",
+          "desc": "投票指令"
+        },
+        {
+          "cmd": "/pm",
+          "desc": "線上獎勵"
+        },
+        {
+          "cmd": "/pex",
+          "desc": "圖鑑系統（收集獎勵）"
+        },
+        {
+          "cmd": "/stattrak",
+          "desc": "查看閃光方塊保底次數"
+        },
+        {
+          "cmd": "/ob open",
+          "desc": "打開冰果任務介面"
+        }
+      ]
+    },
+    {
+      "title": "玩家 / 基礎指令",
+      "color": "text-blue-900",
+      "items": [
+        {
+          "cmd": "/wiki [英文名]",
+          "desc": "查看寶可夢資訊與生態域"
+        },
+        {
+          "cmd": "/cos",
+          "desc": "時裝系統"
+        },
+        {
+          "cmd": "/playerinv",
+          "desc": "開啟隨身倉庫"
+        },
+        {
+          "cmd": "/baltop",
+          "desc": "查看金錢排行榜"
+        },
+        {
+          "cmd": "/pvp",
+          "desc": "開關 PvP 功能"
+        },
+        {
+          "cmd": "/suicide",
+          "desc": "角色自殺（脫困用）"
+        },
+        {
+          "cmd": "/banlist",
+          "desc": "查看禁用物品名單"
+        }
+      ]
+    },
+    {
+      "title": "🏠 領地系統指令",
+      "color": "text-green-700",
+      "items": [
+        {
+          "cmd": "/res create [名稱]",
+          "desc": "建立領地"
+        },
+        {
+          "cmd": "/res remove [名稱]",
+          "desc": "移除所選領地"
+        },
+        {
+          "cmd": "/res tp [名稱]",
+          "desc": "回到領地"
+        },
+        {
+          "cmd": "/res tpset",
+          "desc": "設置傳送位置"
+        },
+        {
+          "cmd": "/res expand [格數]",
+          "desc": "擴張領地"
+        },
+        {
+          "cmd": "/res padd [玩家ID]",
+          "desc": "給予該玩家全部權限"
+        },
+        {
+          "cmd": "/res pset [玩家ID]",
+          "desc": "單獨設置該玩家權限"
+        }
+      ],
+      "isResidence": true
+    },
+    {
+      "title": "社交系統指令",
+      "color": "text-blue-900",
+      "items": [
+        {
+          "cmd": "/m [ID] [訊息]",
+          "desc": "私密訊息"
+        },
+        {
+          "cmd": "/r [訊息]",
+          "desc": "回覆最近密語"
+        },
+        {
+          "cmd": "/ignore [ID] [t|f]",
+          "desc": "屏蔽/解除屏蔽"
+        },
+        {
+          "cmd": "/ignorelist",
+          "desc": "查看屏蔽名單"
+        }
+      ]
+    }
+  ],
+  "search_index": [
+    {
+      "type": "strategy",
+      "target": "strat-money",
+      "keywords": "賺錢 金幣 收入 GTS 冰果 投票 幫工 商店 領取",
+      "title": "賺錢小技巧",
+      "desc": "包含冰果、投票、線上獎勵、GTS、幫工與商店收購等技巧。"
+    },
+    {
+      "type": "strategy",
+      "target": "strat-chestshop",
+      "keywords": "箱子商店 設置商店 買賣 賺錢 箱子 木桶 價格 銷售",
+      "title": "如何設置箱子商店？",
+      "desc": "手拿物品左鍵箱子輸入價格即可完成設置。"
+    },
+    {
+      "type": "faq",
+      "target": "faq-1",
+      "keywords": "回血 治療 生命 補血 恢復",
+      "title": "幫寶可夢回血",
+      "desc": "主選單 C/F ➜ 點擊「治療」"
+    },
+    {
+      "type": "faq",
+      "target": "faq-2",
+      "keywords": "搜尋 找 哪裡 生成 wiki 座標 地圖",
+      "title": "尋找特定的寶可夢",
+      "desc": "利用導航、蒐尋器 or /wiki 指令"
+    },
+    {
+      "type": "faq",
+      "target": "faq-3",
+      "keywords": "薄荷 釣竿 幽靈之淚 種子 釣魚 耿鬼 獲取",
+      "title": "常見物品獲取方式",
+      "desc": "薄荷種植、釣竿模板、幽靈之淚來源"
+    },
+    {
+      "type": "faq",
+      "target": "faq-4",
+      "keywords": "傳奇 神獸 幻獸 生成 倒數 時間 二區 3V",
+      "title": "二區傳奇寶可夢生成規則",
+      "desc": "隨機玩家腳下生成，必定 3V"
+    },
+    {
+      "type": "faq",
+      "target": "faq-5",
+      "keywords": "傳說 神獸 精靈方塊 冰果 ob open 線上獎勵 獲得 刷神 stattrak",
+      "title": "獲得傳說寶可夢的其他方式",
+      "desc": "敲精靈方塊 (64次保底) 或完成冰果任務"
+    },
+    {
+      "type": "faq",
+      "target": "faq-6",
+      "keywords": "給別人 交換 照片 轉移 傳送 道具 交易",
+      "title": "把寶可夢給別人",
+      "desc": "透過交換系統 or 照片功能（目前失效）"
+    },
+    {
+      "type": "faq",
+      "target": "faq-7",
+      "keywords": "蓋家 建築 家園世界 領地 洗白 世界 住 房子",
+      "title": "我可以去哪裡蓋家？",
+      "desc": "前往家園世界設置領地，該世界不洗白"
+    },
+    {
+      "type": "newbie",
+      "target": "kb-m",
+      "keywords": "M 御三家 夥伴 隊伍 資訊",
+      "title": "快捷鍵 M",
+      "desc": "領夥伴/查看隊伍資訊"
+    },
+    {
+      "type": "newbie",
+      "target": "kb-r",
+      "keywords": "R 叫出 收回 召喚",
+      "title": "快捷鍵 R",
+      "desc": "叫出或收回寶可夢"
+    },
+    {
+      "type": "newbie",
+      "target": "kb-shift",
+      "keywords": "shift 右鍵 攜帶 道具 裝備",
+      "title": "快捷鍵 Shift + 右鍵",
+      "desc": "讓寶可夢攜帶或拿取道具"
+    },
+    {
+      "type": "newbie",
+      "target": "kb-cf",
+      "keywords": "C F 菜單 選單 治療 地標 任務",
+      "title": "快捷鍵 C / F",
+      "desc": "開啟伺服器功能菜單"
+    },
+    {
+      "type": "newbie",
+      "target": "kb-u",
+      "keywords": "U JEI 物品 用途 合成",
+      "title": "快捷鍵 U",
+      "desc": "查看物品用途 (JEI)"
+    },
+    {
+      "type": "newbie",
+      "target": "kb-o",
+      "keywords": "O JEI 清單 物品欄 隱藏 顯示",
+      "title": "快捷鍵 O",
+      "desc": "隱藏或顯示 JEI 物品查詢清單"
+    },
+    {
+      "type": "newbie",
+      "target": "kb-arrows",
+      "keywords": "上 下 方向鍵 切換 隊伍 派出",
+      "title": "快捷鍵 ↑ ↓",
+      "desc": "切換要派出的寶可夢"
+    },
+    {
+      "type": "tutorial",
+      "target": "tut-newbie-guide",
+      "keywords": "開局 福利 御三家 冒險 新手福利",
+      "title": "新手開局指南",
+      "desc": "領取福利、選擇御三家與升級指南。"
+    },
+    {
+      "type": "tutorial",
+      "target": "tut-server-info",
+      "keywords": "區域 世界 主城 家園 冒險 地獄 終界 洗白 神獸",
+      "title": "伺服器五大區域",
+      "desc": "各個世界的規則與神獸刷新機制。"
+    },
+    {
+      "type": "tutorial",
+      "target": "tut-3",
+      "keywords": "領地 鋤頭 保護 圈地 房子 洗白 蓋家 家園世界",
+      "title": "保護你的家園 (領地)",
+      "desc": "只能在家園世界建立領地"
+    },
+    {
+      "type": "strategy",
+      "target": "strat-breeding",
+      "keywords": "孵蛋 繁殖 牧場 蛋群 紅線 性格 遺傳 鎖V 力量",
+      "title": "孵蛋教學",
+      "desc": "寶可夢繁殖條件、遺傳規則與道具介紹"
+    },
+    {
+      "type": "strategy",
+      "target": "strat-stats",
+      "keywords": "個體值 努力值 IV EV 31 V 數值 訓練場 等級 練功",
+      "title": "個體與努力值",
+      "desc": "查詢IV與努力值練習場指南"
+    },
+    {
+      "type": "strategy",
+      "target": "strat-nature",
+      "keywords": "性格 性格表 加成 性格用途 性格推薦",
+      "title": "性格對照表",
+      "desc": "性格加成與推薦用途"
+    },
+    {
+      "type": "commands",
+      "target": "寶可夢展示",
+      "keywords": "寶可夢展示 展示 分享 秀",
+      "title": "寶可夢展示",
+      "desc": "按鍵 C ➜ 寶可夢訊息 ➜ 右鍵寶可夢",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "[i]",
+      "keywords": "[i] 展示物品 手持 顯示",
+      "title": "[i]",
+      "desc": "展示手上拿著的物品",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "[inv]",
+      "keywords": "[inv] 背包 物品欄 展示背包",
+      "title": "[inv]",
+      "desc": "展示個人背包內容",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "[ender]",
+      "keywords": "[ender] 末影箱 展示末影",
+      "title": "[ender]",
+      "desc": "展示末影箱內容",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "@[玩家ID]",
+      "keywords": "@ 標記 提醒 tag 玩家",
+      "title": "@[玩家ID]",
+      "desc": "標記並提醒在線的玩家",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/back",
+      "keywords": "/back 返回 上一個 死亡 紀錄點 回去",
+      "title": "/back",
+      "desc": "返回上一個紀錄點或死亡地點",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/dp",
+      "keywords": "/dp 地標 傳送 選單 地點",
+      "title": "/dp",
+      "desc": "開啟地標傳送選單",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/warps",
+      "keywords": "/warps 地標 清單 公共 傳送點",
+      "title": "/warps",
+      "desc": "列出伺服器所有公共地標",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/spawn",
+      "keywords": "/spawn 主城 重生點 回城 出生點",
+      "title": "/spawn",
+      "desc": "回到主城 / 重生點",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/tpa [玩家ID]",
+      "keywords": "/tpa 傳送 玩家 請求 去找",
+      "title": "/tpa [玩家ID]",
+      "desc": "請求傳送到該玩家位置",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/tpahere [玩家ID]",
+      "keywords": "/tpahere 傳送 玩家 過來 召喚",
+      "title": "/tpahere [玩家ID]",
+      "desc": "請求將玩家傳送至自己身旁",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/sethome [名稱]",
+      "keywords": "/sethome 設置 家園點 設家 home",
+      "title": "/sethome [名稱]",
+      "desc": "設置一個家園點",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/home [名稱]",
+      "keywords": "/home 回家 家園點 傳送 home",
+      "title": "/home [名稱]",
+      "desc": "傳送至指定家園點",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/home delete [名稱]",
+      "keywords": "/home delete 刪除 家園點 移除 home",
+      "title": "/home delete [名稱]",
+      "desc": "刪除指定家園點",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/homelist",
+      "keywords": "/homelist 查看 家園點 清單 列表",
+      "title": "/homelist",
+      "desc": "查看所有家園點",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/days",
+      "keywords": "/days 每日任務 日任 任務",
+      "title": "/days",
+      "desc": "查看每日任務",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/vote",
+      "keywords": "/vote 投票 積分 金幣 赚",
+      "title": "/vote",
+      "desc": "投票指令",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/pm",
+      "keywords": "/pm 線上獎勵 在線 獎勵 領取",
+      "title": "/pm",
+      "desc": "線上獎勵",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/pex",
+      "keywords": "/pex 圖鑑 收集 獎勵 pokedex",
+      "title": "/pex",
+      "desc": "圖鑑系統（收集獎勵）",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/stattrak",
+      "keywords": "/stattrak 閃光方塊 保底 次數 精靈方塊 stattrak",
+      "title": "/stattrak",
+      "desc": "查看閃光方塊保底次數",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/ob open",
+      "keywords": "/ob open 冰果 任務 ob 冰果任務",
+      "title": "/ob open",
+      "desc": "打開冰果任務介面",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/wiki [英文名]",
+      "keywords": "/wiki 查詢 寶可夢 資訊 生態域 出沒",
+      "title": "/wiki [英文名]",
+      "desc": "查看寶可夢資訊與生態域",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/cos",
+      "keywords": "/cos 時裝 外觀 皮膚 服裝",
+      "title": "/cos",
+      "desc": "時裝系統",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/playerinv",
+      "keywords": "/playerinv 隨身倉庫 背包 倉庫 儲存",
+      "title": "/playerinv",
+      "desc": "開啟隨身倉庫",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/baltop",
+      "keywords": "/baltop 金錢 排行榜 有錢 富豪",
+      "title": "/baltop",
+      "desc": "查看金錢排行榜",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/pvp",
+      "keywords": "/pvp 開關 玩家對戰 pvp 戰鬥",
+      "title": "/pvp",
+      "desc": "開關 PvP 功能",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/suicide",
+      "keywords": "/suicide 自殺 脫困 卡住 重生",
+      "title": "/suicide",
+      "desc": "角色自殺（脫困用）",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/banlist",
+      "keywords": "/banlist 禁用 物品 名單 ban",
+      "title": "/banlist",
+      "desc": "查看禁用物品名單",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/res create [名稱]",
+      "keywords": "/res create 建立 領地 圈地 保護",
+      "title": "/res create [名稱]",
+      "desc": "建立領地",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/res remove [名稱]",
+      "keywords": "/res remove 移除 刪除 領地",
+      "title": "/res remove [名稱]",
+      "desc": "移除所選領地",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/res tp [名稱]",
+      "keywords": "/res tp 傳送 領地 回家",
+      "title": "/res tp [名稱]",
+      "desc": "回到領地",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/res tpset",
+      "keywords": "/res tpset 傳送點 設置 領地",
+      "title": "/res tpset",
+      "desc": "設置傳送位置",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/res expand [格數]",
+      "keywords": "/res expand 擴張 領地 擴大",
+      "title": "/res expand [格數]",
+      "desc": "擴張領地",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/res padd [玩家ID]",
+      "keywords": "/res padd 權限 好友 玩家 全部",
+      "title": "/res padd [玩家ID]",
+      "desc": "給予該玩家全部權限",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/res pset [玩家ID]",
+      "keywords": "/res pset 權限 玩家 單獨 設置",
+      "title": "/res pset [玩家ID]",
+      "desc": "單獨設置該玩家權限",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/m [ID] [訊息]",
+      "keywords": "/m 私訊 密語 傳訊息 私信",
+      "title": "/m [ID] [訊息]",
+      "desc": "私密訊息",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/r [訊息]",
+      "keywords": "/r 回覆 密語 私訊 reply",
+      "title": "/r [訊息]",
+      "desc": "回覆最近密語",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/ignore [ID] [t|f]",
+      "keywords": "/ignore 屏蔽 封鎖 忽略 玩家",
+      "title": "/ignore [ID] [t|f]",
+      "desc": "屏蔽/解除屏蔽",
+      "isCommand": true
+    },
+    {
+      "type": "commands",
+      "target": "/ignorelist",
+      "keywords": "/ignorelist 屏蔽名單 封鎖清單",
+      "title": "/ignorelist",
+      "desc": "查看屏蔽名單",
+      "isCommand": true
+    },
+    {
+      "type": "strategy",
+      "target": "strat-mega-z-dmax-tera",
+      "keywords": "mega超級進化 超級進化石 白鑰石 彩色鑰石 超級手環 多功能手環 鑰石 隕石",
+      "title": "Mega 超級進化材料獲取",
+      "desc": "白鑰石(Y=5~-11)、彩色鑰石(Y=-20~-30)、超級手環合成方式"
+    },
+    {
+      "type": "strategy",
+      "target": "strat-mega-z-dmax-tera",
+      "keywords": "極巨化 許願星 極巨菇 極巨湯 甜味極巨湯 極巨糖果 能量場 極巨手腕",
+      "title": "極巨化材料獲取",
+      "desc": "許願星、極巨菇、能量場、極巨湯、極巨糖果等材料來源"
+    },
+    {
+      "type": "strategy",
+      "target": "strat-mega-z-dmax-tera",
+      "keywords": "太晶化 太晶碎片 太晶球 終界珍珠 烈焰粉 羊毛",
+      "title": "太晶化材料獲取",
+      "desc": "太晶碎片、太晶球材料來源整理"
+    },
+    {
+      "type": "strategy",
+      "target": "strat-mega-z-dmax-tera",
+      "keywords": "Z招式 Z結晶 空白Z結晶 閃耀之石 Z手環 廢棄天文台 試煉密室",
+      "title": "Z 招式材料獲取",
+      "desc": "閃耀之石(沙漠考古)、空白Z結晶(廢棄天文台/試煉密室)"
+    },
+    {
+      "type": "strategy",
+      "target": "strat-mega-z-dmax-tera",
+      "keywords": "小智帽 小智甲賀忍蛙 小智皮卡丘 好感度 綠色染料 仙人掌 綠球果樹",
+      "title": "小智帽獲取與啟動方式",
+      "desc": "好感度≥200、綠色染料來源、啟動條件與注意事項"
+    }
+  ],
+  "strategies": [
+    {
+      "id": "strat-money",
+      "title": "💰 賺錢小技巧",
+      "class": "class=\"bg-white border shadow-sm p-8 relative\"",
+      "html": "<h3 class=\"text-2xl font-bold text-purple-900 mb-6 flex items-center\">💰 賺錢小技巧</h3>\n                    <div class=\"space-y-6 text-gray-700 leading-relaxed\">\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">1. 解冰果</p>\n                            <p>按C開啟選單➡️ 左方點選最新資訊➡️ 打開冰果任務（或/ob open ）</p>\n                        </div>\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">2. 投票赚金幣</p>\n                            <p>在主城輸入/vote 到網站後輸入ID驗證就可以拿投票積分 1點積分可以兌換300 或是兌換其他好物（百變怪）每日都可以投1票</p>\n                        </div>\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">3.線上獎勵赚金幣</p>\n                            <p>輸入/pm 可以觀看線上獎勵 點擊領取到郵箱領出來就可以了</p>\n                        </div>\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">4.全球市場（GTS)</p>\n                            <p>可以把自己的寶可夢或物品出售上去<br>（有毅力可以找個村莊刷個修補村民）</p>\n                        </div>\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">5.幫工</p>\n                            <p>伺服器有時會有玩家招工人（可能幫忙蓋房子挖石頭）</p>\n                        </div>\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">6.商店收購</p>\n                            <p>有些玩家商店會收購材料或方塊，可以蒐集需要的物品至玩家商店販售</p>\n                        </div>\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">7.設置箱子商店</p>\n                            <p>可以透過「<a href=\"javascript:void(0)\" onclick=\"navigateToResult('strategy', 'strat-chestshop', false)\" class=\"text-blue-500 underline hover:text-blue-700 font-bold\">箱子商店</a>」建立自己的自動化店面。</p>\n                        </div>\n                    </div>"
+    },
+    {
+      "id": "strat-chestshop",
+      "title": "📦 如何設置箱子商店？",
+      "class": "class=\"bg-white border shadow-sm p-8 relative\"",
+      "html": "<h3 class=\"text-2xl font-bold text-purple-900 mb-6 flex items-center\">📦 如何設置箱子商店？</h3>\n                    <div class=\"space-y-4 text-gray-700 leading-relaxed\">\n                        <p>放置一個箱子或木桶</p>\n                        <p>右手拿著想要販售的物品，對著箱子按左鍵，聊天欄會跑出提示，依照提示直接輸入價格數字就設置完成了。</p>\n                        <p class=\"bg-red-50 p-4 border-l-4 border-red-500 text-red-700 font-bold\">⚠️ 如果還沒設置完跑開會自動取消設置</p>\n                    </div>"
+    },
+    {
+      "id": "strat-breeding",
+      "title": "🥚 孵蛋教學",
+      "class": "class=\"bg-white border shadow-sm p-8 relative\"",
+      "html": "<h3 class=\"text-2xl font-bold text-purple-900 mb-6 flex items-center\">🥚 孵蛋教學</h3>\n                    <div class=\"mb-8\">\n                        <h4 class=\"text-lg font-bold text-blue-800 border-l-4 border-blue-500 pl-3 mb-4\">繁殖基本條件</h4>\n                        <div class=\"space-y-3 text-gray-700 leading-relaxed\">\n                            <p>進行寶可夢繁殖前，請先確認以下條件：</p>\n                            <ul class=\"list-disc ml-6 space-y-2\">\n                                <li>必須有一隻公寶可夢＋一隻母寶可夢</li>\n                                <li>兩隻寶可夢需屬於 相同蛋群（蛋種）</li>\n                                <li>蛋群查詢網站：<a href=\"https://wiki.52poke.com/wiki/%E6%80%AA%E5%85%BD%EF%BC%88%E8%9B%8B%E7%BE%A4%EF%BC%89\" target=\"_blank\" class=\"text-blue-500 underline hover:text-blue-700\">神奇寶貝百科</a></li>\n                                <li>將兩隻寶可夢放入 牧場（點開牧場介面將一公一母放進去即可開始生蛋）</li>\n                                <li class=\"text-red-600 font-bold\">⚠️ 要記得牧場介面右上角孵蛋開關要打開（預設為關閉）</li>\n                            </ul>\n                        </div>\n                    </div>\n                    <div class=\"mb-8\">\n                        <h4 class=\"text-lg font-bold text-blue-800 border-l-4 border-blue-500 pl-3 mb-4\">繁殖知識說明</h4>\n                        <div class=\"space-y-4\">\n                            <div class=\"bg-gray-50 p-4 rounded border\">\n                                <p class=\"font-bold text-gray-800 mb-1\">蛋生成時間</p>\n                                <p class=\"text-gray-600\">• 每 10 分鐘有 <strong>50% 機率</strong> 生成 1 顆蛋</p>\n                                <p class=\"text-gray-600\">• 有機率生出壞蛋，所以有些蛋孵出來數值會莫名很低。</p>\n                            </div>\n                            <div class=\"grid grid-cols-1 md:grid-cols-2 gap-4\">\n                                <div class=\"border p-4\">\n                                    <p class=\"font-bold text-red-600 mb-2\">🔴 紅線</p>\n                                    <p class=\"text-sm text-gray-600\">子代 6 項個體值中，會隨機繼承父母的 <strong>5 項</strong>。</p>\n                                </div>\n                                <div class=\"border p-4\">\n                                    <p class=\"font-bold text-gray-600 mb-2\">⚪ 不變之石</p>\n                                    <p class=\"text-sm text-gray-600\">子代 <strong>性格 100% 繼承</strong> 該攜帶者的性格。</p>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                    <div>\n                        <h4 class=\"text-lg font-bold text-blue-800 border-l-4 border-blue-500 pl-3 mb-4\">六大「鎖V」道具（個體值繼承）</h4>\n                        <div class=\"grid grid-cols-2 md:grid-cols-3 gap-3\">\n                            <div class=\"p-3 bg-blue-50 border border-blue-100 rounded text-center\"><p class=\"font-bold text-blue-900\">力量負重</p><p class=\"text-xs\">遺傳 HP</p></div>\n                            <div class=\"p-3 bg-blue-50 border border-blue-100 rounded text-center\"><p class=\"font-bold text-blue-900\">力量護腕</p><p class=\"text-xs\">遺傳 攻擊</p></div>\n                            <div class=\"p-3 bg-blue-50 border border-blue-100 rounded text-center\"><p class=\"font-bold text-blue-900\">力量腰帶</p><p class=\"text-xs\">遺傳 防禦</p></div>\n                            <div class=\"p-3 bg-blue-50 border border-blue-100 rounded text-center\"><p class=\"font-bold text-blue-900\">力量鏡</p><p class=\"text-xs\">遺傳 特攻</p></div>\n                            <div class=\"p-3 bg-blue-50 border border-blue-100 rounded text-center\"><p class=\"font-bold text-blue-900\">力量束帶</p><p class=\"text-xs\">遺傳 特防</p></div>\n                            <div class=\"p-3 bg-blue-50 border border-blue-100 rounded text-center\"><p class=\"font-bold text-blue-900\">力量護踝</p><p class=\"text-xs\">遺傳 速度</p></div>\n                        </div>\n                    </div>"
+    },
+    {
+      "id": "strat-stats",
+      "title": "📊 個體值 (IVs) 與努力值 (EVs)",
+      "class": "class=\"bg-white border shadow-sm p-8 relative\"",
+      "html": "<h3 class=\"text-2xl font-bold text-blue-900 mb-6 flex items-center\">📊 個體值 (IVs) 與努力值 (EVs)</h3>\n                    <div class=\"mb-8\">\n                        <h4 class=\"text-lg font-bold text-blue-800 border-l-4 border-blue-500 pl-3 mb-4\">個體值 (IVs) - 天生潛力</h4>\n                        <p class=\"text-gray-700 mb-4\">每項數值最高為 31，也就是俗稱的 <strong>\"V\"</strong>。6項全部31即為 6V。</p>\n                        <div class=\"bg-blue-50 p-4 border rounded\">\n                            <p class=\"font-bold mb-2\">如何查看？</p>\n                            <p class=\"text-sm\">在隊伍選單中對寶可夢點擊 <kbd contenteditable=\"false\">M</kbd> 查看詳細資訊，切換至「數值」分頁即可看到 0~31 的數字。</p>\n                        </div>\n                    </div>\n                    <div>\n                        <h4 class=\"text-lg font-bold text-blue-800 border-l-4 border-blue-500 pl-3 mb-4\">努力值 (EVs) - 後天訓練</h4>\n                        <p class=\"text-gray-700 mb-2\">單項上限 252，全項總計上限 510。每 4 點努力值可增加 1 點實質數值。</p>\n                        <div class=\"mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400\">\n                            <p class=\"text-gray-800 font-bold\">💡 小提醒：</p>\n                            <p class=\"text-gray-700 mt-1 text-lg\">按 <kbd class=\"bg-white px-2 border\" contenteditable=\"false\">C</kbd> 選擇 EVS 訓練可至訓練場練<span class=\"text-red-600 bg-yellow-200 px-1 font-black\">等級</span>及<span class=\"text-blue-700 bg-yellow-200 px-1 font-black\">努力值</span>。</p>\n                        </div>\n                    </div>"
+    },
+    {
+      "id": "strat-nature",
+      "title": "🎭 性格加成對照表",
+      "class": "class=\"bg-white border shadow-sm p-8 relative\"",
+      "html": "<h3 class=\"text-2xl font-bold text-green-900 mb-6 flex items-center\">🎭 性格加成對照表</h3>\n                    <p class=\"text-gray-700 mb-4\">性格會影響兩項數值，一項增加 10% (紅色)，一項減少 10% (藍色)。</p>\n                    <div class=\"overflow-x-auto\">\n                        <table class=\"w-full text-center text-sm border-collapse border border-gray-200\">\n                            <thead><tr class=\"bg-green-100 font-bold\">\n                                <th class=\"border p-2\">性格</th><th class=\"border p-2\">增加 (1.1x)</th><th class=\"border p-2\">減少 (0.9x)</th><th class=\"border p-2\">推薦用途</th>\n                            </tr></thead>\n                            <tbody>\n                                <tr><td class=\"border p-2 font-bold\">固執 (Adamant)</td><td class=\"border p-2 text-red-600\">攻擊</td><td class=\"border p-2 text-blue-600\">特攻</td><td class=\"border p-2\">物攻手</td></tr>\n                                <tr><td class=\"border p-2 font-bold\">內斂 (Modest)</td><td class=\"border p-2 text-red-600\">特攻</td><td class=\"border p-2 text-blue-600\">攻擊</td><td class=\"border p-2\">特攻手</td></tr>\n                                <tr><td class=\"border p-2 font-bold\">爽朗 (Jolly)</td><td class=\"border p-2 text-red-600\">速度</td><td class=\"border p-2 text-blue-600\">特攻</td><td class=\"border p-2\">高速物攻手</td></tr>\n                                <tr><td class=\"border p-2 font-bold\">膽小 (Timid)</td><td class=\"border p-2 text-red-600\">速度</td><td class=\"border p-2 text-blue-600\">攻擊</td><td class=\"border p-2\">高速特攻手</td></tr>\n                                <tr><td class=\"border p-2 font-bold\">大膽 (Bold)</td><td class=\"border p-2 text-red-600\">防禦</td><td class=\"border p-2 text-blue-600\">攻擊</td><td class=\"border p-2\">物理肉盾</td></tr>\n                            </tbody>\n                        </table>\n                    </div>"
+    },
+    {
+      "id": "strat-mega-z-dmax-tera",
+      "title": "✨ 傳說中的超級進化、Z、極巨化、太晶化材料與小智帽獲取方式",
+      "html": "<h3 class=\"text-2xl font-bold text-purple-900 mb-2 flex items-center\">✨ 傳說中的超級進化、Z、極巨化、太晶化材料與小智帽獲取方式</h3>\n<p class=\"text-xs text-gray-400 mb-6 border-l-4 border-gray-200 pl-3\">\n    本攻略資料來自玩家社群分享，本站進行整理與修改。<br>\n    原作者：♚伊比利小豬♚ ／\n    <a href=\"https://discord.com/channels/1088052757350596608/1447965630639771738\" target=\"_blank\" class=\"text-blue-400 underline hover:text-blue-600\">來源連結</a><br>\n    若原作者不希望本站收錄，請聯絡我們，將立即移除。\n</p>\n\n<div class=\"space-y-10 text-gray-700 leading-relaxed\">\n\n    <!-- 一、Mega 超級進化 -->\n    <div>\n        <h4 class=\"text-lg font-bold text-purple-800 border-l-4 border-purple-400 pl-3 mb-4\">⚡ 一、Mega 超級進化</h4>\n        <div class=\"space-y-4\">\n\n            <div class=\"bg-gray-50 border rounded p-4\">\n                <p class=\"font-bold text-blue-800 mb-2\">1️⃣ 未加工超級進化石（白鑰石）</p>\n                <ul class=\"list-disc ml-5 space-y-1 text-sm\">\n                    <li><strong>生成位置：</strong>地下 Y=5 ~ Y=-11</li>\n                    <li>觀察小地圖，找到 <strong>立方體結構 + 中間黑紫色球體</strong></li>\n                    <li>挖到球體中心找到水晶，需使用 <strong>鑽石鎬</strong></li>\n                </ul>\n                <p class=\"text-xs text-gray-500 mt-2\">✅ 用途：製作各種寶可夢專屬 Mega 進化石（部分材料可在大廳寶可夢商店購買）</p>\n            </div>\n\n            <div class=\"bg-gray-50 border rounded p-4\">\n                <p class=\"font-bold text-blue-800 mb-2\">2️⃣ 已加工超級進化石（彩色鑰石）</p>\n                <ul class=\"list-disc ml-5 space-y-1 text-sm\">\n                    <li><strong>生成位置：</strong>地下 Y=-20 ~ Y=-30</li>\n                    <li>挖隕石球中心，需使用 <strong>鑽石鎬</strong></li>\n                </ul>\n                <p class=\"text-xs text-gray-500 mt-2\">✅ 用途：製作超級手環</p>\n            </div>\n\n            <div class=\"bg-blue-50 border border-blue-100 rounded p-4\">\n                <p class=\"font-bold text-blue-800 mb-2\">3️⃣ 鑰石其他取得方式</p>\n                <ul class=\"list-disc ml-5 space-y-1 text-sm\">\n                    <li>大廳 GTS 旁扭蛋機（祈願之星）</li>\n                    <li>使用 <strong>每日任務券</strong> 兌換祈願之星鑰匙（機率極低）</li>\n                    <li>大廳補給站有機率獲得已加工鑰石</li>\n                </ul>\n            </div>\n\n            <div class=\"bg-purple-50 border border-purple-100 rounded p-4\">\n                <p class=\"font-bold text-purple-800 mb-2\">4️⃣ 超級手環</p>\n                <p class=\"text-sm mb-2\">手環有多種製作方式（Mega 手環、多功能手環等）</p>\n                <div class=\"bg-white border border-purple-200 rounded p-3\">\n                    <p class=\"font-bold text-sm text-purple-700 mb-1\">🌟 多功能手環效果</p>\n                    <p class=\"text-sm\">可同時使用：<strong>Mega 進化 ／ 極巨化 ／ Z 招式 ／ 太晶化</strong></p>\n                    <p class=\"text-xs text-red-600 font-bold mt-1\">⚠️ 材料非常稀有，製作難度極高</p>\n                </div>\n            </div>\n        </div>\n    </div>\n\n    <!-- 二、極巨化 -->\n    <div>\n        <h4 class=\"text-lg font-bold text-red-800 border-l-4 border-red-400 pl-3 mb-4\">🔴 二、極巨化</h4>\n        <div class=\"space-y-4\">\n\n            <div class=\"bg-gray-50 border rounded p-4\">\n                <p class=\"font-bold text-blue-800 mb-2\">1️⃣ 許願星（目前非常稀有）</p>\n                <ul class=\"list-disc ml-5 space-y-1 text-sm\">\n                    <li>幾乎無玩家在商店販售</li>\n                    <li>可能出現在原版麥塊 <strong>黑森林 / 不祥森林遺跡</strong></li>\n                </ul>\n                <p class=\"text-xs text-gray-500 mt-2\">✅ 用途：製作極巨手腕、能量場</p>\n            </div>\n\n            <div class=\"bg-gray-50 border rounded p-4\">\n                <p class=\"font-bold text-blue-800 mb-2\">2️⃣ 極巨菇</p>\n                <ul class=\"list-disc ml-5 space-y-1 text-sm\">\n                    <li>出現在原版 <strong>蒼鬱洞窟</strong></li>\n                    <li>採取後可在 <strong>苔蘚方塊</strong> 上種植培育</li>\n                    <li class=\"text-green-700\">備註：3 區也有出現</li>\n                </ul>\n            </div>\n\n            <div class=\"bg-yellow-50 border border-yellow-200 rounded p-4 space-y-2 text-sm\">\n                <p><span class=\"font-bold\">3️⃣ 使用條件：</span>必須先在場上設置 <strong>能量場</strong></p>\n                <p><span class=\"font-bold\">4️⃣ 極巨湯：</span>喝完 <strong>不是永久效果</strong>，對戰前需確認寶可夢是否處於可極巨化狀態</p>\n                <p><span class=\"font-bold\">5️⃣ 特殊寶可夢：</span>部分寶可夢需要 <strong>甜味極巨湯</strong>，而非普通極巨湯</p>\n                <p><span class=\"font-bold\">6️⃣ 極巨糖果：</span>1 糖果 = 1 等級，最高 10 等，可強化極巨能力</p>\n            </div>\n        </div>\n    </div>\n\n    <!-- 三、太晶化 -->\n    <div>\n        <h4 class=\"text-lg font-bold text-blue-800 border-l-4 border-blue-400 pl-3 mb-4\">💎 三、太晶化</h4>\n        <div class=\"space-y-4\">\n            <div class=\"bg-gray-50 border rounded p-4\">\n                <p class=\"font-bold text-blue-800 mb-2\">1️⃣ 太晶碎片</p>\n                <p class=\"text-sm\">與野生寶可夢對戰，有機率掉落各屬性太晶碎片</p>\n            </div>\n            <div class=\"bg-gray-50 border rounded p-4\">\n                <p class=\"font-bold text-blue-800 mb-2\">2️⃣ 太晶球材料</p>\n                <ul class=\"list-disc ml-5 space-y-1 text-sm\">\n                    <li><strong>終界珍珠：</strong>終界 安德、未知圖騰掉落物</li>\n                    <li><strong>烈焰粉：</strong>地獄 烈焰使者生怪磚</li>\n                    <li><strong>羊毛：</strong>綿羊寶可夢</li>\n                </ul>\n                <p class=\"text-xs text-gray-400 mt-2\">感謝 Life_0901 玩家補充</p>\n            </div>\n        </div>\n    </div>\n\n    <!-- 四、Z招式 -->\n    <div>\n        <h4 class=\"text-lg font-bold text-yellow-700 border-l-4 border-yellow-400 pl-3 mb-4\">⚡ 四、Z 招式</h4>\n        <p class=\"text-xs text-orange-600 font-bold mb-3\">⚠️ 目前伺服器是否存在尚未完全確認</p>\n        <div class=\"space-y-4\">\n            <div class=\"bg-gray-50 border rounded p-4\">\n                <p class=\"font-bold text-blue-800 mb-2\">1️⃣ 閃耀之石</p>\n                <ul class=\"list-disc ml-5 space-y-1 text-sm\">\n                    <li>出現在 <strong>沙漠考古遺跡</strong></li>\n                    <li>用途：製作 Z 手環</li>\n                </ul>\n            </div>\n            <div class=\"bg-gray-50 border rounded p-4\">\n                <p class=\"font-bold text-blue-800 mb-2\">2️⃣ 空白 Z 結晶</p>\n                <ul class=\"list-disc ml-5 space-y-1 text-sm\">\n                    <li><strong>方式一：</strong>叢林 / 平原地形極低機率出現 <strong>廢棄天文台</strong>（銅磚建築，頂樓展示框必定有空白 Z 結晶）</li>\n                    <li><strong>方式二：</strong>試煉密室有機率取得</li>\n                </ul>\n            </div>\n        </div>\n    </div>\n\n    <!-- 五、小智帽 -->\n    <div>\n        <h4 class=\"text-lg font-bold text-green-800 border-l-4 border-green-400 pl-3 mb-4\">🧢 五、小智帽</h4>\n        <div class=\"space-y-4\">\n            <div class=\"bg-gray-50 border rounded p-4\">\n                <p class=\"font-bold text-blue-800 mb-2\">1️⃣ 小智甲賀忍蛙</p>\n                <ul class=\"list-disc ml-5 space-y-1 text-sm\">\n                    <li>啟動條件：<strong>好感度 ≥ 200</strong></li>\n                    <li>製作材料：羊毛 + 綠色染料</li>\n                    <li>綠色染料來源：仙人掌（沙漠）或綠球果樹（2 區 / 3 區，非常稀有）放入熔爐燒製</li>\n                    <li>製作後：<strong>右鍵點擊甲賀忍蛙</strong>即可啟動</li>\n                </ul>\n            </div>\n            <div class=\"bg-gray-50 border rounded p-4\">\n                <p class=\"font-bold text-blue-800 mb-2\">2️⃣ 小智皮卡丘</p>\n                <ul class=\"list-disc ml-5 space-y-1 text-sm\">\n                    <li>啟動條件：<strong>好感度 ≥ 200</strong></li>\n                    <li>效果：可使用小智皮卡丘 Z 招式</li>\n                </ul>\n                <div class=\"mt-2 p-2 bg-red-50 border border-red-200 rounded text-sm text-red-700\">\n                    ⚠️ 若皮卡丘有極巨化或太晶化效果，Z 招式將無法使用，必須先移除 Z 結晶\n                </div>\n            </div>\n        </div>\n    </div>\n\n    <!-- 六、實用小技巧 -->\n    <div class=\"bg-blue-50 border border-blue-200 rounded p-5\">\n        <h4 class=\"font-bold text-blue-900 mb-3\">💡 六、實用小技巧</h4>\n        <p class=\"text-sm mb-2\">不知道物品怎麼合成？</p>\n        <ol class=\"list-decimal ml-5 space-y-1 text-sm text-blue-800 font-bold\">\n            <li>按 <kbd style=\"background:#e0ecff;border:1px solid #93c5fd;border-radius:4px;padding:1px 6px;font-size:0.8rem\">E</kbd> 打開背包</li>\n            <li>找右側 <strong>搜尋欄</strong></li>\n            <li>輸入物品名稱</li>\n            <li>即可查看合成配方</li>\n        </ol>\n    </div>\n\n</div>"
+    }
+  ]
+}
