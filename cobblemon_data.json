@@ -669,38 +669,38 @@
     },
     {
       "type": "strategy",
-      "target": "strat-mega-z-dmax-tera",
-      "keywords": "mega超級進化 超級進化石 白鑰石 彩色鑰石 超級手環 多功能手環 鑰石 隕石",
-      "title": "Mega 超級進化材料獲取",
-      "desc": "白鑰石(Y=5~-11)、彩色鑰石(Y=-20~-30)、超級手環合成方式"
+      "target": "strat-mega",
+      "keywords": "超級進化 mega 鑰石 超級手環 白鑰石 彩色鑰石 隕石 祈願之星 多功能手環 進化石 GTS 扭蛋",
+      "title": "Mega 超級進化材料獲取方式",
+      "desc": "鑰石挖掘位置、鑰石其他取得方式、超級手環製作。"
     },
     {
       "type": "strategy",
-      "target": "strat-mega-z-dmax-tera",
-      "keywords": "極巨化 許願星 極巨菇 極巨湯 甜味極巨湯 極巨糖果 能量場 極巨手腕",
-      "title": "極巨化材料獲取",
-      "desc": "許願星、極巨菇、能量場、極巨湯、極巨糖果等材料來源"
+      "target": "strat-dmax",
+      "keywords": "極巨化 dmax 許願星 極巨菇 能量場 極巨湯 極巨手腕 極巨糖果 蒼鬱洞窟 苔蘚方塊",
+      "title": "極巨化材料獲取方式",
+      "desc": "許願星、極巨菇取得方式、使用條件與極巨湯說明。"
     },
     {
       "type": "strategy",
-      "target": "strat-mega-z-dmax-tera",
-      "keywords": "太晶化 太晶碎片 太晶球 終界珍珠 烈焰粉 羊毛",
-      "title": "太晶化材料獲取",
-      "desc": "太晶碎片、太晶球材料來源整理"
+      "target": "strat-tera",
+      "keywords": "太晶化 tera 太晶碎片 太晶球 終界珍珠 烈焰粉 羊毛 屬性",
+      "title": "太晶化材料獲取方式",
+      "desc": "太晶碎片來源、太晶球材料（終界珍珠、烈焰粉、羊毛）。"
     },
     {
       "type": "strategy",
-      "target": "strat-mega-z-dmax-tera",
-      "keywords": "Z招式 Z結晶 空白Z結晶 閃耀之石 Z手環 廢棄天文台 試煉密室",
-      "title": "Z 招式材料獲取",
-      "desc": "閃耀之石(沙漠考古)、空白Z結晶(廢棄天文台/試煉密室)"
+      "target": "strat-z",
+      "keywords": "Z招式 Z結晶 Z手環 閃耀之石 空白Z結晶 廢棄天文台 試煉密室 沙漠 考古遺跡",
+      "title": "Z 招式材料獲取方式",
+      "desc": "閃耀之石、空白 Z 結晶取得方式（天文台、試煉密室）。"
     },
     {
       "type": "strategy",
-      "target": "strat-mega-z-dmax-tera",
-      "keywords": "小智帽 小智甲賀忍蛙 小智皮卡丘 好感度 綠色染料 仙人掌 綠球果樹",
-      "title": "小智帽獲取與啟動方式",
-      "desc": "好感度≥200、綠色染料來源、啟動條件與注意事項"
+      "target": "strat-ashcap",
+      "keywords": "小智帽 甲賀忍蛙 皮卡丘 好感度 羊毛 綠色染料 仙人掌 綠球果樹 右鍵 啟動",
+      "title": "小智帽獲取方式",
+      "desc": "小智甲賀忍蛙、小智皮卡丘啟動條件與製作材料說明。"
     }
   ],
   "strategies": [

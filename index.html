@@ -71,6 +71,7 @@
         .suggestion-box { position: absolute; width: 100%; background: white; border: 1px solid #ddd; z-index: 100; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); max-height: 400px; overflow-y: auto; }
         .suggestion-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #eee; }
         .suggestion-item:hover { background-color: #f0f9ff; }
+        mark.fuzzy-hl { background: #fef08a; color: #713f12; border-radius: 2px; padding: 0 1px; font-weight: 800; }
 
         /* ── Page hero (fix: was missing CSS) ─────────── */
         .page-hero { padding: 48px 0; position: relative; overflow: hidden; }
@@ -123,6 +124,7 @@
         .dark-mode .suggestion-box { background-color: #1f2937; border-color: #374151; }
         .dark-mode .suggestion-item { border-bottom-color: #374151; color: #f3f4f6; }
         .dark-mode .suggestion-item:hover { background-color: #283448; }
+        .dark-mode mark.fuzzy-hl { background: #854d0e; color: #fef08a; }
         .dark-mode kbd         { background-color: #283448; color: #f3f4f6; border-color: #4b5563; box-shadow: 0 2px 0 #4b5563; }
         .dark-mode table, .dark-mode th, .dark-mode td { border-color: #374151 !important; }
         .dark-mode tr.bg-green-100 { background-color: #0f2d1f !important; }
@@ -768,28 +770,111 @@
             return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
         }
 
+        // ── 模糊搜尋核心 ─────────────────────────────────────────
+        // 回傳 {score, highlighted} — score 愈高愈相關
+        function fuzzyScore(query, text) {
+            if (!query || !text) return { score: -1, highlighted: escapeHtml(text) };
+            const q = query.toLowerCase();
+            const t = text.toLowerCase();
+
+            // 完整包含：最高分
+            if (t.includes(q)) {
+                const idx = t.indexOf(q);
+                const hi = escapeHtml(text.slice(0, idx))
+                    + '<mark class="fuzzy-hl">' + escapeHtml(text.slice(idx, idx + q.length)) + '</mark>'
+                    + escapeHtml(text.slice(idx + q.length));
+                return { score: 100 + (idx === 0 ? 20 : 0), highlighted: hi };
+            }
+
+            // 字元順序模糊比對
+            let qi = 0, score = 0, prev = -1;
+            const positions = [];
+            for (let ti = 0; ti < t.length && qi < q.length; ti++) {
+                if (t[ti] === q[qi]) {
+                    positions.push(ti);
+                    score += (ti === prev + 1) ? 10 : 2; // 連續加分
+                    if (ti === 0 || t[ti - 1] === ' ') score += 5; // 詞首加分
+                    prev = ti;
+                    qi++;
+                }
+            }
+            if (qi < q.length) return { score: -1, highlighted: escapeHtml(text) }; // 未完全匹配
+
+            // 標記匹配字元
+            let hi = '', pi = 0;
+            for (let i = 0; i < text.length; i++) {
+                if (pi < positions.length && positions[pi] === i) {
+                    hi += '<mark class="fuzzy-hl">' + escapeHtml(text[i]) + '</mark>';
+                    pi++;
+                } else {
+                    hi += escapeHtml(text[i]);
+                }
+            }
+            return { score, highlighted: hi };
+        }
+
+        const PAGE_LABEL = {
+            strategy: '⚔️ 攻略', faq: '❓ 常見問題', commands: '📋 指令集',
+            tutorial: '🔰 入門教學', newbie: '🚩 快捷鍵'
+        };
+
         function handleGlobalSearch(input, suggestBoxId) {
-            const query = input.value.toLowerCase().trim();
+            const query = input.value.trim();
             const suggestBox = document.getElementById(suggestBoxId);
             if (!query) { suggestBox.classList.add('hidden'); return; }
-            const results = ALL_DATA.filter(item =>
-                item.keywords.toLowerCase().includes(query) ||
-                item.title.toLowerCase().includes(query) ||
-                item.desc.toLowerCase().includes(query)
-            ).slice(0, 8);
-            if (results.length > 0) {
-                suggestBox.innerHTML = results.map(res =>
-                    `<div class="suggestion-item" onclick="navigateToResult('${escapeHtml(res.type)}','${escapeHtml(res.target)}',${!!res.isCommand})"><div class="text-[10px] uppercase font-bold text-blue-400">${escapeHtml(res.type)}</div><div class="font-bold text-gray-800">${escapeHtml(res.title)}</div><div class="text-xs text-gray-500">${escapeHtml(res.desc)}</div></div>`
-                ).join('');
+
+            const scored = ALL_DATA.map(item => {
+                const haystack = [item.title, item.keywords, item.desc].join(' ');
+                const { score, highlighted } = fuzzyScore(query, item.title);
+                const kwScore = fuzzyScore(query, item.keywords).score;
+                const descScore = fuzzyScore(query, item.desc).score;
+                const best = Math.max(score, kwScore * 0.6, descScore * 0.4);
+                return { item, score: best, titleHl: score > 0 ? highlighted : escapeHtml(item.title) };
+            }).filter(r => r.score > 0)
+              .sort((a, b) => b.score - a.score)
+              .slice(0, 8);
+
+            if (scored.length > 0) {
+                suggestBox.innerHTML = scored.map(({ item: res, titleHl }) => {
+                    const label = PAGE_LABEL[res.type] || res.type;
+                    const isCmd = !!res.isCommand;
+                    return `<div class="suggestion-item" onclick="navigateToResult('${escapeHtml(res.type)}','${escapeHtml(res.target)}',${isCmd})">
+                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+                            <span style="font-size:10px;font-weight:700;color:#7c3aed;background:#f5f3ff;padding:1px 6px;border-radius:999px;">${label}</span>
+                        </div>
+                        <div class="font-bold text-gray-800">${titleHl}</div>
+                        <div class="text-xs text-gray-500">${escapeHtml(res.desc)}</div>
+                    </div>`;
+                }).join('');
                 suggestBox.classList.remove('hidden');
             } else {
-                suggestBox.classList.add('hidden');
+                suggestBox.innerHTML = `<div class="suggestion-item text-gray-400 text-sm">找不到「${escapeHtml(query)}」相關結果</div>`;
+                suggestBox.classList.remove('hidden');
             }
         }
 
         function navigateToResult(page, targetId, isCommand) {
-            showPage(page);
             document.querySelectorAll('.suggestion-box').forEach(b => b.classList.add('hidden'));
+            // 清空搜尋框
+            document.querySelectorAll('#homeSearchInput, #innerSearchInput').forEach(el => el.value = '');
+
+            // 攻略 → 直接跳頁並開啟 modal
+            if (page === 'strategy') {
+                showPage('strategy');
+                setTimeout(() => {
+                    const strat = (window.STRATEGIES_DATA || []).find(s => s.id === targetId);
+                    if (strat) {
+                        openStratModal(strat);
+                    } else {
+                        // fallback: scroll to card
+                        const el = document.getElementById(targetId);
+                        if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+                    }
+                }, 150);
+                return;
+            }
+
+            showPage(page);
             setTimeout(() => {
                 if (isCommand) {
                     document.querySelectorAll('.cmd-box').forEach(box => {
