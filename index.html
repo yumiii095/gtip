@@ -24,24 +24,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Syne:wght@700;800&display=swap');
-        /* ── Design System ────────────────────────────────────── */
-        :root {
-            --brand-dark:  #003366;
-            --brand-mid:   #0055a5;
-            --brand-light: #00AEEF;
-            --surface:     #f4f7f9;
-            --card:        #ffffff;
-            --radius-card: 10px;
-            --shadow-card: 0 2px 8px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.05);
-            --shadow-lift: 0 8px 24px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06);
-            --transition:  0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        body { font-family: 'Noto Sans TC', sans-serif; background-color: var(--surface); transition: background-color 0.3s, color 0.3s; }
-        
-        /* Page-in animation */
-        .page-content:not(.hidden) { animation: pageFade 0.22s ease both; }
-        @keyframes pageFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f4f7f9; transition: background-color 0.3s, color 0.3s; }
         .tm-blue-dark { background-color: #003366; }
         .tm-blue-light { background-color: #00AEEF; }
         .section-title { border-bottom: 3px solid #003366; padding-bottom: 5px; margin-bottom: 20px; font-weight: bold; color: #003366; }
@@ -206,100 +190,6 @@
         .dark-mode .notice-block .notice-title { color: #fbbf24; }
         .dark-mode .notice-block p { color: #fcd34d; }
 
-
-        /* ── Nav active state & transitions ──────────────────── */
-        .nav-btn { border-radius: 6px; transition: background var(--transition), color var(--transition); position: relative; padding-bottom: 8px; }
-        .nav-btn:hover { background-color: rgba(0,174,239,0.08); }
-        .nav-btn::after { content:''; position:absolute; bottom:2px; left:50%; width:0; height:2px; background:var(--brand-light); border-radius:2px; transition: width 0.2s, left 0.2s; }
-        .nav-btn.nav-active::after { width:70%; left:15%; }
-        .nav-btn.nav-active { color: var(--brand-light) !important; }
-
-        /* ── Header shadow on scroll ─────────────────────────── */
-        header { transition: box-shadow 0.3s; }
-
-        /* ── FAQ cards ───────────────────────────────────────── */
-        #faq-container > div {
-            border-radius: var(--radius-card) !important;
-            box-shadow: var(--shadow-card) !important;
-            border: none !important;
-            transition: box-shadow var(--transition), transform var(--transition) !important;
-        }
-        #faq-container > div:hover {
-            box-shadow: var(--shadow-lift) !important;
-            transform: translateY(-2px);
-        }
-
-        /* ── News cards ──────────────────────────────────────── */
-        #news-container > div {
-            border-radius: var(--radius-card);
-            box-shadow: var(--shadow-card);
-            border-left-width: 4px !important;
-            border-top: none; border-right: none; border-bottom: none;
-            transition: box-shadow var(--transition), transform var(--transition);
-        }
-        #news-container > div:hover {
-            box-shadow: var(--shadow-lift);
-            transform: translateY(-2px);
-        }
-
-        /* ── Accordion (commands) ────────────────────────────── */
-        .accordion-item {
-            border-radius: var(--radius-card) !important;
-            overflow: hidden;
-            box-shadow: var(--shadow-card) !important;
-            border: none !important;
-            margin-bottom: 2px;
-            transition: box-shadow var(--transition);
-        }
-        .accordion-item:hover { box-shadow: var(--shadow-lift) !important; }
-        .accordion-header:hover { background-color: rgba(0,174,239,0.04); }
-        .accordion-header { border-radius: var(--radius-card) var(--radius-card) 0 0; }
-
-        /* ── Strategy cards enhancement ──────────────────────── */
-        .strat-card { border-radius: 14px !important; transition: all 0.22s cubic-bezier(0.4,0,0.2,1) !important; }
-        .strat-card:hover { transform: translateY(-5px) !important; }
-        .strat-card::before { border-radius: 14px 14px 0 0 !important; }
-
-        /* ── Strategy modal ──────────────────────────────────── */
-        .strat-modal-box { border-radius: 18px !important; }
-
-        /* ── cmd-box hover ───────────────────────────────────── */
-        .cmd-box { border-radius: 6px; }
-        .cmd-box:hover { background-color: #eef4ff; }
-
-        /* ── Suggestion box ──────────────────────────────────── */
-        .suggestion-box { border-radius: 12px !important; border: none !important; box-shadow: 0 12px 40px rgba(0,0,0,0.14), 0 0 0 1px rgba(0,0,0,0.06) !important; overflow: hidden; margin-top: 6px !important; }
-        .suggestion-item:last-child { border-bottom: none; }
-        .suggestion-item { transition: background var(--transition); }
-
-        /* ── Section title ───────────────────────────────────── */
-        .section-title { font-family: 'Syne', 'Noto Sans TC', sans-serif; letter-spacing: -0.01em; }
-
-        /* ── kbd key ─────────────────────────────────────────── */
-        kbd { border-radius: 5px; font-family: 'Noto Sans TC', ui-monospace, monospace; }
-
-        /* ── Page hero decorative ────────────────────────────── */
-        .page-hero { border-bottom: none !important; box-shadow: 0 2px 16px rgba(0,0,0,0.06); }
-
-        /* ── Custom scrollbar ────────────────────────────────── */
-        ::-webkit-scrollbar { width: 7px; height: 7px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #c4d0e0; border-radius: 99px; }
-        ::-webkit-scrollbar-thumb:hover { background: #97a9be; }
-
-        /* ── Dark mode enhancements ──────────────────────────── */
-        .dark-mode { --surface: #111827; --card: #1f2937; }
-        .dark-mode .nav-btn:hover { background: rgba(255,255,255,0.06); }
-        .dark-mode .cmd-box:hover { background-color: #2d3d58; }
-        .dark-mode #faq-container > div { box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important; }
-        .dark-mode #faq-container > div:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.4) !important; }
-        .dark-mode .accordion-item { box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important; }
-        .dark-mode .accordion-item:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.4) !important; }
-        .dark-mode ::-webkit-scrollbar-thumb { background: #374151; }
-        .dark-mode ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
-        .dark-mode .strat-card { background: #1c1428 !important; }
-        .dark-mode .nav-btn.nav-active { color: #60a5fa !important; }
-
         /* ── Strategy cards ──────────────────────────────────────── */
         .strat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         .strat-card {
@@ -396,32 +286,160 @@
         </div>
     </div>
 
-    <div id="admin-toolbar" class="edit-ignore" contenteditable="false">
-        <div class="flex items-center gap-4">
-            <span class="font-bold">🛠️ 管理模式</span>
-            <div class="format-toolbar" contenteditable="false">
-                <button class="format-btn" onmousedown="event.preventDefault();applyFormat('bold')" title="粗體" contenteditable="false"><b>B</b></button>
-                <button class="format-btn" onmousedown="event.preventDefault();applyFormat('italic')" title="斜體" contenteditable="false"><i>I</i></button>
-                <button class="format-btn" onmousedown="event.preventDefault();applyFormat('strikethrough')" title="刪除線" contenteditable="false"><s>S</s></button>
-                <div class="format-divider" contenteditable="false"></div>
-                <span style="font-size:11px;opacity:0.7;margin-right:2px" contenteditable="false">顏色：</span>
-                <div class="color-swatch" style="background:#e11d48" onmousedown="event.preventDefault();applyFormat('foreColor','#e11d48')" title="紅色" contenteditable="false"></div>
-                <div class="color-swatch" style="background:#f97316" onmousedown="event.preventDefault();applyFormat('foreColor','#f97316')" title="橘色" contenteditable="false"></div>
-                <div class="color-swatch" style="background:#eab308" onmousedown="event.preventDefault();applyFormat('foreColor','#eab308')" title="黃色" contenteditable="false"></div>
-                <div class="color-swatch" style="background:#22c55e" onmousedown="event.preventDefault();applyFormat('foreColor','#22c55e')" title="綠色" contenteditable="false"></div>
-                <div class="color-swatch" style="background:#3b82f6" onmousedown="event.preventDefault();applyFormat('foreColor','#3b82f6')" title="藍色" contenteditable="false"></div>
-                <div class="color-swatch" style="background:#a855f7" onmousedown="event.preventDefault();applyFormat('foreColor','#a855f7')" title="紫色" contenteditable="false"></div>
-                <div class="color-swatch" style="background:#94a3b8" onmousedown="event.preventDefault();applyFormat('foreColor','#94a3b8')" title="灰色" contenteditable="false"></div>
-                <div class="format-divider" contenteditable="false"></div>
-                <button class="format-btn" onmousedown="event.preventDefault();insertTip()" title="插入小提醒框" contenteditable="false">💡 提醒</button>
-                <button class="format-btn" onmousedown="event.preventDefault();insertNotice()" title="插入注意事項框" contenteditable="false">⚠️ 注意</button>
-            </div>
-            <button onclick="openPublishModal()" class="bg-white text-red-600 px-6 py-1.5 font-black rounded-full hover:bg-gray-100 transition-colors shadow-lg" contenteditable="false">儲存並發佈新檔案</button>
-            <button onclick="toggleEditMode(false)" class="bg-gray-800 text-white px-4 py-1.5 rounded-full hover:bg-gray-700 transition-colors" contenteditable="false">取消</button>
-        </div>
+    <!-- ── Floating selection toolbar ───────────────────────── -->
+    <div id="float-toolbar" contenteditable="false">
+        <button class="rb" onmousedown="event.preventDefault();applyFormat('bold')" title="粗體"><b>B</b></button>
+        <button class="rb" onmousedown="event.preventDefault();applyFormat('italic')" title="斜體"><i>I</i></button>
+        <button class="rb" onmousedown="event.preventDefault();applyFormat('underline')" title="底線"><u>U</u></button>
+        <button class="rb" onmousedown="event.preventDefault();applyFormat('strikeThrough')" title="刪除線"><s>S</s></button>
+        <span class="rb-sep"></span>
+        <button class="rb" onmousedown="event.preventDefault();applyFormat('foreColor','#e11d48')" title="紅色" style="color:#e11d48">A</button>
+        <button class="rb" onmousedown="event.preventDefault();applyFormat('foreColor','#2563eb')" title="藍色" style="color:#2563eb">A</button>
+        <button class="rb" onmousedown="event.preventDefault();applyFormat('foreColor','#16a34a')" title="綠色" style="color:#16a34a">A</button>
+        <span class="rb-sep"></span>
+        <button class="rb" onmousedown="event.preventDefault();applyFormat('hiliteColor','#fef08a')" title="螢光標記" style="background:rgba(254,240,138,0.2);">🖊</button>
+        <button class="rb" onmousedown="event.preventDefault();applyFormat('removeFormat')" title="清除格式">✕</button>
     </div>
 
-    <div class="tm-blue-dark text-white text-xs py-2 px-4 edit-ignore" style="background:linear-gradient(90deg,#002855 0%,#003d7a 100%);" contenteditable="false">
+    <!-- ── Word-style Admin Toolbar ──────────────────────────── -->
+    <div id="admin-toolbar" class="edit-ignore" contenteditable="false">
+
+        <!-- Top action bar -->
+        <div id="admin-top-bar">
+            <span style="font-weight:900;color:#00AEEF;font-size:0.95rem;letter-spacing:-0.02em;font-family:'Syne','Noto Sans TC',sans-serif;">✏️ 編輯模式</span>
+            <span style="color:rgba(255,255,255,0.3);font-size:11px;flex:1;">Ctrl+Z 復原　Ctrl+Y 重做　Ctrl+Shift+K 退出</span>
+
+            <!-- Undo / Redo -->
+            <button class="rb" onmousedown="event.preventDefault();document.execCommand('undo')" title="復原 Ctrl+Z">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a5 5 0 0 1 0 10h-1"/></svg>
+            </button>
+            <button class="rb" onmousedown="event.preventDefault();document.execCommand('redo')" title="重做 Ctrl+Y">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14l5-5-5-5"/><path d="M20 9H10a5 5 0 0 0 0 10h1"/></svg>
+            </button>
+
+            <span class="rb-sep"></span>
+            <button onclick="openPublishModal()" style="background:linear-gradient(90deg,#16a34a,#15803d);color:white;border:none;padding:6px 16px;border-radius:6px;font-weight:700;cursor:pointer;font-size:13px;" contenteditable="false">💾 儲存並發佈</button>
+            <button onclick="toggleEditMode(false)" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.15);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;" contenteditable="false">✕ 退出</button>
+        </div>
+
+        <!-- Ribbon -->
+        <div id="admin-ribbon">
+
+            <!-- 字型 -->
+            <div class="ribbon-group">
+                <select class="rb-select" id="rb-fontsize" onchange="applyFormat('fontSize',this.value)" title="字體大小" contenteditable="false">
+                    <option value="1">10px</option>
+                    <option value="2">13px</option>
+                    <option value="3" selected>16px</option>
+                    <option value="4">18px</option>
+                    <option value="5">24px</option>
+                    <option value="6">32px</option>
+                    <option value="7">48px</option>
+                </select>
+                <span class="ribbon-label">字級</span>
+            </div>
+
+            <!-- 格式 -->
+            <div class="ribbon-group">
+                <button class="rb" id="rb-bold" onmousedown="event.preventDefault();applyFormat('bold')" title="粗體 Ctrl+B"><b>B</b></button>
+                <button class="rb" id="rb-italic" onmousedown="event.preventDefault();applyFormat('italic')" title="斜體 Ctrl+I"><i>I</i></button>
+                <button class="rb" id="rb-underline" onmousedown="event.preventDefault();applyFormat('underline')" title="底線 Ctrl+U"><u>U</u></button>
+                <button class="rb" id="rb-strike" onmousedown="event.preventDefault();applyFormat('strikeThrough')" title="刪除線"><s>S</s></button>
+                <button class="rb" onmousedown="event.preventDefault();applyFormat('removeFormat')" title="清除格式" style="font-size:11px;">清除</button>
+                <span class="ribbon-label">字元格式</span>
+            </div>
+
+            <!-- 文字顏色 -->
+            <div class="ribbon-group">
+                <div class="rb-swatch" style="background:#e11d48" onmousedown="event.preventDefault();applyFormat('foreColor','#e11d48')" title="紅"></div>
+                <div class="rb-swatch" style="background:#f97316" onmousedown="event.preventDefault();applyFormat('foreColor','#f97316')" title="橘"></div>
+                <div class="rb-swatch" style="background:#eab308" onmousedown="event.preventDefault();applyFormat('foreColor','#eab308')" title="黃"></div>
+                <div class="rb-swatch" style="background:#16a34a" onmousedown="event.preventDefault();applyFormat('foreColor','#16a34a')" title="綠"></div>
+                <div class="rb-swatch" style="background:#2563eb" onmousedown="event.preventDefault();applyFormat('foreColor','#2563eb')" title="藍"></div>
+                <div class="rb-swatch" style="background:#9333ea" onmousedown="event.preventDefault();applyFormat('foreColor','#9333ea')" title="紫"></div>
+                <div class="rb-swatch" style="background:#94a3b8" onmousedown="event.preventDefault();applyFormat('foreColor','#94a3b8')" title="灰"></div>
+                <div class="rb-swatch" style="background:#f1f5f9;border:1px solid rgba(255,255,255,0.2)" onmousedown="event.preventDefault();applyFormat('foreColor','#f1f5f9')" title="白"></div>
+                <span class="ribbon-label">文字色</span>
+            </div>
+
+            <!-- 螢光 -->
+            <div class="ribbon-group">
+                <div class="rb-swatch" style="background:#fef08a" onmousedown="event.preventDefault();applyFormat('hiliteColor','#fef08a')" title="黃底"></div>
+                <div class="rb-swatch" style="background:#bbf7d0" onmousedown="event.preventDefault();applyFormat('hiliteColor','#bbf7d0')" title="綠底"></div>
+                <div class="rb-swatch" style="background:#bfdbfe" onmousedown="event.preventDefault();applyFormat('hiliteColor','#bfdbfe')" title="藍底"></div>
+                <div class="rb-swatch" style="background:#fecdd3" onmousedown="event.preventDefault();applyFormat('hiliteColor','#fecdd3')" title="粉底"></div>
+                <div class="rb-swatch" style="background:transparent;border:1px solid rgba(255,255,255,0.25)" onmousedown="event.preventDefault();applyFormat('hiliteColor','transparent')" title="移除底色" title="無底色">✕</div>
+                <span class="ribbon-label">螢光底色</span>
+            </div>
+
+            <!-- 對齊 -->
+            <div class="ribbon-group">
+                <button class="rb" onmousedown="event.preventDefault();applyFormat('justifyLeft')" title="靠左">
+                    <svg viewBox="0 0 20 20" fill="currentColor"><rect x="2" y="4" width="16" height="2" rx="1"/><rect x="2" y="9" width="10" height="2" rx="1"/><rect x="2" y="14" width="14" height="2" rx="1"/></svg>
+                </button>
+                <button class="rb" onmousedown="event.preventDefault();applyFormat('justifyCenter')" title="置中">
+                    <svg viewBox="0 0 20 20" fill="currentColor"><rect x="2" y="4" width="16" height="2" rx="1"/><rect x="5" y="9" width="10" height="2" rx="1"/><rect x="3" y="14" width="14" height="2" rx="1"/></svg>
+                </button>
+                <button class="rb" onmousedown="event.preventDefault();applyFormat('justifyRight')" title="靠右">
+                    <svg viewBox="0 0 20 20" fill="currentColor"><rect x="2" y="4" width="16" height="2" rx="1"/><rect x="8" y="9" width="10" height="2" rx="1"/><rect x="4" y="14" width="14" height="2" rx="1"/></svg>
+                </button>
+                <span class="ribbon-label">對齊</span>
+            </div>
+
+            <!-- 清單 -->
+            <div class="ribbon-group">
+                <button class="rb" onmousedown="event.preventDefault();applyFormat('insertUnorderedList')" title="項目清單">
+                    <svg viewBox="0 0 20 20" fill="currentColor"><circle cx="3" cy="5" r="1.5"/><rect x="6" y="4" width="12" height="2" rx="1"/><circle cx="3" cy="10" r="1.5"/><rect x="6" y="9" width="12" height="2" rx="1"/><circle cx="3" cy="15" r="1.5"/><rect x="6" y="14" width="12" height="2" rx="1"/></svg>
+                </button>
+                <button class="rb" onmousedown="event.preventDefault();applyFormat('insertOrderedList')" title="編號清單">
+                    <svg viewBox="0 0 20 20" fill="currentColor"><text x="1" y="7" font-size="6" fill="currentColor">1.</text><rect x="7" y="4" width="11" height="2" rx="1"/><text x="1" y="12" font-size="6" fill="currentColor">2.</text><rect x="7" y="9" width="11" height="2" rx="1"/><text x="1" y="17" font-size="6" fill="currentColor">3.</text><rect x="7" y="14" width="11" height="2" rx="1"/></svg>
+                </button>
+                <button class="rb" onmousedown="event.preventDefault();applyFormat('outdent')" title="減少縮排">
+                    <svg viewBox="0 0 20 20" fill="currentColor"><path d="M8 6l-4 4 4 4"/><rect x="10" y="5" width="8" height="2" rx="1"/><rect x="10" y="13" width="8" height="2" rx="1"/></svg>
+                </button>
+                <button class="rb" onmousedown="event.preventDefault();applyFormat('indent')" title="增加縮排">
+                    <svg viewBox="0 0 20 20" fill="currentColor"><path d="M4 6l4 4-4 4"/><rect x="10" y="5" width="8" height="2" rx="1"/><rect x="10" y="13" width="8" height="2" rx="1"/></svg>
+                </button>
+                <span class="ribbon-label">清單／縮排</span>
+            </div>
+
+            <!-- 連結 -->
+            <div class="ribbon-group">
+                <button class="rb" onmousedown="event.preventDefault();insertLink()" title="插入連結">
+                    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 12.5a4.5 4.5 0 0 0 6.364 0l2-2a4.5 4.5 0 0 0-6.364-6.364L8.5 5.636"/><path d="M12 7.5a4.5 4.5 0 0 0-6.364 0l-2 2a4.5 4.5 0 0 0 6.364 6.364l1.5-1.5"/></svg>
+                </button>
+                <button class="rb" onmousedown="event.preventDefault();document.execCommand('unlink')" title="移除連結" style="font-size:11px;">✂</button>
+                <span class="ribbon-label">連結</span>
+            </div>
+
+            <!-- 分隔線 -->
+            <div class="ribbon-group">
+                <button class="rb" onmousedown="event.preventDefault();insertHRule()" title="插入分隔線" style="font-size:11px;">─</button>
+                <span class="ribbon-label">分隔</span>
+            </div>
+
+            <!-- 圖片 -->
+            <div class="ribbon-group">
+                <label class="rb" title="插入圖片（可拖曳位置）" style="cursor:pointer;">
+                    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="16" height="14" rx="2"/><circle cx="7" cy="8" r="1.5"/><path d="M2 14l4-4 3 3 3-3 4 4"/></svg>
+                    <input type="file" accept="image/*" style="display:none" onchange="insertEditableImage(this)" contenteditable="false">
+                </label>
+                <button class="rb" onmousedown="event.preventDefault();insertImageFromUrl()" title="從網址插入圖片" style="font-size:11px;">URL</button>
+                <span class="ribbon-label">圖片</span>
+            </div>
+
+            <!-- 區塊 -->
+            <div class="ribbon-group">
+                <button class="rb" onmousedown="event.preventDefault();insertTip()" title="插入小提醒">💡</button>
+                <button class="rb" onmousedown="event.preventDefault();insertNotice()" title="插入注意事項">⚠️</button>
+                <button class="rb" onmousedown="event.preventDefault();insertCodeBlock()" title="插入程式碼區塊" style="font-family:monospace;font-size:12px;">&lt;/&gt;</button>
+                <span class="ribbon-label">區塊</span>
+            </div>
+
+        </div><!-- /ribbon -->
+    </div><!-- /admin-toolbar -->
+
+    <div class="tm-blue-dark text-white text-xs py-2 px-4 edit-ignore" contenteditable="false">
         <div class="container mx-auto flex justify-end items-center space-x-4">
             <span>伺服器狀態：<span class="text-green-400">● 運行中</span></span>
             <button onclick="showPage('home')" class="hover:underline" contenteditable="false">回首頁</button>
@@ -435,17 +453,17 @@
     <header class="bg-white border-b border-gray-200 py-4 sticky top-0 z-50 shadow-sm edit-ignore" contenteditable="false">
         <div class="container mx-auto px-4 flex justify-between items-center">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="showPage('home')">
-                <div style="width:40px;height:40px;background:linear-gradient(135deg,#003366,#00AEEF);display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:1.2rem;border-radius:8px;box-shadow:0 2px 8px rgba(0,174,239,0.35);font-family:'Syne',sans-serif;letter-spacing:-1px;">C</div>
-                <h1 class="text-2xl font-bold text-blue-900 tracking-tighter" style="font-family:'Syne','Noto Sans TC',sans-serif;">Cobblemon <span class="text-blue-500">方可夢樂園</span></h1>
+                <div class="bg-blue-500 w-10 h-10 flex items-center justify-center text-white font-bold text-xl">C</div>
+                <h1 class="text-2xl font-bold text-blue-900 tracking-tighter">Cobblemon <span class="text-blue-500">方可夢樂園</span></h1>
             </div>
             <nav class="hidden md:block" contenteditable="false">
                 <ul class="flex space-x-1 font-bold">
-                    <li><button onclick="showPage('home')" data-nav="home" class="nav-btn px-3 py-2 text-blue-900" contenteditable="false">首頁</button></li>
-                    <li><button onclick="showPage('newbie')" data-nav="newbie" class="nav-btn px-3 py-2 text-red-600" contenteditable="false">快捷鍵</button></li>
-                    <li><button onclick="showPage('commands')" data-nav="commands" class="nav-btn px-3 py-2 text-blue-900" contenteditable="false">指令集</button></li>
-                    <li><button onclick="showPage('tutorial')" data-nav="tutorial" class="nav-btn px-3 py-2 text-green-700" contenteditable="false">入門教學</button></li>
-                    <li><button onclick="showPage('faq')" data-nav="faq" class="nav-btn px-3 py-2 text-orange-600" contenteditable="false">常見問題</button></li>
-                    <li><button onclick="showPage('strategy')" data-nav="strategy" class="nav-btn px-3 py-2 text-purple-700" contenteditable="false">攻略區</button></li>
+                    <li><button onclick="showPage('home')" class="px-3 py-2 hover:bg-blue-50 text-blue-900 btn-sq" contenteditable="false">首頁</button></li>
+                    <li><button onclick="showPage('newbie')" class="px-3 py-2 hover:bg-blue-50 text-red-600 btn-sq" contenteditable="false">快捷鍵</button></li>
+                    <li><button onclick="showPage('commands')" class="px-3 py-2 hover:bg-blue-50 text-blue-900 btn-sq" contenteditable="false">指令集</button></li>
+                    <li><button onclick="showPage('tutorial')" class="px-3 py-2 hover:bg-blue-50 text-green-700 btn-sq" contenteditable="false">入門教學</button></li>
+                    <li><button onclick="showPage('faq')" class="px-3 py-2 hover:bg-blue-50 text-orange-600 btn-sq" contenteditable="false">常見問題</button></li>
+                    <li><button onclick="showPage('strategy')" class="px-3 py-2 hover:bg-blue-50 text-purple-700 btn-sq" contenteditable="false">攻略區</button></li>
                 </ul>
             </nav>
             <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-blue-900 focus:outline-none" contenteditable="false">
@@ -465,13 +483,13 @@
     </header>
 
     <div id="home-page" class="page-content">
-        <section class="py-10 md:py-16 text-center text-white edit-ignore" style="background:linear-gradient(135deg,#003d7a 0%,#0077c8 55%,#00AEEF 100%);position:relative;overflow:hidden;" contenteditable="false"><div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 120%,rgba(255,255,255,0.08) 0%,transparent 70%);pointer-events:none;"></div><div style="position:absolute;top:-30px;right:-30px;width:220px;height:220px;background:radial-gradient(circle,rgba(255,255,255,0.06) 0%,transparent 70%);pointer-events:none;border-radius:50%;"></div>
-            <div class="container mx-auto px-4" style="position:relative;z-index:1;">
-                <h2 class="text-2xl md:text-4xl font-bold mb-6" style="font-family:'Syne','Noto Sans TC',sans-serif;text-shadow:0 2px 12px rgba(0,0,0,0.18);letter-spacing:-0.02em;">搜尋你的方塊冒險資訊</h2>
+        <section class="tm-blue-light py-10 md:py-16 text-center text-white edit-ignore" contenteditable="false">
+            <div class="container mx-auto px-4">
+                <h2 class="text-2xl md:text-4xl font-bold mb-6">搜尋你的方塊冒險資訊</h2>
                 <div class="max-w-md md:max-w-2xl mx-auto relative">
-                    <div class="flex bg-white text-gray-800" style="border-radius:50px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.18);padding:4px;">
-                        <input type="text" id="homeSearchInput" oninput="handleGlobalSearch(this, 'homeSuggestions')" placeholder="搜尋指令、攻略、教學..." class="flex-grow p-2 md:p-4 outline-none text-sm md:text-base bg-transparent" style="padding-left:20px;" contenteditable="false">
-                        <button style="background:linear-gradient(135deg,#003366,#0055a5);color:white;border:none;padding:10px 28px;font-weight:700;border-radius:50px;font-size:0.9rem;cursor:pointer;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'" contenteditable="false">搜尋</button>
+                    <div class="flex bg-white shadow-lg p-1 text-gray-800">
+                        <input type="text" id="homeSearchInput" oninput="handleGlobalSearch(this, 'homeSuggestions')" placeholder="搜尋關鍵字..." class="flex-grow p-2 md:p-4 outline-none text-sm md:text-base" contenteditable="false">
+                        <button class="tm-blue-dark px-6 md:px-10 py-2 md:py-4 font-bold text-white btn-sq text-sm md:text-base" contenteditable="false">搜尋</button>
                     </div>
                     <div id="homeSuggestions" class="suggestion-box hidden text-left"></div>
                 </div>
@@ -481,10 +499,10 @@
             <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
                 <div class="md:col-span-3 edit-ignore" contenteditable="false">
                     <div class="section-title">快速導航</div>
-                    <div class="flex flex-col" style="gap:8px;">
-                        <button onclick="showPage('tutorial')" class="p-4 text-left font-bold text-green-700" style="background:#f0fdf4;border-radius:8px;border:1px solid #bbf7d0;transition:all 0.18s;display:flex;align-items:center;gap:10px;" onmouseover="this.style.transform='translateX(4px)';this.style.boxShadow='0 4px 12px rgba(21,128,61,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''" contenteditable="false"><span style="font-size:1.3rem;">🔰</span> 入門教學指南</button>
-                        <button onclick="showPage('faq')" class="p-4 text-left font-bold text-orange-600" style="background:#fff7ed;border-radius:8px;border:1px solid #fed7aa;transition:all 0.18s;display:flex;align-items:center;gap:10px;" onmouseover="this.style.transform='translateX(4px)';this.style.boxShadow='0 4px 12px rgba(234,88,12,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''" contenteditable="false"><span style="font-size:1.3rem;">❓</span> 常見問題解答</button>
-                        <button onclick="showPage('strategy')" class="p-4 text-left font-bold text-purple-700" style="background:#faf5ff;border-radius:8px;border:1px solid #ddd6fe;transition:all 0.18s;display:flex;align-items:center;gap:10px;" onmouseover="this.style.transform='translateX(4px)';this.style.boxShadow='0 4px 12px rgba(124,58,237,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''" contenteditable="false"><span style="font-size:1.3rem;">⚔️</span> 專業攻略專區</button>
+                    <div class="flex flex-col border bg-white shadow-sm border-gray-300">
+                        <button onclick="showPage('tutorial')" class="p-4 border-b text-left hover:bg-green-50 font-bold text-green-700" contenteditable="false">▶ 入門教學指南</button>
+                        <button onclick="showPage('faq')" class="p-4 border-b text-left hover:bg-orange-50 font-bold text-orange-600" contenteditable="false">▶ 常見問題解答</button>
+                        <button onclick="showPage('strategy')" class="p-4 border-b text-left hover:bg-purple-50 font-bold text-purple-700" contenteditable="false">▶ 專業攻略專區</button>
                     </div>
                 </div>
                 <div class="md:col-span-9">
@@ -732,7 +750,7 @@
     </div>
 
     <div id="strategy-page" class="page-content hidden">
-        <div class="page-hero page-hero-strategy edit-ignore" style="position:relative;overflow:hidden;" contenteditable="false"><div style="position:absolute;right:-40px;top:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(124,58,237,0.1) 0%,transparent 70%);border-radius:50%;pointer-events:none;"></div>
+        <div class="page-hero page-hero-strategy edit-ignore" contenteditable="false">
             <div class="container mx-auto px-4 flex justify-between items-center">
                 <h2 style="color:#581c87">⚔️ 專業攻略區</h2>
                 <button class="edit-ui admin-btn" onclick="addNewSection('strategy-container', 'strategy')" contenteditable="false">[+] 新增攻略章節</button>
@@ -746,10 +764,9 @@
         </main>
     </div>
 
-    <footer class="text-white py-10 text-center mt-20 edit-ignore" style="background:linear-gradient(135deg,#0a0e1a 0%,#0d1b33 100%);border-top:1px solid rgba(255,255,255,0.06);" contenteditable="false">
-        <div style="width:40px;height:3px;background:linear-gradient(90deg,#003366,#00AEEF);margin:0 auto 16px;border-radius:2px;"></div>
-        <p class="font-bold text-xl" style="font-family:'Syne','Noto Sans TC',sans-serif;color:#60a5fa;letter-spacing:-0.02em;">Cobblemon 方可夢樂園</p>
-        <p class="text-sm mt-2" style="color:#4b5563;">本站由玩家自發性維護，非官方（伺服器管理團隊）直接運營。</p>
+    <footer class="bg-gray-900 text-white py-12 text-center mt-20 edit-ignore" contenteditable="false">
+        <p class="font-bold text-xl text-blue-400">Cobblemon 方可夢樂園</p>
+        <p class="text-gray-500 text-sm mt-2">本站由玩家自發性維護，非官方（伺服器管理團隊）直接運營。</p>
     </footer>
 
     <script>
@@ -808,22 +825,7 @@
             const isEditing = document.body.classList.contains('editing-active');
 
             // 編輯模式專用工具列
-            const editBar = isEditing ? `
-                <div class="edit-ui" style="display:flex;align-items:center;gap:8px;background:#1e3a5f;padding:10px 14px;border-radius:8px;margin-bottom:16px;flex-wrap:wrap">
-                    <span style="font-size:0.8rem;font-weight:700;color:#93c5fd">✏️ 攻略編輯中</span>
-                    <button class="format-btn" onmousedown="event.preventDefault();applyFormat('bold')" contenteditable="false"><b>B</b></button>
-                    <button class="format-btn" onmousedown="event.preventDefault();applyFormat('italic')" contenteditable="false"><i>I</i></button>
-                    <button class="format-btn" onmousedown="event.preventDefault();applyFormat('strikethrough')" contenteditable="false"><s>S</s></button>
-                    <div class="color-swatch" style="background:#f87171;width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid rgba(255,255,255,0.4)" onmousedown="event.preventDefault();applyFormat('foreColor','#f87171')" title="紅" contenteditable="false"></div>
-                    <div class="color-swatch" style="background:#fb923c;width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid rgba(255,255,255,0.4)" onmousedown="event.preventDefault();applyFormat('foreColor','#fb923c')" title="橘" contenteditable="false"></div>
-                    <div class="color-swatch" style="background:#facc15;width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid rgba(255,255,255,0.4)" onmousedown="event.preventDefault();applyFormat('foreColor','#facc15')" title="黃" contenteditable="false"></div>
-                    <div class="color-swatch" style="background:#4ade80;width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid rgba(255,255,255,0.4)" onmousedown="event.preventDefault();applyFormat('foreColor','#4ade80')" title="綠" contenteditable="false"></div>
-                    <div class="color-swatch" style="background:#60a5fa;width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid rgba(255,255,255,0.4)" onmousedown="event.preventDefault();applyFormat('foreColor','#60a5fa')" title="藍" contenteditable="false"></div>
-                    <div class="color-swatch" style="background:#c084fc;width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid rgba(255,255,255,0.4)" onmousedown="event.preventDefault();applyFormat('foreColor','#c084fc')" title="紫" contenteditable="false"></div>
-                    <button onmousedown="event.preventDefault();insertTip()" class="format-btn" contenteditable="false">💡</button>
-                    <button onmousedown="event.preventDefault();insertNotice()" class="format-btn" contenteditable="false">⚠️</button>
-                    <button onclick="saveStratEdits()" style="background:#16a34a;color:white;border:none;padding:5px 14px;border-radius:6px;font-weight:700;cursor:pointer;margin-left:auto" contenteditable="false">💾 儲存修改</button>
-                </div>` : '';
+            const editBar = isEditing ? _buildModalEditBar() : '';
 
             body.innerHTML = editBar + strat.html;
             // 讓內文在編輯模式下可以直接改
@@ -836,6 +838,7 @@
             }
             modal.classList.add('open');
             document.body.style.overflow = 'hidden';
+            if (isEditing) setTimeout(_setupImgDropTargets, 50);
         }
 
         function saveStratEdits() {
@@ -1014,11 +1017,7 @@
             document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
             const target = document.getElementById(pageId + '-page');
             if (target) target.classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            // Update active nav
-            document.querySelectorAll('[data-nav]').forEach(btn => {
-                btn.classList.toggle('nav-active', btn.dataset.nav === pageId);
-            });
+            window.scrollTo(0, 0);
         }
 
         // ── 編輯模式 ──────────────────────────────────────────────
@@ -1059,6 +1058,7 @@
                     }
                 };
                 document.addEventListener('keydown', _enterGuard);
+                setTimeout(_setupImgDropTargets, 100);
 
             } else {
                 body.classList.remove('editing-active');
@@ -1068,24 +1068,289 @@
             }
         }
 
-        function applyFormat(command, value = null) { document.execCommand(command, false, value); }
+        // ── Format & selection ──────────────────────────────────
+        function applyFormat(command, value = null) {
+            document.execCommand(command, false, value);
+            updateFormatState();
+        }
+
+        // Reflect bold/italic/underline state in ribbon
+        function updateFormatState() {
+            try {
+                ['bold','italic','underline','strikeThrough'].forEach(cmd => {
+                    const btn = document.getElementById('rb-' + cmd.toLowerCase().replace('through','strike').replace('strikethrough','strike'));
+                    if (btn) btn.classList.toggle('active', document.queryCommandState(cmd));
+                });
+            } catch(e) {}
+        }
+
+        document.addEventListener('selectionchange', () => {
+            if (!document.body.classList.contains('editing-active')) return;
+            updateFormatState();
+            // Show / hide floating toolbar
+            const sel = window.getSelection();
+            const ft = document.getElementById('float-toolbar');
+            if (!ft) return;
+            if (sel && !sel.isCollapsed && sel.toString().trim().length > 0) {
+                const rect = sel.getRangeAt(0).getBoundingClientRect();
+                ft.style.left = (rect.left + rect.width / 2 - 130) + 'px';
+                ft.style.top  = (rect.top + window.scrollY - 48) + 'px';
+                ft.classList.add('visible');
+            } else {
+                ft.classList.remove('visible');
+            }
+        });
+
+        document.addEventListener('mousedown', (e) => {
+            const ft = document.getElementById('float-toolbar');
+            if (ft && !ft.contains(e.target)) ft.classList.remove('visible');
+        });
+
+        // ── Insert helpers ───────────────────────────────────────
+        function _insertAtCursor(el) {
+            const sel = window.getSelection();
+            if (sel && sel.rangeCount) {
+                const r = sel.getRangeAt(0);
+                r.collapse(false);
+                r.insertNode(el);
+                r.setStartAfter(el);
+                r.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(r);
+            }
+        }
 
         function insertTip() {
-            const sel = window.getSelection();
-            if (!sel.rangeCount) return;
             const tip = document.createElement('div');
             tip.className = 'mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 text-gray-800';
+            tip.setAttribute('contenteditable','true');
             tip.innerHTML = '💡 <b>小提醒：</b>在此輸入文字...';
-            sel.getRangeAt(0).insertNode(tip);
+            _insertAtCursor(tip);
         }
 
         function insertNotice() {
-            const sel = window.getSelection();
-            if (!sel.rangeCount) return;
             const notice = document.createElement('div');
             notice.className = 'notice-block';
+            notice.setAttribute('contenteditable','true');
             notice.innerHTML = '<div class="notice-title">⚠️ 注意事項</div><p>在此輸入注意事項內容...</p>';
-            sel.getRangeAt(0).insertNode(notice);
+            _insertAtCursor(notice);
+        }
+
+        function insertHRule() {
+            const hr = document.createElement('hr');
+            hr.style.cssText = 'border:none;border-top:2px solid #e2e8f0;margin:16px 0;';
+            _insertAtCursor(hr);
+        }
+
+        function insertCodeBlock() {
+            const pre = document.createElement('pre');
+            pre.style.cssText = 'background:#1e293b;color:#e2e8f0;padding:14px 18px;border-radius:8px;font-family:monospace;font-size:0.88rem;overflow-x:auto;margin:12px 0;';
+            pre.setAttribute('contenteditable','true');
+            pre.textContent = '// 在此輸入程式碼...';
+            _insertAtCursor(pre);
+        }
+
+        function insertLink() {
+            const url = prompt('輸入連結網址：','https://');
+            if (!url) return;
+            const text = window.getSelection()?.toString() || url;
+            document.execCommand('createLink', false, url);
+            // Style the link
+            const links = document.querySelectorAll('[contenteditable] a:not([target])');
+            links.forEach(a => { if (a.href === url) { a.target = '_blank'; a.style.color='#2563eb'; } });
+        }
+
+        function insertImageFromUrl() {
+            const url = prompt('輸入圖片網址：','https://');
+            if (!url) return;
+            _createDraggableImage(url, '網路圖片');
+        }
+
+        // ── Draggable / resizable image ─────────────────────────
+        function insertEditableImage(input) {
+            if (!input.files?.[0]) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                _createDraggableImage(e.target.result, input.files[0].name);
+                input.value = '';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+
+        function _createDraggableImage(src, name) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'drag-img img-center edit-ui-img';
+            wrapper.setAttribute('contenteditable','false');
+            wrapper.draggable = true;
+            wrapper.style.cssText = 'display:block;text-align:center;margin:8px auto;max-width:100%;';
+
+            const img = document.createElement('img');
+            img.src = src;
+            img.alt = name;
+            img.style.cssText = 'max-width:100%;border-radius:6px;display:inline-block;';
+
+            // Resize handle
+            const resizeHandle = document.createElement('div');
+            resizeHandle.className = 'img-resize-handle';
+            resizeHandle.title = '拖曳調整大小';
+
+            // Image toolbar
+            const imgToolbar = document.createElement('div');
+            imgToolbar.className = 'img-toolbar';
+            imgToolbar.setAttribute('contenteditable','false');
+            imgToolbar.innerHTML = `
+                <button class="rb" style="font-size:10px;padding:2px 5px;" onmousedown="event.preventDefault();setImgAlign(this,'left')" title="靠左">◀</button>
+                <button class="rb" style="font-size:10px;padding:2px 5px;" onmousedown="event.preventDefault();setImgAlign(this,'center')" title="置中">■</button>
+                <button class="rb" style="font-size:10px;padding:2px 5px;" onmousedown="event.preventDefault();setImgAlign(this,'right')" title="靠右">▶</button>
+                <span class="rb-sep"></span>
+                <button class="rb" style="font-size:10px;padding:2px 5px;" onmousedown="event.preventDefault();setImgWidth(this,'25%')" title="25%">¼</button>
+                <button class="rb" style="font-size:10px;padding:2px 5px;" onmousedown="event.preventDefault();setImgWidth(this,'50%')" title="50%">½</button>
+                <button class="rb" style="font-size:10px;padding:2px 5px;" onmousedown="event.preventDefault();setImgWidth(this,'100%')" title="100%">全</button>
+                <span class="rb-sep"></span>
+                <button class="rb" style="font-size:10px;padding:2px 5px;color:#f87171;" onmousedown="event.preventDefault();this.closest('.drag-img').remove()" title="刪除">✕</button>`;
+
+            wrapper.appendChild(imgToolbar);
+            wrapper.appendChild(img);
+            wrapper.appendChild(resizeHandle);
+
+            // Click to select
+            img.addEventListener('click', (e) => {
+                if (!document.body.classList.contains('editing-active')) return;
+                e.stopPropagation();
+                document.querySelectorAll('.selected-img').forEach(i => i.classList.remove('selected-img'));
+                img.classList.add('selected-img');
+            });
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.drag-img')) {
+                    document.querySelectorAll('.selected-img').forEach(i => i.classList.remove('selected-img'));
+                }
+            });
+
+            // Resize by dragging the handle
+            let _resizing = false, _startX, _startW;
+            resizeHandle.addEventListener('mousedown', (e) => {
+                if (!document.body.classList.contains('editing-active')) return;
+                e.preventDefault(); e.stopPropagation();
+                _resizing = true;
+                _startX = e.clientX;
+                _startW = img.offsetWidth;
+                document.addEventListener('mousemove', _onResize);
+                document.addEventListener('mouseup', () => {
+                    _resizing = false;
+                    document.removeEventListener('mousemove', _onResize);
+                }, { once: true });
+            });
+            function _onResize(e) {
+                if (!_resizing) return;
+                const newW = Math.max(60, _startW + (e.clientX - _startX));
+                img.style.width = newW + 'px';
+                img.style.maxWidth = 'none';
+            }
+
+            // Drag-to-reposition
+            wrapper.addEventListener('dragstart', (e) => {
+                if (!document.body.classList.contains('editing-active')) return;
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', '');
+                wrapper._dragging = true;
+                wrapper.style.opacity = '0.5';
+                window._dragImgEl = wrapper;
+            });
+            wrapper.addEventListener('dragend', () => {
+                wrapper.style.opacity = '';
+                wrapper._dragging = false;
+                window._dragImgEl = null;
+                document.querySelectorAll('.img-drop-indicator').forEach(d => d.remove());
+            });
+
+            _insertAtCursor(wrapper);
+            img.classList.add('selected-img');
+        }
+
+        // Drop target setup — make all contenteditable areas accept image drops
+        function _setupImgDropTargets() {
+            document.querySelectorAll('[contenteditable="true"]').forEach(zone => {
+                if (zone._imgDropReady) return;
+                zone._imgDropReady = true;
+                zone.addEventListener('dragover', (e) => {
+                    if (!window._dragImgEl) return;
+                    e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+                });
+                zone.addEventListener('drop', (e) => {
+                    if (!window._dragImgEl) return;
+                    e.preventDefault();
+                    const el = window._dragImgEl;
+                    // Find insertion point from drop position
+                    let range;
+                    if (document.caretRangeFromPoint) {
+                        range = document.caretRangeFromPoint(e.clientX, e.clientY);
+                    } else if (document.caretPositionFromPoint) {
+                        const pos = document.caretPositionFromPoint(e.clientX, e.clientY);
+                        if (pos) { range = document.createRange(); range.setStart(pos.offsetNode, pos.offset); }
+                    }
+                    if (range) {
+                        range.collapse(true);
+                        range.insertNode(el);
+                    } else {
+                        zone.appendChild(el);
+                    }
+                    window._dragImgEl = null;
+                });
+            });
+        }
+
+        function setImgAlign(btn, align) {
+            const wrapper = btn.closest('.drag-img');
+            wrapper.classList.remove('img-float-left','img-float-right','img-center');
+            wrapper.style.float = '';
+            wrapper.style.margin = '';
+            wrapper.style.display = '';
+            if (align === 'left')   { wrapper.style.cssText += ';float:left;margin:6px 16px 6px 0;'; }
+            else if (align === 'right') { wrapper.style.cssText += ';float:right;margin:6px 0 6px 16px;'; }
+            else { wrapper.style.cssText = 'display:block;text-align:center;margin:8px auto;max-width:100%;'; }
+        }
+        function setImgWidth(btn, w) {
+            const img = btn.closest('.drag-img').querySelector('img');
+            img.style.width = w; img.style.maxWidth = '100%';
+        }
+
+        // ── In-modal rich edit bar (strategy modal) ─────────────
+        function _buildModalEditBar() {
+            return `<div class="edit-ui" contenteditable="false" style="position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:4px;background:#0f172a;padding:8px 12px;border-radius:10px;margin-bottom:14px;flex-wrap:wrap;box-shadow:0 4px 14px rgba(0,0,0,0.3);">
+                <span style="font-size:11px;font-weight:700;color:#00AEEF;margin-right:4px;">✏️ 攻略編輯</span>
+                <button class="rb" onmousedown="event.preventDefault();applyFormat('bold')"><b>B</b></button>
+                <button class="rb" onmousedown="event.preventDefault();applyFormat('italic')"><i>I</i></button>
+                <button class="rb" onmousedown="event.preventDefault();applyFormat('underline')"><u>U</u></button>
+                <button class="rb" onmousedown="event.preventDefault();applyFormat('strikeThrough')"><s>S</s></button>
+                <span class="rb-sep"></span>
+                <div class="rb-swatch" style="background:#e11d48;" onmousedown="event.preventDefault();applyFormat('foreColor','#e11d48')"></div>
+                <div class="rb-swatch" style="background:#f97316;" onmousedown="event.preventDefault();applyFormat('foreColor','#f97316')"></div>
+                <div class="rb-swatch" style="background:#eab308;" onmousedown="event.preventDefault();applyFormat('foreColor','#eab308')"></div>
+                <div class="rb-swatch" style="background:#16a34a;" onmousedown="event.preventDefault();applyFormat('foreColor','#16a34a')"></div>
+                <div class="rb-swatch" style="background:#2563eb;" onmousedown="event.preventDefault();applyFormat('foreColor','#2563eb')"></div>
+                <div class="rb-swatch" style="background:#9333ea;" onmousedown="event.preventDefault();applyFormat('foreColor','#9333ea')"></div>
+                <span class="rb-sep"></span>
+                <div class="rb-swatch" style="background:#fef08a;" onmousedown="event.preventDefault();applyFormat('hiliteColor','#fef08a')"></div>
+                <div class="rb-swatch" style="background:#bbf7d0;" onmousedown="event.preventDefault();applyFormat('hiliteColor','#bbf7d0')"></div>
+                <div class="rb-swatch" style="background:#bfdbfe;" onmousedown="event.preventDefault();applyFormat('hiliteColor','#bfdbfe')"></div>
+                <span class="rb-sep"></span>
+                <button class="rb" onmousedown="event.preventDefault();applyFormat('justifyLeft')" title="靠左"><svg viewBox="0 0 16 16" fill="currentColor" width="14"><rect x="1" y="2" width="14" height="2"/><rect x="1" y="7" width="9" height="2"/><rect x="1" y="12" width="12" height="2"/></svg></button>
+                <button class="rb" onmousedown="event.preventDefault();applyFormat('justifyCenter')" title="置中"><svg viewBox="0 0 16 16" fill="currentColor" width="14"><rect x="1" y="2" width="14" height="2"/><rect x="3.5" y="7" width="9" height="2"/><rect x="2" y="12" width="12" height="2"/></svg></button>
+                <button class="rb" onmousedown="event.preventDefault();applyFormat('insertUnorderedList')" title="清單">≡</button>
+                <button class="rb" onmousedown="event.preventDefault();insertLink()" title="連結">🔗</button>
+                <span class="rb-sep"></span>
+                <label class="rb" style="cursor:pointer;" title="插入圖片">
+                    🖼
+                    <input type="file" accept="image/*" style="display:none" onchange="insertEditableImage(this)" contenteditable="false">
+                </label>
+                <button class="rb" onmousedown="event.preventDefault();insertTip()" title="小提醒">💡</button>
+                <button class="rb" onmousedown="event.preventDefault();insertNotice()" title="注意">⚠️</button>
+                <button class="rb" onmousedown="event.preventDefault();insertHRule()" style="font-size:11px;" title="分隔線">─</button>
+                <span class="rb-sep"></span>
+                <button class="rb" onmousedown="event.preventDefault();document.execCommand('undo')" title="復原">↩</button>
+                <button class="rb" onmousedown="event.preventDefault();document.execCommand('redo')" title="重做">↪</button>
+                <button onclick="saveStratEdits()" style="background:#16a34a;color:white;border:none;padding:5px 14px;border-radius:6px;font-weight:700;cursor:pointer;margin-left:auto;font-size:12px;" contenteditable="false">💾 儲存</button>
+            </div>`;
         }
 
         function updateVersionPreview(type) {
