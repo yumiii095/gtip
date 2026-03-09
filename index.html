@@ -24,8 +24,24 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
-        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f4f7f9; transition: background-color 0.3s, color 0.3s; }
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Syne:wght@700;800&display=swap');
+        /* ── Design System ────────────────────────────────────── */
+        :root {
+            --brand-dark:  #003366;
+            --brand-mid:   #0055a5;
+            --brand-light: #00AEEF;
+            --surface:     #f4f7f9;
+            --card:        #ffffff;
+            --radius-card: 10px;
+            --shadow-card: 0 2px 8px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.05);
+            --shadow-lift: 0 8px 24px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06);
+            --transition:  0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: var(--surface); transition: background-color 0.3s, color 0.3s; }
+        
+        /* Page-in animation */
+        .page-content:not(.hidden) { animation: pageFade 0.22s ease both; }
+        @keyframes pageFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
         .tm-blue-dark { background-color: #003366; }
         .tm-blue-light { background-color: #00AEEF; }
         .section-title { border-bottom: 3px solid #003366; padding-bottom: 5px; margin-bottom: 20px; font-weight: bold; color: #003366; }
@@ -190,6 +206,100 @@
         .dark-mode .notice-block .notice-title { color: #fbbf24; }
         .dark-mode .notice-block p { color: #fcd34d; }
 
+
+        /* ── Nav active state & transitions ──────────────────── */
+        .nav-btn { border-radius: 6px; transition: background var(--transition), color var(--transition); position: relative; padding-bottom: 8px; }
+        .nav-btn:hover { background-color: rgba(0,174,239,0.08); }
+        .nav-btn::after { content:''; position:absolute; bottom:2px; left:50%; width:0; height:2px; background:var(--brand-light); border-radius:2px; transition: width 0.2s, left 0.2s; }
+        .nav-btn.nav-active::after { width:70%; left:15%; }
+        .nav-btn.nav-active { color: var(--brand-light) !important; }
+
+        /* ── Header shadow on scroll ─────────────────────────── */
+        header { transition: box-shadow 0.3s; }
+
+        /* ── FAQ cards ───────────────────────────────────────── */
+        #faq-container > div {
+            border-radius: var(--radius-card) !important;
+            box-shadow: var(--shadow-card) !important;
+            border: none !important;
+            transition: box-shadow var(--transition), transform var(--transition) !important;
+        }
+        #faq-container > div:hover {
+            box-shadow: var(--shadow-lift) !important;
+            transform: translateY(-2px);
+        }
+
+        /* ── News cards ──────────────────────────────────────── */
+        #news-container > div {
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-card);
+            border-left-width: 4px !important;
+            border-top: none; border-right: none; border-bottom: none;
+            transition: box-shadow var(--transition), transform var(--transition);
+        }
+        #news-container > div:hover {
+            box-shadow: var(--shadow-lift);
+            transform: translateY(-2px);
+        }
+
+        /* ── Accordion (commands) ────────────────────────────── */
+        .accordion-item {
+            border-radius: var(--radius-card) !important;
+            overflow: hidden;
+            box-shadow: var(--shadow-card) !important;
+            border: none !important;
+            margin-bottom: 2px;
+            transition: box-shadow var(--transition);
+        }
+        .accordion-item:hover { box-shadow: var(--shadow-lift) !important; }
+        .accordion-header:hover { background-color: rgba(0,174,239,0.04); }
+        .accordion-header { border-radius: var(--radius-card) var(--radius-card) 0 0; }
+
+        /* ── Strategy cards enhancement ──────────────────────── */
+        .strat-card { border-radius: 14px !important; transition: all 0.22s cubic-bezier(0.4,0,0.2,1) !important; }
+        .strat-card:hover { transform: translateY(-5px) !important; }
+        .strat-card::before { border-radius: 14px 14px 0 0 !important; }
+
+        /* ── Strategy modal ──────────────────────────────────── */
+        .strat-modal-box { border-radius: 18px !important; }
+
+        /* ── cmd-box hover ───────────────────────────────────── */
+        .cmd-box { border-radius: 6px; }
+        .cmd-box:hover { background-color: #eef4ff; }
+
+        /* ── Suggestion box ──────────────────────────────────── */
+        .suggestion-box { border-radius: 12px !important; border: none !important; box-shadow: 0 12px 40px rgba(0,0,0,0.14), 0 0 0 1px rgba(0,0,0,0.06) !important; overflow: hidden; margin-top: 6px !important; }
+        .suggestion-item:last-child { border-bottom: none; }
+        .suggestion-item { transition: background var(--transition); }
+
+        /* ── Section title ───────────────────────────────────── */
+        .section-title { font-family: 'Syne', 'Noto Sans TC', sans-serif; letter-spacing: -0.01em; }
+
+        /* ── kbd key ─────────────────────────────────────────── */
+        kbd { border-radius: 5px; font-family: 'Noto Sans TC', ui-monospace, monospace; }
+
+        /* ── Page hero decorative ────────────────────────────── */
+        .page-hero { border-bottom: none !important; box-shadow: 0 2px 16px rgba(0,0,0,0.06); }
+
+        /* ── Custom scrollbar ────────────────────────────────── */
+        ::-webkit-scrollbar { width: 7px; height: 7px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #c4d0e0; border-radius: 99px; }
+        ::-webkit-scrollbar-thumb:hover { background: #97a9be; }
+
+        /* ── Dark mode enhancements ──────────────────────────── */
+        .dark-mode { --surface: #111827; --card: #1f2937; }
+        .dark-mode .nav-btn:hover { background: rgba(255,255,255,0.06); }
+        .dark-mode .cmd-box:hover { background-color: #2d3d58; }
+        .dark-mode #faq-container > div { box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important; }
+        .dark-mode #faq-container > div:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.4) !important; }
+        .dark-mode .accordion-item { box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important; }
+        .dark-mode .accordion-item:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.4) !important; }
+        .dark-mode ::-webkit-scrollbar-thumb { background: #374151; }
+        .dark-mode ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+        .dark-mode .strat-card { background: #1c1428 !important; }
+        .dark-mode .nav-btn.nav-active { color: #60a5fa !important; }
+
         /* ── Strategy cards ──────────────────────────────────────── */
         .strat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         .strat-card {
@@ -311,7 +421,7 @@
         </div>
     </div>
 
-    <div class="tm-blue-dark text-white text-xs py-2 px-4 edit-ignore" contenteditable="false">
+    <div class="tm-blue-dark text-white text-xs py-2 px-4 edit-ignore" style="background:linear-gradient(90deg,#002855 0%,#003d7a 100%);" contenteditable="false">
         <div class="container mx-auto flex justify-end items-center space-x-4">
             <span>伺服器狀態：<span class="text-green-400">● 運行中</span></span>
             <button onclick="showPage('home')" class="hover:underline" contenteditable="false">回首頁</button>
@@ -325,17 +435,17 @@
     <header class="bg-white border-b border-gray-200 py-4 sticky top-0 z-50 shadow-sm edit-ignore" contenteditable="false">
         <div class="container mx-auto px-4 flex justify-between items-center">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="showPage('home')">
-                <div class="bg-blue-500 w-10 h-10 flex items-center justify-center text-white font-bold text-xl">C</div>
-                <h1 class="text-2xl font-bold text-blue-900 tracking-tighter">Cobblemon <span class="text-blue-500">方可夢樂園</span></h1>
+                <div style="width:40px;height:40px;background:linear-gradient(135deg,#003366,#00AEEF);display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:1.2rem;border-radius:8px;box-shadow:0 2px 8px rgba(0,174,239,0.35);font-family:'Syne',sans-serif;letter-spacing:-1px;">C</div>
+                <h1 class="text-2xl font-bold text-blue-900 tracking-tighter" style="font-family:'Syne','Noto Sans TC',sans-serif;">Cobblemon <span class="text-blue-500">方可夢樂園</span></h1>
             </div>
             <nav class="hidden md:block" contenteditable="false">
                 <ul class="flex space-x-1 font-bold">
-                    <li><button onclick="showPage('home')" class="px-3 py-2 hover:bg-blue-50 text-blue-900 btn-sq" contenteditable="false">首頁</button></li>
-                    <li><button onclick="showPage('newbie')" class="px-3 py-2 hover:bg-blue-50 text-red-600 btn-sq" contenteditable="false">快捷鍵</button></li>
-                    <li><button onclick="showPage('commands')" class="px-3 py-2 hover:bg-blue-50 text-blue-900 btn-sq" contenteditable="false">指令集</button></li>
-                    <li><button onclick="showPage('tutorial')" class="px-3 py-2 hover:bg-blue-50 text-green-700 btn-sq" contenteditable="false">入門教學</button></li>
-                    <li><button onclick="showPage('faq')" class="px-3 py-2 hover:bg-blue-50 text-orange-600 btn-sq" contenteditable="false">常見問題</button></li>
-                    <li><button onclick="showPage('strategy')" class="px-3 py-2 hover:bg-blue-50 text-purple-700 btn-sq" contenteditable="false">攻略區</button></li>
+                    <li><button onclick="showPage('home')" data-nav="home" class="nav-btn px-3 py-2 text-blue-900" contenteditable="false">首頁</button></li>
+                    <li><button onclick="showPage('newbie')" data-nav="newbie" class="nav-btn px-3 py-2 text-red-600" contenteditable="false">快捷鍵</button></li>
+                    <li><button onclick="showPage('commands')" data-nav="commands" class="nav-btn px-3 py-2 text-blue-900" contenteditable="false">指令集</button></li>
+                    <li><button onclick="showPage('tutorial')" data-nav="tutorial" class="nav-btn px-3 py-2 text-green-700" contenteditable="false">入門教學</button></li>
+                    <li><button onclick="showPage('faq')" data-nav="faq" class="nav-btn px-3 py-2 text-orange-600" contenteditable="false">常見問題</button></li>
+                    <li><button onclick="showPage('strategy')" data-nav="strategy" class="nav-btn px-3 py-2 text-purple-700" contenteditable="false">攻略區</button></li>
                 </ul>
             </nav>
             <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-blue-900 focus:outline-none" contenteditable="false">
@@ -355,13 +465,13 @@
     </header>
 
     <div id="home-page" class="page-content">
-        <section class="tm-blue-light py-10 md:py-16 text-center text-white edit-ignore" contenteditable="false">
-            <div class="container mx-auto px-4">
-                <h2 class="text-2xl md:text-4xl font-bold mb-6">搜尋你的方塊冒險資訊</h2>
+        <section class="py-10 md:py-16 text-center text-white edit-ignore" style="background:linear-gradient(135deg,#003d7a 0%,#0077c8 55%,#00AEEF 100%);position:relative;overflow:hidden;" contenteditable="false"><div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 120%,rgba(255,255,255,0.08) 0%,transparent 70%);pointer-events:none;"></div><div style="position:absolute;top:-30px;right:-30px;width:220px;height:220px;background:radial-gradient(circle,rgba(255,255,255,0.06) 0%,transparent 70%);pointer-events:none;border-radius:50%;"></div>
+            <div class="container mx-auto px-4" style="position:relative;z-index:1;">
+                <h2 class="text-2xl md:text-4xl font-bold mb-6" style="font-family:'Syne','Noto Sans TC',sans-serif;text-shadow:0 2px 12px rgba(0,0,0,0.18);letter-spacing:-0.02em;">搜尋你的方塊冒險資訊</h2>
                 <div class="max-w-md md:max-w-2xl mx-auto relative">
-                    <div class="flex bg-white shadow-lg p-1 text-gray-800">
-                        <input type="text" id="homeSearchInput" oninput="handleGlobalSearch(this, 'homeSuggestions')" placeholder="搜尋關鍵字..." class="flex-grow p-2 md:p-4 outline-none text-sm md:text-base" contenteditable="false">
-                        <button class="tm-blue-dark px-6 md:px-10 py-2 md:py-4 font-bold text-white btn-sq text-sm md:text-base" contenteditable="false">搜尋</button>
+                    <div class="flex bg-white text-gray-800" style="border-radius:50px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.18);padding:4px;">
+                        <input type="text" id="homeSearchInput" oninput="handleGlobalSearch(this, 'homeSuggestions')" placeholder="搜尋指令、攻略、教學..." class="flex-grow p-2 md:p-4 outline-none text-sm md:text-base bg-transparent" style="padding-left:20px;" contenteditable="false">
+                        <button style="background:linear-gradient(135deg,#003366,#0055a5);color:white;border:none;padding:10px 28px;font-weight:700;border-radius:50px;font-size:0.9rem;cursor:pointer;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'" contenteditable="false">搜尋</button>
                     </div>
                     <div id="homeSuggestions" class="suggestion-box hidden text-left"></div>
                 </div>
@@ -371,10 +481,10 @@
             <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
                 <div class="md:col-span-3 edit-ignore" contenteditable="false">
                     <div class="section-title">快速導航</div>
-                    <div class="flex flex-col border bg-white shadow-sm border-gray-300">
-                        <button onclick="showPage('tutorial')" class="p-4 border-b text-left hover:bg-green-50 font-bold text-green-700" contenteditable="false">▶ 入門教學指南</button>
-                        <button onclick="showPage('faq')" class="p-4 border-b text-left hover:bg-orange-50 font-bold text-orange-600" contenteditable="false">▶ 常見問題解答</button>
-                        <button onclick="showPage('strategy')" class="p-4 border-b text-left hover:bg-purple-50 font-bold text-purple-700" contenteditable="false">▶ 專業攻略專區</button>
+                    <div class="flex flex-col" style="gap:8px;">
+                        <button onclick="showPage('tutorial')" class="p-4 text-left font-bold text-green-700" style="background:#f0fdf4;border-radius:8px;border:1px solid #bbf7d0;transition:all 0.18s;display:flex;align-items:center;gap:10px;" onmouseover="this.style.transform='translateX(4px)';this.style.boxShadow='0 4px 12px rgba(21,128,61,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''" contenteditable="false"><span style="font-size:1.3rem;">🔰</span> 入門教學指南</button>
+                        <button onclick="showPage('faq')" class="p-4 text-left font-bold text-orange-600" style="background:#fff7ed;border-radius:8px;border:1px solid #fed7aa;transition:all 0.18s;display:flex;align-items:center;gap:10px;" onmouseover="this.style.transform='translateX(4px)';this.style.boxShadow='0 4px 12px rgba(234,88,12,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''" contenteditable="false"><span style="font-size:1.3rem;">❓</span> 常見問題解答</button>
+                        <button onclick="showPage('strategy')" class="p-4 text-left font-bold text-purple-700" style="background:#faf5ff;border-radius:8px;border:1px solid #ddd6fe;transition:all 0.18s;display:flex;align-items:center;gap:10px;" onmouseover="this.style.transform='translateX(4px)';this.style.boxShadow='0 4px 12px rgba(124,58,237,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''" contenteditable="false"><span style="font-size:1.3rem;">⚔️</span> 專業攻略專區</button>
                     </div>
                 </div>
                 <div class="md:col-span-9">
@@ -622,7 +732,7 @@
     </div>
 
     <div id="strategy-page" class="page-content hidden">
-        <div class="page-hero page-hero-strategy edit-ignore" contenteditable="false">
+        <div class="page-hero page-hero-strategy edit-ignore" style="position:relative;overflow:hidden;" contenteditable="false"><div style="position:absolute;right:-40px;top:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(124,58,237,0.1) 0%,transparent 70%);border-radius:50%;pointer-events:none;"></div>
             <div class="container mx-auto px-4 flex justify-between items-center">
                 <h2 style="color:#581c87">⚔️ 專業攻略區</h2>
                 <button class="edit-ui admin-btn" onclick="addNewSection('strategy-container', 'strategy')" contenteditable="false">[+] 新增攻略章節</button>
@@ -636,9 +746,10 @@
         </main>
     </div>
 
-    <footer class="bg-gray-900 text-white py-12 text-center mt-20 edit-ignore" contenteditable="false">
-        <p class="font-bold text-xl text-blue-400">Cobblemon 方可夢樂園</p>
-        <p class="text-gray-500 text-sm mt-2">本站由玩家自發性維護，非官方（伺服器管理團隊）直接運營。</p>
+    <footer class="text-white py-10 text-center mt-20 edit-ignore" style="background:linear-gradient(135deg,#0a0e1a 0%,#0d1b33 100%);border-top:1px solid rgba(255,255,255,0.06);" contenteditable="false">
+        <div style="width:40px;height:3px;background:linear-gradient(90deg,#003366,#00AEEF);margin:0 auto 16px;border-radius:2px;"></div>
+        <p class="font-bold text-xl" style="font-family:'Syne','Noto Sans TC',sans-serif;color:#60a5fa;letter-spacing:-0.02em;">Cobblemon 方可夢樂園</p>
+        <p class="text-sm mt-2" style="color:#4b5563;">本站由玩家自發性維護，非官方（伺服器管理團隊）直接運營。</p>
     </footer>
 
     <script>
@@ -903,7 +1014,11 @@
             document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
             const target = document.getElementById(pageId + '-page');
             if (target) target.classList.remove('hidden');
-            window.scrollTo(0, 0);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Update active nav
+            document.querySelectorAll('[data-nav]').forEach(btn => {
+                btn.classList.toggle('nav-active', btn.dataset.nav === pageId);
+            });
         }
 
         // ── 編輯模式 ──────────────────────────────────────────────
