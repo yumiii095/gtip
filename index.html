@@ -73,7 +73,7 @@
         .suggestion-item:hover { background-color: #f0f9ff; }
         mark.fuzzy-hl { background: #fef08a; color: #713f12; border-radius: 2px; padding: 0 1px; font-weight: 800; }
 
-        /* ── Page hero (fix: was missing CSS) ─────────── */
+        
         .page-hero { padding: 48px 0; position: relative; overflow: hidden; }
         .page-hero h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; letter-spacing: -0.02em; }
         .page-hero-faq      { background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border-bottom: 2px solid #fed7aa; }
@@ -82,8 +82,8 @@
         .page-hero-tutorial { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-bottom: 2px solid #bbf7d0; }
         .page-hero-strategy { background: linear-gradient(135deg, #faf5ff 0%, #ede9fe 100%); border-bottom: 2px solid #ddd6fe; }
 
-        /* ── Dark Mode ───────────────────────────────── */
-        /* 色彩系統：bg=#111827  card=#1f2937  surface=#283448  border=#374151 */
+        
+        
         body.dark-mode          { background-color: #111827; color: #f3f4f6; }
         .dark-mode header       { background-color: #1f2937 !important; border-color: #374151 !important; }
         .dark-mode .bg-white    { background-color: #1f2937 !important; border-color: #374151 !important; }
@@ -129,7 +129,7 @@
         .dark-mode table, .dark-mode th, .dark-mode td { border-color: #374151 !important; }
         .dark-mode tr.bg-green-100 { background-color: #0f2d1f !important; }
 
-        /* Page heroes dark */
+        
         .dark-mode .page-hero-faq      { background: linear-gradient(135deg, #1a0800, #2d1400); border-color: #5c2800; }
         .dark-mode .page-hero-commands { background: linear-gradient(135deg, #050e1f, #0a1e3d); border-color: #0e3060; }
         .dark-mode .page-hero-newbie   { background: linear-gradient(135deg, #1a0508, #2d0d15); border-color: #5c1a2a; }
@@ -156,7 +156,7 @@
         .news-dot { position: absolute; left: -7px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background-color: #00AEEF; border: 2px solid white; }
         .dark-mode .news-dot { border-color: #2d3748; }
 
-        /* ── 管理模式 ───────────────────────────────────────────── */
+        
 
         /* 工具列：預設完全不存在（不佔任何空間） */
         #admin-toolbar {
@@ -303,11 +303,11 @@
         .color-swatch:hover { border-color: white; }
         .format-divider { width: 1px; height: 14px; background: rgba(255,255,255,0.15); margin: 0 3px; display: inline-block; }
 
-        /* 確認彈窗樣式 */
+        
         #confirm-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center; }
         .modal-box { background: white; padding: 2rem; border-radius: 12px; max-width: 500px; width: 90%; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
         .dark-mode .modal-box { background: #2d3748; color: white; }
-        /* ── 注意事項 block ──── */
+        
         .notice-block { border-left: 4px solid #f59e0b; background: #fffbeb; padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 12px 0; }
         .notice-block .notice-title { font-weight: 700; color: #92400e; margin-bottom: 4px; font-size: 0.9rem; }
         .notice-block p { color: #78350f; font-size: 0.88rem; margin: 0; }
@@ -315,7 +315,7 @@
         .dark-mode .notice-block .notice-title { color: #fbbf24; }
         .dark-mode .notice-block p { color: #fcd34d; }
 
-        /* ── Strategy cards ──────────────────────────────────────── */
+        
         .strat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         .strat-card {
             background: var(--card, #fff); border: 1px solid var(--border, #dde3ec);
@@ -337,7 +337,7 @@
         .dark-mode .strat-card-title { color: #d8b4fe; }
         .dark-mode .strat-card-preview { color: #9ca3af; }
 
-        /* ── Strategy detail modal ───────────────────────────────── */
+        
         #strat-modal {
             display: none; position: fixed; inset: 0;
             background: rgba(0,0,0,0.65); z-index: 9998;
@@ -888,21 +888,18 @@
         let COMMANDS_DATA = [];
         let ALL_DATA = [];
 
-        // ── 深色模式 ──────────────────────────────────────────────
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
             document.getElementById('mode-label').innerText =
                 document.body.classList.contains('dark-mode') ? '深色' : '淺色';
         }
 
-        // ── 初始化攻略區（卡片模式）────────────────────────────
-        // 從 HTML 抽取純文字預覽（去除標籤）
         function _stratPreview(html) {
             const tmp = document.createElement('div');
             tmp.innerHTML = html;
             return (tmp.innerText || tmp.textContent || '').replace(/\s+/g,' ').trim().slice(0, 100);
         }
-        // 每個攻略標題前的 emoji 圖示
+        
         const _stratIcons = ['📖','⚔️','💰','🛒','🥚','📊','🌿','✨','🏆','🗺️','💎','⚡'];
 
         function initStrategies() {
@@ -929,8 +926,6 @@
             });
         }
 
-        // ── 攻略詳情 Modal ────────────────────────────────────────
-        // 目前正在 modal 中編輯的 strat 物件
         let _activeStrat = null;
 
         function openStratModal(strat) {
@@ -939,14 +934,13 @@
             const body  = document.getElementById('strat-modal-body');
             const isEditing = document.body.classList.contains('editing-active');
 
-            // 編輯模式專用工具列
             const editBar = isEditing ? _buildModalEditBar() : '';
 
             body.innerHTML = editBar + strat.html;
-            // 讓內文在編輯模式下可以直接改
+            
             if (isEditing) {
                 body.setAttribute('contenteditable', 'true');
-                // 不可編輯的 UI 元素 lock
+                
                 body.querySelectorAll('button, input, .edit-ui').forEach(el => el.setAttribute('contenteditable', 'false'));
             } else {
                 body.removeAttribute('contenteditable');
@@ -959,13 +953,13 @@
         function saveStratEdits() {
             if (!_activeStrat) return;
             const body = document.getElementById('strat-modal-body');
-            // Clone body, remove edit UI
+            
             const clone = body.cloneNode(true);
             clone.querySelectorAll('.edit-ui').forEach(el => el.remove());
             const h3 = clone.querySelector('h3');
             _activeStrat.title = h3 ? h3.innerText.trim() : _activeStrat.title;
             _activeStrat.html  = clone.innerHTML.trim();
-            // Re-render card in grid
+            
             initStrategies();
             const btn = document.querySelector('[onclick="saveStratEdits()"]');
             if (btn) { btn.textContent = '✅ 已儲存'; setTimeout(() => { if(btn) btn.textContent = '💾 儲存修改'; }, 1500); }
@@ -978,7 +972,6 @@
             _activeStrat = null;
         }
 
-        // ── 初始化指令集 ──────────────────────────────────────────
         function initCommands() {
             const container = document.getElementById('accordion-container');
             if (!container) return;
@@ -994,19 +987,15 @@
             });
         }
 
-        // ── 搜尋 ──────────────────────────────────────────────────
         function escapeHtml(str) {
             return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
         }
 
-        // ── 模糊搜尋核心 ─────────────────────────────────────────
-        // 回傳 {score, highlighted} — score 愈高愈相關
         function fuzzyScore(query, text) {
             if (!query || !text) return { score: -1, highlighted: escapeHtml(text) };
             const q = query.toLowerCase();
             const t = text.toLowerCase();
 
-            // 完整包含：最高分
             if (t.includes(q)) {
                 const idx = t.indexOf(q);
                 const hi = escapeHtml(text.slice(0, idx))
@@ -1015,7 +1004,6 @@
                 return { score: 100 + (idx === 0 ? 20 : 0), highlighted: hi };
             }
 
-            // 字元順序模糊比對
             let qi = 0, score = 0, prev = -1;
             const positions = [];
             for (let ti = 0; ti < t.length && qi < q.length; ti++) {
@@ -1029,7 +1017,6 @@
             }
             if (qi < q.length) return { score: -1, highlighted: escapeHtml(text) }; // 未完全匹配
 
-            // 標記匹配字元
             let hi = '', pi = 0;
             for (let i = 0; i < text.length; i++) {
                 if (pi < positions.length && positions[pi] === i) {
@@ -1084,10 +1071,8 @@
 
         function navigateToResult(page, targetId, isCommand) {
             document.querySelectorAll('.suggestion-box').forEach(b => b.classList.add('hidden'));
-            // 清空搜尋框
             document.querySelectorAll('#homeSearchInput, #innerSearchInput').forEach(el => el.value = '');
 
-            // 攻略 → 直接跳頁並開啟 modal
             if (page === 'strategy') {
                 showPage('strategy');
                 setTimeout(() => {
@@ -1095,7 +1080,6 @@
                     if (strat) {
                         openStratModal(strat);
                     } else {
-                        // fallback: scroll to card
                         const el = document.getElementById(targetId);
                         if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
                     }
@@ -1125,7 +1109,6 @@
             }, 300);
         }
 
-        // ── 導覽 ──────────────────────────────────────────────────
         function toggleAccordion(header) { header.closest('.accordion-item').classList.toggle('accordion-active'); }
         function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('open'); }
         function showPage(pageId) {
@@ -1135,7 +1118,6 @@
             window.scrollTo(0, 0);
         }
 
-        // ── 編輯模式 ──────────────────────────────────────────────
         let baseVersion = 1.0;
         let faqSortable;
         let _enterGuard = null;
@@ -1160,7 +1142,6 @@
                 }
                 updateVersionPreview('minor');
 
-                // 攔截標題欄位的 Enter，防止換行破壞排版
                 _enterGuard = (e) => {
                     if (e.key !== 'Enter') return;
                     const el = e.target;
@@ -1183,13 +1164,11 @@
             }
         }
 
-        // ── Format & selection ──────────────────────────────────
         function applyFormat(command, value = null) {
             document.execCommand(command, false, value);
             updateFormatState();
         }
 
-        // Reflect bold/italic/underline state in ribbon
         function updateFormatState() {
             try {
                 ['bold','italic','underline','strikeThrough'].forEach(cmd => {
@@ -1202,7 +1181,6 @@
         document.addEventListener('selectionchange', () => {
             if (!document.body.classList.contains('editing-active')) return;
             updateFormatState();
-            // Show / hide floating toolbar
             const sel = window.getSelection();
             const ft = document.getElementById('float-toolbar');
             if (!ft) return;
@@ -1221,7 +1199,6 @@
             if (ft && !ft.contains(e.target)) ft.classList.remove('visible');
         });
 
-        // ── Insert helpers ───────────────────────────────────────
         function _insertAtCursor(el) {
             const sel = window.getSelection();
             if (sel && sel.rangeCount) {
@@ -1270,7 +1247,6 @@
             if (!url) return;
             const text = window.getSelection()?.toString() || url;
             document.execCommand('createLink', false, url);
-            // Style the link
             const links = document.querySelectorAll('[contenteditable] a:not([target])');
             links.forEach(a => { if (a.href === url) { a.target = '_blank'; a.style.color='#2563eb'; } });
         }
@@ -1281,7 +1257,6 @@
             _createDraggableImage(url, '網路圖片');
         }
 
-        // ── Draggable / resizable image ─────────────────────────
         function insertEditableImage(input) {
             if (!input.files?.[0]) return;
             const reader = new FileReader();
@@ -1304,12 +1279,10 @@
             img.alt = name;
             img.style.cssText = 'max-width:100%;border-radius:6px;display:inline-block;';
 
-            // Resize handle
             const resizeHandle = document.createElement('div');
             resizeHandle.className = 'img-resize-handle';
             resizeHandle.title = '拖曳調整大小';
 
-            // Image toolbar
             const imgToolbar = document.createElement('div');
             imgToolbar.className = 'img-toolbar';
             imgToolbar.setAttribute('contenteditable','false');
@@ -1328,7 +1301,6 @@
             wrapper.appendChild(img);
             wrapper.appendChild(resizeHandle);
 
-            // Click to select
             img.addEventListener('click', (e) => {
                 if (!document.body.classList.contains('editing-active')) return;
                 e.stopPropagation();
@@ -1341,7 +1313,6 @@
                 }
             });
 
-            // Resize by dragging the handle
             let _resizing = false, _startX, _startW;
             resizeHandle.addEventListener('mousedown', (e) => {
                 if (!document.body.classList.contains('editing-active')) return;
@@ -1362,7 +1333,6 @@
                 img.style.maxWidth = 'none';
             }
 
-            // Drag-to-reposition
             wrapper.addEventListener('dragstart', (e) => {
                 if (!document.body.classList.contains('editing-active')) return;
                 e.dataTransfer.effectAllowed = 'move';
@@ -1382,7 +1352,6 @@
             img.classList.add('selected-img');
         }
 
-        // Drop target setup — make all contenteditable areas accept image drops
         function _setupImgDropTargets() {
             document.querySelectorAll('[contenteditable="true"]').forEach(zone => {
                 if (zone._imgDropReady) return;
@@ -1395,7 +1364,6 @@
                     if (!window._dragImgEl) return;
                     e.preventDefault();
                     const el = window._dragImgEl;
-                    // Find insertion point from drop position
                     let range;
                     if (document.caretRangeFromPoint) {
                         range = document.caretRangeFromPoint(e.clientX, e.clientY);
@@ -1429,7 +1397,6 @@
             img.style.width = w; img.style.maxWidth = '100%';
         }
 
-        // ── In-modal rich edit bar (strategy modal) ─────────────
         function _buildModalEditBar() {
             return `<div class="edit-ui" contenteditable="false" style="position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:4px;background:#0f172a;padding:8px 12px;border-radius:10px;margin-bottom:14px;flex-wrap:wrap;box-shadow:0 4px 14px rgba(0,0,0,0.3);">
                 <span style="font-size:11px;font-weight:700;color:#00AEEF;margin-right:4px;">✏️ 攻略編輯</span>
@@ -1479,7 +1446,6 @@
         function openPublishModal() { document.getElementById('confirm-modal').style.display = 'flex'; }
         function closeModal()       { document.getElementById('confirm-modal').style.display = 'none'; }
 
-        // ── 從 DOM 重建 JSON ───────────────────────────────────────
         function extractCommandsFromDOM() {
             return Array.from(document.querySelectorAll('#accordion-container .accordion-item')).flatMap(item => {
                 const header = item.querySelector('.accordion-header');
@@ -1501,14 +1467,12 @@
         }
 
         function extractStrategiesFromDOM() {
-            // Cards are rendered from STRATEGIES_DATA; reflect deletions from the DOM
             const remaining = new Set(
                 Array.from(document.querySelectorAll('#strategy-container > .strat-card[id]')).map(c => c.id)
             );
             return (window.STRATEGIES_DATA || []).filter(s => remaining.has(s.id));
         }
 
-        // ── 儲存並發佈 ────────────────────────────────────────────
         function executeFinalSave() {
             const summary = document.getElementById('modal-summary').value || '攻略站內容更新';
             const detail  = document.getElementById('modal-detail').value;
@@ -1537,7 +1501,6 @@
             closeModal();
             toggleEditMode(false);
 
-            // 下載更新後的 JSON
             const jsonBlob = new Blob([JSON.stringify({
                 commands:     extractCommandsFromDOM(),
                 search_index: ALL_DATA,
@@ -1547,7 +1510,6 @@
                 href: URL.createObjectURL(jsonBlob), download: 'cobblemon_data.json'
             }).click();
 
-            // 延遲 300ms 下載 HTML，避免瀏覽器攔截同時觸發的雙下載
             setTimeout(() => {
                 Object.assign(document.createElement('a'), {
                     href: URL.createObjectURL(new Blob(
@@ -1559,7 +1521,6 @@
             }, 300);
         }
 
-        // ── 新增區塊 ──────────────────────────────────────────────
         function addNewSection(containerId, type) {
             const container = document.getElementById(containerId);
             const el = document.createElement('div');
@@ -1567,7 +1528,6 @@
                 el.className = 'bg-white border shadow-sm p-6 relative';
                 el.innerHTML = `<span class="drag-handle edit-ui">☰</span><button class="edit-ui admin-btn admin-btn-delete absolute top-2 right-2" onclick="this.parentElement.remove()">[x] 刪除</button><h3 class="text-xl font-bold text-blue-900 mb-4 inline-block">新問題標題</h3><div class="text-gray-700 space-y-2"><p>內容填寫...</p></div>`;
             } else if (type === 'strategy') {
-                // Create new strategy and push to STRATEGIES_DATA
                 const newId = 'strat-new-' + Date.now();
                 const newStrat = {
                     id: newId,
@@ -1610,7 +1570,6 @@
             reader.readAsDataURL(input.files[0]);
         }
 
-        // ── 複製指令 ──────────────────────────────────────────────
         function copyCmd(btn) {
             const text = btn.closest('.cmd-box').querySelector('.cmd-text').innerText;
             const feedback = () => {
@@ -1628,7 +1587,6 @@
             });
         }
 
-        // ── 快捷鍵 ─────────────────────────────────────────────
         window.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.shiftKey && e.code === 'KeyK') {
                 e.preventDefault();
@@ -1637,7 +1595,6 @@
             if (e.key === 'Escape') closeStratModal();
         });
 
-        // ── 頁面載入 ──────────────────────────────────────────────
         window.onload = async function() {
             try {
                 const res = await fetch('cobblemon_data.json');
