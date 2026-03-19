@@ -156,27 +156,152 @@
         .news-dot { position: absolute; left: -7px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background-color: #00AEEF; border: 2px solid white; }
         .dark-mode .news-dot { border-color: #2d3748; }
 
-        /* 管理功能樣式 */
-        #admin-toolbar { display: none; background-color: #e11d48; color: white; padding: 10px; position: sticky; top: 0; z-index: 1000; flex-direction: column; align-items: center; gap: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
-        .editing-active #admin-toolbar { display: flex; }
-        .editing-active [contenteditable="true"]:hover { outline: 2px dashed #e11d48; outline-offset: 4px; }
-        
-        .admin-btn { cursor: pointer; background: #2563eb; color: white; border: none; padding: 6px 14px; font-size: 14px; border-radius: 6px; margin: 0 5px; font-weight: bold; transition: background 0.2s; }
+        /* ── 管理模式 ───────────────────────────────────────────── */
+
+        /* 工具列：預設完全不存在（不佔任何空間） */
+        #admin-toolbar {
+            display: none;            /* 預設隱藏 */
+            position: fixed;          /* fixed = 不影響文件流，不把內容往下推 */
+            top: 0; left: 0; right: 0;
+            z-index: 2000;
+            flex-direction: column;
+            background: #0f172a;
+            border-bottom: 2px solid #00AEEF;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+        }
+        /* 只有 editing-active 時才顯示 */
+        body.editing-active #admin-toolbar { display: flex; }
+        /* 補償 fixed 工具列遮住的高度（兩層合計約 72px） */
+        body.editing-active { padding-top: 72px !important; }
+
+        /* 上層：動作列，高度固定 */
+        #admin-top-bar {
+            display: flex; align-items: center; gap: 8px;
+            padding: 5px 14px; height: 36px; flex-shrink: 0;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        /* 下層：Ribbon，高度固定，橫向滾動不換行 */
+        #admin-ribbon {
+            display: flex; align-items: center;
+            height: 34px; flex-shrink: 0;
+            padding: 0 10px;
+            overflow-x: auto; overflow-y: hidden;
+            flex-wrap: nowrap;   /* ← 關鍵：絕不換行 */
+            white-space: nowrap;
+            scrollbar-width: thin; scrollbar-color: #334155 transparent;
+            gap: 0;
+        }
+        #admin-ribbon::-webkit-scrollbar { height: 3px; }
+        #admin-ribbon::-webkit-scrollbar-thumb { background: #334155; border-radius: 99px; }
+
+        /* Ribbon 群組 */
+        .ribbon-group {
+            display: inline-flex; align-items: center; gap: 2px;
+            padding: 0 6px; flex-shrink: 0;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            height: 100%;
+        }
+        .ribbon-group:last-child { border-right: none; }
+        /* 隱藏群組標籤（省空間） */
+        .ribbon-label { display: none !important; }
+
+        /* Ribbon 按鈕 */
+        .rb {
+            background: transparent; border: none;
+            color: rgba(255,255,255,0.82); padding: 3px 6px;
+            border-radius: 4px; cursor: pointer; font-size: 12px;
+            transition: background 0.15s, color 0.15s;
+            display: inline-flex; align-items: center; gap: 3px;
+            white-space: nowrap; flex-shrink: 0;
+            min-width: 24px; justify-content: center; line-height: 1;
+            height: 26px;
+        }
+        .rb:hover  { background: rgba(0,174,239,0.22); color: #00AEEF; }
+        .rb.rb-active { background: rgba(0,174,239,0.28); color: #00AEEF; }
+        .rb svg { width: 13px; height: 13px; flex-shrink: 0; }
+        .rb-sep {
+            width: 1px; height: 16px;
+            background: rgba(255,255,255,0.1);
+            margin: 0 3px; flex-shrink: 0; display: inline-block;
+        }
+        select.rb-select {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: white; border-radius: 4px;
+            padding: 2px 4px; font-size: 11px;
+            cursor: pointer; outline: none; max-width: 75px; flex-shrink: 0;
+            height: 24px;
+        }
+        select.rb-select option { background: #1e293b; color: white; }
+        .rb-swatch {
+            width: 14px; height: 14px; border-radius: 3px;
+            cursor: pointer; border: 2px solid transparent;
+            transition: border-color 0.12s; flex-shrink: 0;
+            display: inline-block;
+        }
+        .rb-swatch:hover { border-color: rgba(255,255,255,0.75); }
+
+        /* 浮動選取工具列 */
+        #float-toolbar {
+            display: none; position: fixed; z-index: 9990;
+            background: #1e293b; border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px; padding: 3px 5px; gap: 2px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            align-items: center; pointer-events: auto;
+        }
+        #float-toolbar.visible { display: flex; }
+        #float-toolbar::after {
+            content: ''; position: absolute;
+            top: 100%; left: 50%; transform: translateX(-50%);
+            border: 5px solid transparent; border-top-color: #1e293b;
+        }
+
+        /* 可拖曳圖片 */
+        .drag-img { display: inline-block; position: relative; cursor: move; user-select: none; max-width: 100%; }
+        .drag-img.img-center { display: block; margin: 8px auto; text-align: center; }
+        .drag-img img { display: block; max-width: 100%; border-radius: 6px; }
+        .drag-img img.selected-img { outline: 2px solid #00AEEF; outline-offset: 2px; }
+        .img-resize-handle {
+            display: none; position: absolute; right: -5px; bottom: -5px;
+            width: 12px; height: 12px; background: #00AEEF;
+            border-radius: 3px; cursor: se-resize; z-index: 10;
+        }
+        .drag-img img.selected-img ~ .img-resize-handle { display: block; }
+        .img-toolbar {
+            display: none; position: absolute; top: -34px; left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b; border-radius: 6px; padding: 3px 5px;
+            gap: 2px; white-space: nowrap; z-index: 20;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+        .drag-img img.selected-img ~ .img-toolbar { display: flex; align-items: center; }
+
+        /* 編輯中外框 */
+        .editing-active [contenteditable="true"]:focus {
+            outline: 2px solid rgba(0,174,239,0.55);
+            outline-offset: 3px; border-radius: 3px;
+        }
+        .editing-active [contenteditable="true"]:hover:not(:focus) {
+            outline: 1px dashed rgba(0,174,239,0.28);
+            outline-offset: 3px; border-radius: 3px;
+        }
+
+        .admin-btn { cursor: pointer; background: rgba(37,99,235,0.85); color: white; border: none; padding: 4px 10px; font-size: 12px; border-radius: 5px; font-weight: bold; transition: background 0.2s; flex-shrink: 0; }
         .admin-btn:hover { background: #1d4ed8; }
-        .admin-btn-delete { background: #dc2626; padding: 8px 16px; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .admin-btn-delete { background: rgba(220,38,38,0.85); }
         .admin-btn-delete:hover { background: #b91c1c; }
-        
         .edit-ui { display: none; pointer-events: auto; }
         .editing-active .edit-ui { display: inline-block; }
-        
         .sortable-ghost { opacity: 0.4; background-color: #f0f9ff; border: 2px dashed #00AEEF; }
         .drag-handle { cursor: grab; color: #ccc; margin-right: 10px; display: none; font-size: 1.2rem; }
         .editing-active .drag-handle { display: inline-block; }
-
-        /* 格式工具列 */
-        .format-toolbar { display: flex; gap: 5px; background: #333; padding: 5px; border-radius: 4px; }
-        .format-btn { background: #444; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 12px; }
-        .format-btn:hover { background: #555; }
+        /* format-toolbar（舊版相容） */
+        .format-toolbar { display: flex; gap: 4px; align-items: center; }
+        .format-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 3px 7px; border-radius: 3px; cursor: pointer; font-size: 12px; flex-shrink: 0; }
+        .format-btn:hover { background: rgba(0,174,239,0.25); color: #00AEEF; }
+        .color-swatch { width: 14px; height: 14px; border-radius: 3px; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); flex-shrink: 0; display: inline-block; }
+        .color-swatch:hover { border-color: white; }
+        .format-divider { width: 1px; height: 14px; background: rgba(255,255,255,0.15); margin: 0 3px; display: inline-block; }
 
         /* 確認彈窗樣式 */
         #confirm-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center; }
@@ -336,7 +461,6 @@
                     <option value="6">32px</option>
                     <option value="7">48px</option>
                 </select>
-                <span class="ribbon-label">字級</span>
             </div>
 
             <!-- 格式 -->
@@ -346,7 +470,6 @@
                 <button class="rb" id="rb-underline" onmousedown="event.preventDefault();applyFormat('underline')" title="底線 Ctrl+U"><u>U</u></button>
                 <button class="rb" id="rb-strike" onmousedown="event.preventDefault();applyFormat('strikeThrough')" title="刪除線"><s>S</s></button>
                 <button class="rb" onmousedown="event.preventDefault();applyFormat('removeFormat')" title="清除格式" style="font-size:11px;">清除</button>
-                <span class="ribbon-label">字元格式</span>
             </div>
 
             <!-- 文字顏色 -->
@@ -359,7 +482,6 @@
                 <div class="rb-swatch" style="background:#9333ea" onmousedown="event.preventDefault();applyFormat('foreColor','#9333ea')" title="紫"></div>
                 <div class="rb-swatch" style="background:#94a3b8" onmousedown="event.preventDefault();applyFormat('foreColor','#94a3b8')" title="灰"></div>
                 <div class="rb-swatch" style="background:#f1f5f9;border:1px solid rgba(255,255,255,0.2)" onmousedown="event.preventDefault();applyFormat('foreColor','#f1f5f9')" title="白"></div>
-                <span class="ribbon-label">文字色</span>
             </div>
 
             <!-- 螢光 -->
@@ -369,7 +491,6 @@
                 <div class="rb-swatch" style="background:#bfdbfe" onmousedown="event.preventDefault();applyFormat('hiliteColor','#bfdbfe')" title="藍底"></div>
                 <div class="rb-swatch" style="background:#fecdd3" onmousedown="event.preventDefault();applyFormat('hiliteColor','#fecdd3')" title="粉底"></div>
                 <div class="rb-swatch" style="background:transparent;border:1px solid rgba(255,255,255,0.25)" onmousedown="event.preventDefault();applyFormat('hiliteColor','transparent')" title="移除底色" title="無底色">✕</div>
-                <span class="ribbon-label">螢光底色</span>
             </div>
 
             <!-- 對齊 -->
@@ -383,7 +504,6 @@
                 <button class="rb" onmousedown="event.preventDefault();applyFormat('justifyRight')" title="靠右">
                     <svg viewBox="0 0 20 20" fill="currentColor"><rect x="2" y="4" width="16" height="2" rx="1"/><rect x="8" y="9" width="10" height="2" rx="1"/><rect x="4" y="14" width="14" height="2" rx="1"/></svg>
                 </button>
-                <span class="ribbon-label">對齊</span>
             </div>
 
             <!-- 清單 -->
@@ -400,7 +520,6 @@
                 <button class="rb" onmousedown="event.preventDefault();applyFormat('indent')" title="增加縮排">
                     <svg viewBox="0 0 20 20" fill="currentColor"><path d="M4 6l4 4-4 4"/><rect x="10" y="5" width="8" height="2" rx="1"/><rect x="10" y="13" width="8" height="2" rx="1"/></svg>
                 </button>
-                <span class="ribbon-label">清單／縮排</span>
             </div>
 
             <!-- 連結 -->
@@ -409,13 +528,11 @@
                     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 12.5a4.5 4.5 0 0 0 6.364 0l2-2a4.5 4.5 0 0 0-6.364-6.364L8.5 5.636"/><path d="M12 7.5a4.5 4.5 0 0 0-6.364 0l-2 2a4.5 4.5 0 0 0 6.364 6.364l1.5-1.5"/></svg>
                 </button>
                 <button class="rb" onmousedown="event.preventDefault();document.execCommand('unlink')" title="移除連結" style="font-size:11px;">✂</button>
-                <span class="ribbon-label">連結</span>
             </div>
 
             <!-- 分隔線 -->
             <div class="ribbon-group">
                 <button class="rb" onmousedown="event.preventDefault();insertHRule()" title="插入分隔線" style="font-size:11px;">─</button>
-                <span class="ribbon-label">分隔</span>
             </div>
 
             <!-- 圖片 -->
@@ -425,7 +542,6 @@
                     <input type="file" accept="image/*" style="display:none" onchange="insertEditableImage(this)" contenteditable="false">
                 </label>
                 <button class="rb" onmousedown="event.preventDefault();insertImageFromUrl()" title="從網址插入圖片" style="font-size:11px;">URL</button>
-                <span class="ribbon-label">圖片</span>
             </div>
 
             <!-- 區塊 -->
@@ -433,7 +549,6 @@
                 <button class="rb" onmousedown="event.preventDefault();insertTip()" title="插入小提醒">💡</button>
                 <button class="rb" onmousedown="event.preventDefault();insertNotice()" title="插入注意事項">⚠️</button>
                 <button class="rb" onmousedown="event.preventDefault();insertCodeBlock()" title="插入程式碼區塊" style="font-family:monospace;font-size:12px;">&lt;/&gt;</button>
-                <span class="ribbon-label">區塊</span>
             </div>
 
         </div><!-- /ribbon -->
