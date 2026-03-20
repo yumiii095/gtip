@@ -716,41 +716,24 @@
                 <div class="md:col-span-9">
                     <div class="section-title flex justify-between items-center">
                         最新情報與更新公告
+                        <button class="edit-ui admin-btn" onclick="addNewsCard()" contenteditable="false">[+] 新增公告</button>
                     </div>
-                    <div id="news-container" class="space-y-6"><div class="bg-white border-l-4 border-red-500 shadow-md p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center space-x-2">
-                        <span class="bg-red-600 text-white text-xs px-2 py-1 font-bold">系統更新</span>
-                        <h3 class="text-xl font-bold text-blue-900 uppercase">v1.1 - 攻略站內容更新</h3>
+                    <div id="news-container" class="space-y-4">
+                    <div class="bg-white border-l-4 border-red-500 shadow-md p-6 relative">
+                        <button class="edit-ui admin-btn admin-btn-delete absolute top-3 right-3" onclick="this.closest('#news-container > div').remove()" contenteditable="false">[x] 刪除</button>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-2">
+                                <span class="bg-red-600 text-white text-xs px-2 py-1 font-bold">系統更新</span>
+                                <h3 class="text-xl font-bold text-blue-900 uppercase">v1.1 - 優化介面</h3>
+                            </div>
+                            <span class="text-gray-400 text-sm font-bold">2026-03-03</span>
+                        </div>
+                        <div class="news-item ml-2">
+                            <div class="news-dot !bg-red-500"></div>
+                            <p class="text-gray-700 text-sm">優化色模式配色</p>
+                        </div>
                     </div>
-                    <span class="text-gray-400 text-sm font-bold">2026-03-21</span>
                 </div>
-                <div class="news-item ml-2">
-                    <div class="news-dot !bg-red-500"></div>
-                    <p class="text-gray-700 text-sm">站內資訊已更新至最新版本。</p>
-                </div></div><div class="bg-white border-l-4 border-red-500 shadow-md p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center space-x-2">
-                        <span class="bg-red-600 text-white text-xs px-2 py-1 font-bold">系統更新</span>
-                        <h3 class="text-xl font-bold text-blue-900 uppercase">v1.1 - 攻略站內容更新</h3>
-                    </div>
-                    <span class="text-gray-400 text-sm font-bold">2026-03-21</span>
-                </div>
-                <div class="news-item ml-2">
-                    <div class="news-dot !bg-red-500"></div>
-                    <p class="text-gray-700 text-sm">站內資訊已更新至最新版本。</p>
-                </div></div><div class="bg-white border-l-4 border-red-500 shadow-md p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center space-x-2">
-                        <span class="bg-red-600 text-white text-xs px-2 py-1 font-bold">系統更新</span>
-                        <h3 class="text-xl font-bold text-blue-900 uppercase">v1.1 - 優化介面</h3>
-                    </div>
-                    <span class="text-gray-400 text-sm font-bold">2026-03-03</span>
-                </div>
-                <div class="news-item ml-2">
-                    <div class="news-dot !bg-red-500"></div>
-                    <p class="text-gray-700 text-sm">優化模式配色</p>
-                </div></div></div>
                 </div>
             </div>
         </main>
@@ -1644,6 +1627,7 @@
             const log = document.createElement('div');
             log.className = 'bg-white border-l-4 border-red-500 shadow-md p-6';
             log.innerHTML = `
+                <button class="edit-ui admin-btn admin-btn-delete absolute top-3 right-3" onclick="this.closest('#news-container > div').remove()" contenteditable="false">[x] 刪除</button>
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center space-x-2">
                         <span class="bg-red-600 text-white text-xs px-2 py-1 font-bold">系統更新</span>
@@ -1655,6 +1639,7 @@
                     <div class="news-dot !bg-red-500"></div>
                     <p class="text-gray-700 text-sm">${detail}</p>
                 </div>`;
+            log.style.position = 'relative';
             newsContainer.prepend(log);
             closeModal();
             toggleEditMode(false);
@@ -1767,6 +1752,28 @@
             initCommands();
             initStrategies();
         };
-    </script>
+    
+        function addNewsCard() {
+            const dateStr = new Date().toLocaleDateString('zh-TW', {
+                timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit'
+            }).replace(/\//g, '-');
+            const card = document.createElement('div');
+            card.className = 'bg-white border-l-4 border-blue-500 shadow-md p-6 relative';
+            card.innerHTML = `
+                <button class="edit-ui admin-btn admin-btn-delete absolute top-3 right-3" onclick="this.closest('#news-container > div').remove()" contenteditable="false">[x] 刪除</button>
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-2">
+                        <span class="bg-blue-600 text-white text-xs px-2 py-1 font-bold">公告</span>
+                        <h3 class="text-xl font-bold text-blue-900 uppercase" contenteditable="true">公告標題</h3>
+                    </div>
+                    <span class="text-gray-400 text-sm font-bold" contenteditable="true">${dateStr}</span>
+                </div>
+                <div class="news-item ml-2">
+                    <div class="news-dot"></div>
+                    <p class="text-gray-700 text-sm" contenteditable="true">在此輸入公告內容...</p>
+                </div>`;
+            document.getElementById('news-container').prepend(card);
+        }
+</script>
 
 </body></html>
