@@ -73,7 +73,6 @@
         .suggestion-item:hover { background-color: #f0f9ff; }
         mark.fuzzy-hl { background: #fef08a; color: #713f12; border-radius: 2px; padding: 0 1px; font-weight: 800; }
 
-        
         .page-hero { padding: 48px 0; position: relative; overflow: hidden; }
         .page-hero h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; letter-spacing: -0.02em; }
         .page-hero-faq      { background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border-bottom: 2px solid #fed7aa; }
@@ -82,15 +81,12 @@
         .page-hero-tutorial { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-bottom: 2px solid #bbf7d0; }
         .page-hero-strategy { background: linear-gradient(135deg, #faf5ff 0%, #ede9fe 100%); border-bottom: 2px solid #ddd6fe; }
 
-        
-        
         body.dark-mode          { background-color: #111827; color: #f3f4f6; }
         .dark-mode header       { background-color: #1f2937 !important; border-color: #374151 !important; }
         .dark-mode .bg-white    { background-color: #1f2937 !important; border-color: #374151 !important; }
         .dark-mode .border      { border-color: #374151 !important; }
         .dark-mode .border-b, .dark-mode .border-t { border-color: #374151 !important; }
 
-        /* Text */
         .dark-mode .text-gray-800, .dark-mode .text-gray-700, .dark-mode .text-gray-600 { color: #e5e7eb !important; }
         .dark-mode .text-gray-500, .dark-mode .text-gray-400 { color: #9ca3af !important; }
         .dark-mode .text-blue-900, .dark-mode .text-blue-800 { color: #93c5fd !important; }
@@ -106,7 +102,6 @@
         .dark-mode .text-orange-600                              { color: #fb923c !important; }
         .dark-mode .text-yellow-200 { color: #fef08a !important; }
 
-        /* Backgrounds */
         .dark-mode .section-title { color: #60a5fa; border-color: #374151; }
         .dark-mode .bg-gray-50, .dark-mode .bg-gray-100  { background-color: #283448 !important; }
         .dark-mode .bg-blue-50, .dark-mode .bg-blue-100  { background-color: #1e3a5f !important; border-color: #2d5a8e !important; }
@@ -116,7 +111,6 @@
         .dark-mode .bg-green-50, .dark-mode .bg-green-100 { background-color: #0f2d1f !important; border-color: #1a5c3a !important; }
         .dark-mode .bg-yellow-50, .dark-mode .bg-yellow-200 { background-color: #2d2000 !important; border-color: #5c4000 !important; }
 
-        /* Components */
         .dark-mode .cmd-box    { background-color: #283448; border-color: #374151; border-left-color: #60a5fa; }
         .dark-mode .cmd-box:hover { background-color: #2d3d58; }
         .dark-mode .cmd-text   { color: #fca5a5; }
@@ -129,7 +123,6 @@
         .dark-mode table, .dark-mode th, .dark-mode td { border-color: #374151 !important; }
         .dark-mode tr.bg-green-100 { background-color: #0f2d1f !important; }
 
-        
         .dark-mode .page-hero-faq      { background: linear-gradient(135deg, #1a0800, #2d1400); border-color: #5c2800; }
         .dark-mode .page-hero-commands { background: linear-gradient(135deg, #050e1f, #0a1e3d); border-color: #0e3060; }
         .dark-mode .page-hero-newbie   { background: linear-gradient(135deg, #1a0508, #2d0d15); border-color: #5c1a2a; }
@@ -156,12 +149,9 @@
         .news-dot { position: absolute; left: -7px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background-color: #00AEEF; border: 2px solid white; }
         .dark-mode .news-dot { border-color: #2d3748; }
 
-        
-
-        /* 工具列：預設完全不存在（不佔任何空間） */
         #admin-toolbar {
-            display: none;            /* 預設隱藏 */
-            position: fixed;          /* fixed = 不影響文件流，不把內容往下推 */
+            display: none;            
+            position: fixed;          
             top: 0; left: 0; right: 0;
             z-index: 2000;
             flex-direction: column;
@@ -169,24 +159,20 @@
             border-bottom: 2px solid #00AEEF;
             box-shadow: 0 4px 24px rgba(0,0,0,0.5);
         }
-        /* 只有 editing-active 時才顯示 */
         body.editing-active #admin-toolbar { display: flex; }
-        /* 補償 fixed 工具列遮住的高度（兩層合計約 72px） */
         body.editing-active { padding-top: 72px !important; }
 
-        /* 上層：動作列，高度固定 */
         #admin-top-bar {
             display: flex; align-items: center; gap: 8px;
             padding: 5px 14px; height: 36px; flex-shrink: 0;
             border-bottom: 1px solid rgba(255,255,255,0.08);
         }
-        /* 下層：Ribbon，高度固定，橫向滾動不換行 */
         #admin-ribbon {
             display: flex; align-items: center;
             height: 34px; flex-shrink: 0;
             padding: 0 10px;
             overflow-x: auto; overflow-y: hidden;
-            flex-wrap: nowrap;   /* ← 關鍵：絕不換行 */
+            flex-wrap: nowrap;   
             white-space: nowrap;
             scrollbar-width: thin; scrollbar-color: #334155 transparent;
             gap: 0;
@@ -194,7 +180,6 @@
         #admin-ribbon::-webkit-scrollbar { height: 3px; }
         #admin-ribbon::-webkit-scrollbar-thumb { background: #334155; border-radius: 99px; }
 
-        /* Ribbon 群組 */
         .ribbon-group {
             display: inline-flex; align-items: center; gap: 2px;
             padding: 0 6px; flex-shrink: 0;
@@ -202,10 +187,8 @@
             height: 100%;
         }
         .ribbon-group:last-child { border-right: none; }
-        /* 隱藏群組標籤（省空間） */
         .ribbon-label { display: none !important; }
 
-        /* Ribbon 按鈕 */
         .rb {
             background: transparent; border: none;
             color: rgba(255,255,255,0.82); padding: 3px 6px;
@@ -241,7 +224,6 @@
         }
         .rb-swatch:hover { border-color: rgba(255,255,255,0.75); }
 
-        /* 浮動選取工具列 */
         #float-toolbar {
             display: none; position: fixed; z-index: 9990;
             background: #1e293b; border: 1px solid rgba(255,255,255,0.12);
@@ -256,7 +238,6 @@
             border: 5px solid transparent; border-top-color: #1e293b;
         }
 
-        /* 可拖曳圖片 */
         .drag-img { display: inline-block; position: relative; cursor: move; user-select: none; max-width: 100%; }
         .drag-img.img-center { display: block; margin: 8px auto; text-align: center; }
         .drag-img img { display: block; max-width: 100%; border-radius: 6px; }
@@ -276,7 +257,6 @@
         }
         .drag-img img.selected-img ~ .img-toolbar { display: flex; align-items: center; }
 
-        /* 編輯中外框 */
         .editing-active [contenteditable="true"]:focus {
             outline: 2px solid rgba(0,174,239,0.55);
             outline-offset: 3px; border-radius: 3px;
@@ -295,7 +275,6 @@
         .sortable-ghost { opacity: 0.4; background-color: #f0f9ff; border: 2px dashed #00AEEF; }
         .drag-handle { cursor: grab; color: #ccc; margin-right: 10px; display: none; font-size: 1.2rem; }
         .editing-active .drag-handle { display: inline-block; }
-        /* format-toolbar（舊版相容） */
         .format-toolbar { display: flex; gap: 4px; align-items: center; }
         .format-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 3px 7px; border-radius: 3px; cursor: pointer; font-size: 12px; flex-shrink: 0; }
         .format-btn:hover { background: rgba(0,174,239,0.25); color: #00AEEF; }
@@ -303,7 +282,6 @@
         .color-swatch:hover { border-color: white; }
         .format-divider { width: 1px; height: 14px; background: rgba(255,255,255,0.15); margin: 0 3px; display: inline-block; }
 
-        
         #confirm-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center; }
         .modal-box { background: white; padding: 2rem; border-radius: 12px; max-width: 500px; width: 90%; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
         .dark-mode .modal-box { background: #2d3748; color: white; }
@@ -315,7 +293,6 @@
         .dark-mode .notice-block .notice-title { color: #fbbf24; }
         .dark-mode .notice-block p { color: #fcd34d; }
 
-        
         .strat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         .strat-card {
             background: var(--card, #fff); border: 1px solid var(--border, #dde3ec);
@@ -337,7 +314,6 @@
         .dark-mode .strat-card-title { color: #d8b4fe; }
         .dark-mode .strat-card-preview { color: #9ca3af; }
 
-        
         #strat-modal {
             display: none; position: fixed; inset: 0;
             background: rgba(0,0,0,0.65); z-index: 9998;
