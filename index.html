@@ -68,12 +68,19 @@
         .accordion-header::after { content: '▼'; position: absolute; right: 20px; font-size: 0.8rem; opacity: 0.5; transition: transform 0.3s; }
         .accordion-item.accordion-active .accordion-header::after { transform: rotate(180deg); }
 
-        .suggestion-box { position: absolute; width: 100%; background: white; border: 1px solid #ddd; z-index: 200; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); max-height: 60vh; overflow-y: auto; }
+        .suggestion-box { position: fixed; background: white; border: 1px solid #ddd; z-index: 9999; box-shadow: 0 10px 25px -3px rgba(0,0,0,0.18); max-height: 55vh; overflow-y: auto; border-radius: 4px; }
         @media (max-width: 767px) {
-            .suggestion-box { position: fixed; top: auto; left: 0; right: 0; width: 100%; max-height: 50vh; border-radius: 0; z-index: 9900; }
+            .suggestion-box { left: 0 !important; right: 0 !important; width: 100% !important; max-height: 50vh; border-radius: 0; border-left: none; border-right: none; }
         }
         .suggestion-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #eee; }
         .suggestion-item:hover { background-color: #f0f9ff; }
+        .search-guess-section { display: none; background: #eef6ff; border-top: 3px solid #00AEEF; padding: 28px 0 36px; }
+        .search-guess-section.visible { display: block; }
+        .search-guess-card { background: white; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px 16px; cursor: pointer; transition: all 0.15s; border-left: 4px solid #00AEEF; }
+        .search-guess-card:hover { border-left-color: #003366; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transform: translateY(-1px); }
+        .dark-mode .search-guess-section { background: #1a2a3a; border-top-color: #60a5fa; }
+        .dark-mode .search-guess-card { background: #1f2937; border-color: #374151; }
+        .dark-mode .search-guess-card:hover { border-left-color: #60a5fa; }
         mark.fuzzy-hl { background: #fef08a; color: #713f12; border-radius: 2px; padding: 0 1px; font-weight: 800; }
 
         
@@ -702,15 +709,28 @@
             </div>
             <div class="container mx-auto px-4" style="position:relative;z-index:1;">
                 <h2 class="text-2xl md:text-4xl font-bold mb-6">今天想找什麼？</h2>
-                <div class="max-w-md md:max-w-2xl mx-auto relative" style="max-width:calc(100vw - 2rem);">
-                    <div class="flex bg-white shadow-lg p-1 text-gray-800">
-                        <input type="text" id="homeSearchInput" oninput="handleGlobalSearch(this, 'homeSuggestions')" onkeydown="if(event.key==='Enter')executeHomeSearch()" placeholder="搜尋關鍵字..." class="flex-grow p-2 md:p-4 outline-none text-sm md:text-base" style="font-size:16px;" contenteditable="false">
-                        <button class="tm-blue-dark px-6 md:px-10 py-2 md:py-4 font-bold text-white btn-sq text-sm md:text-base" onclick="executeHomeSearch()" contenteditable="false">搜尋</button>
+                <div class="w-full max-w-2xl mx-auto relative">
+                    <div class="flex bg-white shadow-lg overflow-hidden text-gray-800">
+                        <input type="text" id="homeSearchInput" oninput="handleGlobalSearch(this, 'homeSuggestions')" onkeydown="if(event.key==='Enter')executeHomeSearch()" placeholder="搜尋關鍵字..." class="flex-1 min-w-0 p-3 md:p-4 outline-none text-sm md:text-base" style="font-size:16px;" contenteditable="false">
+                        <button class="tm-blue-dark flex-shrink-0 px-4 md:px-10 py-3 md:py-4 font-bold text-white btn-sq text-sm md:text-base whitespace-nowrap" onclick="executeHomeSearch()" contenteditable="false">搜尋</button>
                     </div>
                     <div id="homeSuggestions" class="suggestion-box hidden text-left"></div>
                 </div>
             </div>
         </section>
+
+        <!-- 搜尋猜測結果區 -->
+        <div id="search-guess-section" class="search-guess-section edit-ignore" contenteditable="false">
+            <div class="container mx-auto px-4">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="text-2xl">🔍</span>
+                    <h3 id="search-guess-title" class="text-xl font-bold text-blue-900">我猜你想找的是...</h3>
+                </div>
+                <div id="search-guess-results" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+                <button onclick="document.getElementById('search-guess-section').classList.remove('visible')" class="mt-4 text-sm text-gray-400 hover:text-gray-600 underline">收起搜尋結果</button>
+            </div>
+        </div>
+
         <main class="container mx-auto py-12 px-4">
             <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
                 <div class="md:col-span-3 edit-ignore" contenteditable="false">
@@ -1169,29 +1189,59 @@
 
         function fuzzyScore(query, text) {
             if (!query || !text) return { score: -1, highlighted: escapeHtml(text) };
-            const q = query.toLowerCase();
+            const q = query.toLowerCase().trim();
             const t = text.toLowerCase();
 
+            // 完全包含：最高分
             if (t.includes(q)) {
                 const idx = t.indexOf(q);
                 const hi = escapeHtml(text.slice(0, idx))
                     + '<mark class="fuzzy-hl">' + escapeHtml(text.slice(idx, idx + q.length)) + '</mark>'
                     + escapeHtml(text.slice(idx + q.length));
-                return { score: 100 + (idx === 0 ? 20 : 0), highlighted: hi };
+                return { score: 120 + (idx === 0 ? 30 : 0), highlighted: hi };
             }
 
+            // 多詞分拆：query 拆成空格分詞，逐詞比對
+            const words = q.split(/\s+/).filter(Boolean);
+            if (words.length > 1) {
+                let allFound = true, totalScore = 0;
+                for (const w of words) {
+                    if (!t.includes(w)) { allFound = false; break; }
+                    totalScore += 60;
+                }
+                if (allFound) {
+                    let result = text;
+                    for (const w of words) {
+                        const reg = new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+                        result = result.replace(reg, m => '\x00' + m + '\x01');
+                    }
+                    const hiText = result.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))
+                        .replace(/\x00/g, '<mark class="fuzzy-hl">').replace(/\x01/g, '</mark>');
+                    return { score: totalScore, highlighted: hiText };
+                }
+            }
+
+            // 字元模糊匹配：所有字元依序出現
             let qi = 0, score = 0, prev = -1;
             const positions = [];
             for (let ti = 0; ti < t.length && qi < q.length; ti++) {
                 if (t[ti] === q[qi]) {
                     positions.push(ti);
-                    score += (ti === prev + 1) ? 10 : 2; // 連續加分
-                    if (ti === 0 || t[ti - 1] === ' ') score += 5; // 詞首加分
+                    score += (ti === prev + 1) ? 12 : 3;
+                    if (ti === 0 || t[ti - 1] === ' ' || t[ti - 1] === '/') score += 8;
+                    if (qi === 0) score += 5;
                     prev = ti;
                     qi++;
                 }
             }
-            if (qi < q.length) return { score: -1, highlighted: escapeHtml(text) }; // 未完全匹配
+            if (qi < q.length) return { score: -1, highlighted: escapeHtml(text) };
+
+            // 連續匹配加分
+            let consecutive = 1;
+            for (let i = 1; i < positions.length; i++) {
+                if (positions[i] === positions[i-1] + 1) { consecutive++; score += consecutive * 2; }
+                else consecutive = 1;
+            }
 
             let hi = '', pi = 0;
             for (let i = 0; i < text.length; i++) {
@@ -1212,13 +1262,51 @@
 
         function executeHomeSearch() {
             const input = document.getElementById('homeSearchInput');
-            if (!input.value.trim()) return;
-            handleGlobalSearch(input, 'homeSuggestions');
-            // 若有結果，自動點擊第一筆
-            setTimeout(() => {
-                const first = document.querySelector('#homeSuggestions .suggestion-item[onclick]');
-                if (first) first.click();
-            }, 50);
+            const query = input.value.trim();
+            if (!query) return;
+
+            // 隱藏下拉建議
+            document.getElementById('homeSuggestions').classList.add('hidden');
+
+            // 計算搜尋結果並顯示「我猜你想找的是...」區塊
+            const scored = ALL_DATA.map(item => {
+                const { score, highlighted } = fuzzyScore(query, item.title);
+                const kwScore  = fuzzyScore(query, item.keywords).score;
+                const descScore = fuzzyScore(query, item.desc).score;
+                const best = Math.max(score, kwScore * 0.7, descScore * 0.5);
+                return { item, score: best, titleHl: score > 0 ? highlighted : escapeHtml(item.title) };
+            }).filter(r => r.score > 0)
+              .sort((a, b) => b.score - a.score)
+              .slice(0, 8);
+
+            const guessSection = document.getElementById('search-guess-section');
+            const guessResults = document.getElementById('search-guess-results');
+            const guessTitle   = document.getElementById('search-guess-title');
+
+            if (scored.length > 0) {
+                guessTitle.innerHTML = `我猜你想找的是：<span class="text-blue-500">「${escapeHtml(query)}」</span>`;
+                guessResults.innerHTML = scored.map(({ item: res, titleHl, score }) => {
+                    const label = PAGE_LABEL[res.type] || res.type;
+                    const isCmd = !!res.isCommand;
+                    const barW = Math.min(100, Math.round((score / 120) * 100));
+                    return `<div class="search-guess-card" onclick="navigateToResult('${escapeHtml(res.type)}','${escapeHtml(res.target)}',${isCmd});document.getElementById('search-guess-section').classList.remove('visible');">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span style="font-size:10px;font-weight:700;color:#7c3aed;background:#f5f3ff;padding:1px 7px;border-radius:999px;">${label}</span>
+                            <div style="flex:1;height:4px;background:#e2e8f0;border-radius:999px;overflow:hidden;"><div style="width:${barW}%;height:100%;background:linear-gradient(90deg,#00AEEF,#003366);border-radius:999px;"></div></div>
+                        </div>
+                        <div class="font-bold text-gray-800 text-sm mb-0.5">${titleHl}</div>
+                        <div class="text-xs text-gray-500">${escapeHtml(res.desc)}</div>
+                    </div>`;
+                }).join('');
+                guessSection.classList.add('visible');
+                // 滾動到結果區
+                guessSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                guessTitle.innerHTML = `找不到與「<span class="text-red-500">${escapeHtml(query)}</span>」相關的結果`;
+                guessResults.innerHTML = `<div class="text-gray-500 text-sm col-span-2 py-2">請嘗試不同的關鍵字，或直接瀏覽上方各頁面分類。</div>`;
+                guessSection.classList.add('visible');
+                guessSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
 
         function handleGlobalSearch(input, suggestBoxId) {
@@ -1226,12 +1314,15 @@
             const suggestBox = document.getElementById(suggestBoxId);
             if (!query) { suggestBox.classList.add('hidden'); return; }
 
-            // 手機版：動態定位建議欄至搜尋框正下方
-            if (window.innerWidth < 768) {
-                const rect = input.getBoundingClientRect();
-                suggestBox.style.top = rect.bottom + 'px';
+            // 定位建議欄至輸入框正下方（所有尺寸都用 fixed 定位）
+            const rect = input.getBoundingClientRect();
+            suggestBox.style.top  = (rect.bottom + 2) + 'px';
+            if (window.innerWidth >= 768) {
+                suggestBox.style.left  = rect.left + 'px';
+                suggestBox.style.width = rect.width + 'px';
             } else {
-                suggestBox.style.top = '';
+                suggestBox.style.left  = '';
+                suggestBox.style.width = '';
             }
 
             // 指令集搜尋：若 ALL_DATA 為空，從 DOM 中搜尋
