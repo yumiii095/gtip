@@ -1686,6 +1686,10 @@
         document.addEventListener('mousedown', (e) => {
             const ft = document.getElementById('float-toolbar');
             if (ft && !ft.contains(e.target)) ft.classList.remove('visible');
+            // 點擊搜尋框或建議框以外的地方時關閉建議
+            if (!e.target.closest('.suggestion-box') && !e.target.closest('#homeSearchInput') && !e.target.closest('#innerSearchInput')) {
+                document.querySelectorAll('.suggestion-box').forEach(b => b.classList.add('hidden'));
+            }
         });
 
         function _insertAtCursor(el) {
@@ -2086,12 +2090,23 @@
             if (e.key === 'Escape') closeStratModal();
         });
 
-        // 回到頂部按鈕：捲動超過 280px 後顯示；捲動時收合搜尋建議
+        // 回到頂部按鈕：捲動超過 280px 後顯示；捲動時更新搜尋建議位置
         window.addEventListener('scroll', () => {
             const btn = document.getElementById('back-to-top');
             if (btn) btn.classList.toggle('btt-visible', window.scrollY > 280);
-            // 電腦滾動時關閉搜尋建議（避免浮在錯誤位置）
-            document.querySelectorAll('.suggestion-box').forEach(b => b.classList.add('hidden'));
+            // 重新計算建議框位置（fixed 定位需跟著 input 移動）
+            ['homeSearchInput', 'innerSearchInput'].forEach(id => {
+                const input = document.getElementById(id);
+                const boxId = id === 'homeSearchInput' ? 'homeSuggestions' : 'innerSuggestions';
+                const box = document.getElementById(boxId);
+                if (!input || !box || box.classList.contains('hidden')) return;
+                const rect = input.getBoundingClientRect();
+                box.style.top = (rect.bottom + 2) + 'px';
+                if (window.innerWidth >= 768) {
+                    box.style.left  = rect.left + 'px';
+                    box.style.width = rect.width + 'px';
+                }
+            });
         }, { passive: true });
 
         window.onload = async function() {
