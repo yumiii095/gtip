@@ -1465,18 +1465,16 @@
 
             _lastQuery = query;
 
-            // 定位建議欄至輸入框正下方
-            // 桌機：fixed + JS 計算；手機：absolute 由 CSS 接管，不需 JS 干預
+            // position:fixed → top 一律由 JS 從 input 位置計算，確保緊貼搜尋欄下方
+            // 手機不設 left/width，交給 CSS media query 處理全寬
             const rect = input.getBoundingClientRect();
+            suggestBox.style.top = (rect.bottom + 2) + 'px';
             if (window.innerWidth >= 768) {
-                suggestBox.style.top   = (rect.bottom + 2) + 'px';
                 suggestBox.style.left  = rect.left + 'px';
                 suggestBox.style.width = rect.width + 'px';
             } else {
-                // 清除任何殘留的 JS inline 樣式，交給 CSS absolute 定位
-                suggestBox.style.top   = '';
-                suggestBox.style.left  = '';
-                suggestBox.style.width = '';
+                suggestBox.style.removeProperty('left');
+                suggestBox.style.removeProperty('width');
             }
 
             // 指令集頁面：若 ALL_DATA 為空則回退到 DOM 搜尋
@@ -2089,11 +2087,9 @@
         });
 
         // 回到頂部按鈕：捲動超過 280px 後顯示
-        // 同時：捲動時隱藏即時搜尋下拉（fixed 定位的下拉不會跟著搜尋欄移動）
         window.addEventListener('scroll', () => {
             const btn = document.getElementById('back-to-top');
             if (btn) btn.classList.toggle('btt-visible', window.scrollY > 280);
-            document.querySelectorAll('.suggestion-box').forEach(b => b.classList.add('hidden'));
         }, { passive: true });
 
         window.onload = async function() {
