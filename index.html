@@ -1415,8 +1415,8 @@
                 const q = query.toLowerCase();
                 const domResults = [];
                 document.querySelectorAll('.cmd-box').forEach(box => {
-                    const cmdText = box.querySelector('.cmd-text')?.innerText || '';
-                    const cmdDesc = box.querySelector('.cmd-desc')?.innerText || '';
+                    const cmdText = box.querySelector('.cmd-text')?.textContent || '';
+                    const cmdDesc = box.querySelector('.cmd-desc')?.textContent || '';
                     if (cmdText.toLowerCase().includes(q) || cmdDesc.toLowerCase().includes(q)) {
                         domResults.push({ cmdText, cmdDesc });
                     }
@@ -1426,14 +1426,16 @@
                         `<div class="suggestion-item" onclick="
                             document.getElementById('innerSuggestions').classList.add('hidden');
                             document.getElementById('innerSearchInput').value='';
+                            var _hit=null;
                             document.querySelectorAll('.cmd-box').forEach(b=>{
                                 b.classList.remove('cmd-highlight');
-                                if(b.querySelector('.cmd-text')?.innerText===\`${cmdText.replace(/`/g,'\\`')}\`){
+                                if(b.querySelector('.cmd-text')?.textContent===\`${cmdText.replace(/`/g,'\\`')}\`){
                                     b.classList.add('cmd-highlight');
                                     b.closest('.accordion-item').classList.add('accordion-active');
-                                    b.scrollIntoView({behavior:'smooth',block:'center'});
+                                    if(!_hit)_hit=b;
                                 }
-                            })">
+                            });
+                            if(_hit)setTimeout(()=>_hit.scrollIntoView({behavior:'smooth',block:'center'}),350);">
                             <div class='font-bold text-gray-800'>${escapeHtml(cmdText)}</div>
                             <div class='text-xs text-gray-500'>${escapeHtml(cmdDesc)}</div>
                         </div>`
@@ -1490,14 +1492,17 @@
             showPage(page);
             setTimeout(() => {
                 if (isCommand) {
+                    let firstHit = null;
                     document.querySelectorAll('.cmd-box').forEach(box => {
                         box.classList.remove('cmd-highlight');
-                        if (box.querySelector('.cmd-text').innerText.toLowerCase().includes(targetId.toLowerCase())) {
+                        if ((box.querySelector('.cmd-text')?.textContent || '').toLowerCase().includes(targetId.toLowerCase())) {
                             box.classList.add('cmd-highlight');
                             box.closest('.accordion-item').classList.add('accordion-active');
-                            box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            if (!firstHit) firstHit = box;
                         }
                     });
+                    // 等手風琴 CSS transition(0.3s) 結束後再滾動，才能算出正確位置
+                    if (firstHit) setTimeout(() => firstHit.scrollIntoView({ behavior: 'smooth', block: 'center' }), 350);
                 } else {
                     const el = document.getElementById(targetId);
                     if (el) {
