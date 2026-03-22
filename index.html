@@ -69,16 +69,14 @@
         .accordion-item.accordion-active .accordion-header::after { transform: rotate(180deg); }
 
         .suggestion-box { position: fixed; background: white; border: 1px solid #ddd; z-index: 9999; box-shadow: 0 10px 25px -3px rgba(0,0,0,0.18); max-height: 55vh; overflow-y: auto; border-radius: 4px; }
-        /* ── 手機：改用 absolute 定位，脫離 iOS fixed 視窗計算問題 ── */
+        /* ── 手機：fixed 全寬，不用 absolute（避免被 overflow:hidden 的 section 裁切） ── */
         @media (max-width: 767px) {
             .suggestion-box {
-                position: absolute !important;
-                top: calc(100% + 4px) !important;
                 left: 0 !important;
                 right: 0 !important;
-                width: auto !important;
+                width: 100% !important;
                 max-height: 50vh;
-                border-radius: 4px;
+                border-radius: 0 0 6px 6px;
                 box-shadow: 0 8px 24px -4px rgba(0,0,0,0.22);
             }
         }
@@ -751,10 +749,10 @@
                         <input type="text" id="homeSearchInput" oninput="handleGlobalSearch(this, 'homeSuggestions')" onkeydown="if(event.key==='Enter')executeHomeSearch()" placeholder="搜尋關鍵字..." class="flex-1 min-w-0 p-3 md:p-4 outline-none text-sm md:text-base" style="font-size:16px;" contenteditable="false">
                         <button class="tm-blue-dark flex-shrink-0 px-4 md:px-10 py-3 md:py-4 font-bold text-white btn-sq text-sm md:text-base whitespace-nowrap" onclick="executeHomeSearch()" contenteditable="false">搜尋</button>
                     </div>
-                    <div id="homeSuggestions" class="suggestion-box hidden text-left"></div>
                 </div>
             </div>
         </section>
+        <div id="homeSuggestions" class="suggestion-box hidden text-left"></div>
 
         <!-- 搜尋猜測結果區 -->
         <div id="search-guess-section" class="search-guess-section edit-ignore" contenteditable="false">
@@ -1466,14 +1464,16 @@
             _lastQuery = query;
 
             // position:fixed → top 一律由 JS 從 input 位置計算，確保緊貼搜尋欄下方
-            // 手機不設 left/width，交給 CSS media query 處理全寬
             const rect = input.getBoundingClientRect();
             suggestBox.style.top = (rect.bottom + 2) + 'px';
             if (window.innerWidth >= 768) {
                 suggestBox.style.left  = rect.left + 'px';
+                suggestBox.style.right = '';
                 suggestBox.style.width = rect.width + 'px';
             } else {
+                // 手機：CSS media query 已設 left:0; right:0; width:100%，JS 不再干涉
                 suggestBox.style.removeProperty('left');
+                suggestBox.style.removeProperty('right');
                 suggestBox.style.removeProperty('width');
             }
 
@@ -2086,10 +2086,12 @@
             if (e.key === 'Escape') closeStratModal();
         });
 
-        // 回到頂部按鈕：捲動超過 280px 後顯示
+        // 回到頂部按鈕：捲動超過 280px 後顯示；捲動時收合搜尋建議
         window.addEventListener('scroll', () => {
             const btn = document.getElementById('back-to-top');
             if (btn) btn.classList.toggle('btt-visible', window.scrollY > 280);
+            // 電腦滾動時關閉搜尋建議（避免浮在錯誤位置）
+            document.querySelectorAll('.suggestion-box').forEach(b => b.classList.add('hidden'));
         }, { passive: true });
 
         window.onload = async function() {
