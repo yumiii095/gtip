@@ -1187,126 +1187,211 @@
             return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
         }
 
-        function fuzzyScore(query, text) {
-            if (!query || !text) return { score: -1, highlighted: escapeHtml(text) };
-            const q = query.toLowerCase().trim();
-            const t = text.toLowerCase();
+        // ═══════════════════════════════════════════════════
+        //  搜尋引擎核心 — Search Engine Core
+        // ═══════════════════════════════════════════════════
 
-            // 完全包含：最高分
-            if (t.includes(q)) {
-                const idx = t.indexOf(q);
-                const hi = escapeHtml(text.slice(0, idx))
-                    + '<mark class="fuzzy-hl">' + escapeHtml(text.slice(idx, idx + q.length)) + '</mark>'
-                    + escapeHtml(text.slice(idx + q.length));
-                return { score: 120 + (idx === 0 ? 30 : 0), highlighted: hi };
-            }
-
-            // 多詞分拆：query 拆成空格分詞，逐詞比對
-            const words = q.split(/\s+/).filter(Boolean);
-            if (words.length > 1) {
-                let allFound = true, totalScore = 0;
-                for (const w of words) {
-                    if (!t.includes(w)) { allFound = false; break; }
-                    totalScore += 60;
-                }
-                if (allFound) {
-                    let result = text;
-                    for (const w of words) {
-                        const reg = new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-                        result = result.replace(reg, m => '\x00' + m + '\x01');
-                    }
-                    const hiText = result.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))
-                        .replace(/\x00/g, '<mark class="fuzzy-hl">').replace(/\x01/g, '</mark>');
-                    return { score: totalScore, highlighted: hiText };
-                }
-            }
-
-            // 字元模糊匹配：所有字元依序出現
-            let qi = 0, score = 0, prev = -1;
-            const positions = [];
-            for (let ti = 0; ti < t.length && qi < q.length; ti++) {
-                if (t[ti] === q[qi]) {
-                    positions.push(ti);
-                    score += (ti === prev + 1) ? 12 : 3;
-                    if (ti === 0 || t[ti - 1] === ' ' || t[ti - 1] === '/') score += 8;
-                    if (qi === 0) score += 5;
-                    prev = ti;
-                    qi++;
-                }
-            }
-            if (qi < q.length) return { score: -1, highlighted: escapeHtml(text) };
-
-            // 連續匹配加分
-            let consecutive = 1;
-            for (let i = 1; i < positions.length; i++) {
-                if (positions[i] === positions[i-1] + 1) { consecutive++; score += consecutive * 2; }
-                else consecutive = 1;
-            }
-
-            let hi = '', pi = 0;
-            for (let i = 0; i < text.length; i++) {
-                if (pi < positions.length && positions[pi] === i) {
-                    hi += '<mark class="fuzzy-hl">' + escapeHtml(text[i]) + '</mark>';
-                    pi++;
-                } else {
-                    hi += escapeHtml(text[i]);
-                }
-            }
-            return { score, highlighted: hi };
+        /** 將文字拆成 token 陣列（空格、標點、/ [ ] 皆為分隔符） */
+        function tokenize(text) {
+            if (!text) return [];
+            return text.toLowerCase()
+                .split(/[\s\u3000,，、。！？/\[\]()（）]+/)
+                .filter(t => t.length > 0);
         }
+
+        /**
+         * 在 text 中把所有 terms 出現處包上 <mark>，回傳 HTML 字串
+         * （先 escapeHtml 再替換，避免 XSS）
+         */
+        function highlightTerms(text, terms) {
+            if (!terms.length) return escapeHtml(text);
+            // 以長度降序排序，避免短詞覆蓋長詞的 highlight
+            const sorted = [...new Set(terms)].sort((a, b) => b.length - a.length);
+            // 在原始文字上標記匹配範圍（避免重複標記）
+            const lower = text.toLowerCase();
+            const marks = new Array(text.length).fill(false);
+            for (const term of sorted) {
+                let idx = 0;
+                while ((idx = lower.indexOf(term, idx)) !== -1) {
+                    for (let k = idx; k < idx + term.length; k++) marks[k] = true;
+                    idx += term.length;
+                }
+            }
+            let result = '', inMark = false;
+            for (let i = 0; i < text.length; i++) {
+                const ch = escapeHtml(text[i]);
+                if (marks[i] && !inMark) { result += '<mark class="fuzzy-hl">'; inMark = true; }
+                if (!marks[i] && inMark) { result += '</mark>'; inMark = false; }
+                result += ch;
+            }
+            if (inMark) result += '</mark>';
+            return result;
+        }
+
+        /**
+         * 搜尋引擎評分 — 模仿搜尋引擎邏輯：
+         *
+         * 評分架構（由高到低）：
+         *   A. Phrase match   — query 完整出現在標題/關鍵字    +300 / +200 / +80
+         *   B. Token AND      — 所有 query token 都在某欄位中出現
+         *      · keyword token 精確匹配（kwToken === queryToken） +100/token
+         *      · title 包含 token                                 +80/token  (+50 若在詞首)
+         *      · keywords 包含 token（非精確）                    +55/token
+         *      · desc 包含 token                                  +20/token
+         *   C. Coverage score — 未全部匹配時依覆蓋率打折
+         *      · coverage < 0.5 → score × 0.05（幾乎不顯示）
+         *      · coverage < 1.0 → score × (0.2 + 0.8×coverage)
+         *   D. Prefix boost   — 標題以 query 起頭額外 +60
+         *
+         * 回傳 { score, titleHl } — score ≤ 0 表示不匹配
+         */
+        function searchScore(query, item) {
+            const q = query.toLowerCase().trim();
+            if (!q || !item) return { score: 0, titleHl: escapeHtml(item?.title || '') };
+
+            const titleL = (item.title  || '').toLowerCase();
+            const kwL    = (item.keywords || '').toLowerCase();
+            const descL  = (item.desc   || '').toLowerCase();
+
+            // 把 item keywords 拆成 token set，用於精確匹配
+            const kwTokenSet = new Set(tokenize(kwL));
+            // query tokens
+            const qTokens = q.split(/\s+/).filter(Boolean);
+
+            let score = 0;
+            const matchedTerms = []; // 用於 highlight
+
+            // ── A. 完整 phrase match ──────────────────────────
+            if (titleL === q) {
+                score += 500; // 完全等於標題
+                matchedTerms.push(q);
+            } else if (titleL.startsWith(q)) {
+                score += 360;
+                matchedTerms.push(q);
+            } else if (titleL.includes(q)) {
+                score += 300;
+                matchedTerms.push(q);
+            }
+            if (kwL.includes(q) && !titleL.includes(q)) {
+                score += 200;
+                matchedTerms.push(q);
+            }
+            if (descL.includes(q) && !titleL.includes(q) && !kwL.includes(q)) {
+                score += 80;
+                matchedTerms.push(q);
+            }
+
+            // ── B. Token-level scoring ────────────────────────
+            let tokenHits = 0;
+            for (const token of qTokens) {
+                if (!token) continue;
+                let hit = false;
+
+                // keyword token 精確匹配（最高優先）
+                if (kwTokenSet.has(token)) {
+                    score += 100;
+                    hit = true;
+                    if (!matchedTerms.includes(token)) matchedTerms.push(token);
+                } else if (kwL.includes(token)) {
+                    score += 55;
+                    hit = true;
+                    if (!matchedTerms.includes(token)) matchedTerms.push(token);
+                }
+
+                if (titleL.includes(token)) {
+                    const prefix = (titleL.startsWith(token) || titleL.includes(' ' + token) || titleL.includes('/' + token));
+                    score += 80 + (prefix ? 50 : 0);
+                    hit = true;
+                    if (!matchedTerms.includes(token)) matchedTerms.push(token);
+                }
+
+                if (descL.includes(token)) {
+                    score += 20;
+                    hit = true;
+                    if (!matchedTerms.includes(token)) matchedTerms.push(token);
+                }
+
+                if (hit) tokenHits++;
+            }
+
+            // ── C. Coverage penalty ───────────────────────────
+            if (qTokens.length > 1) {
+                const coverage = tokenHits / qTokens.length;
+                if (coverage === 0)      { score = 0; }
+                else if (coverage < 0.5) { score = Math.floor(score * 0.05); }
+                else if (coverage < 1.0) { score = Math.floor(score * (0.2 + 0.8 * coverage)); }
+                // coverage === 1 → no penalty
+            }
+
+            // ── D. Prefix boost ───────────────────────────────
+            if (score > 0 && titleL.startsWith(q)) score += 60;
+
+            // 若完全無匹配
+            if (score <= 0 && tokenHits === 0 && !titleL.includes(q) && !kwL.includes(q)) {
+                return { score: -1, titleHl: escapeHtml(item.title) };
+            }
+
+            return {
+                score,
+                titleHl: matchedTerms.length ? highlightTerms(item.title, matchedTerms) : escapeHtml(item.title)
+            };
+        }
+
+        // ═══════════════════════════════════════════════════
+        //  Page labels & 執行搜尋
+        // ═══════════════════════════════════════════════════
 
         const PAGE_LABEL = {
             strategy: '⚔️ 攻略', faq: '❓ 常見問題', commands: '📋 指令集',
             tutorial: '🔰 入門教學', newbie: '🚩 快捷鍵'
         };
 
+        /** 取得全域評分結果（最多 limit 筆，score > 0） */
+        function rankResults(query, limit = 8) {
+            return ALL_DATA.map(item => {
+                const { score, titleHl } = searchScore(query, item);
+                return { item, score, titleHl };
+            }).filter(r => r.score > 0)
+              .sort((a, b) => b.score - a.score)
+              .slice(0, limit);
+        }
+
         function executeHomeSearch() {
             const input = document.getElementById('homeSearchInput');
             const query = input.value.trim();
             if (!query) return;
 
-            // 隱藏下拉建議
             document.getElementById('homeSuggestions').classList.add('hidden');
 
-            // 計算搜尋結果並顯示「我猜你想找的是...」區塊
-            const scored = ALL_DATA.map(item => {
-                const { score, highlighted } = fuzzyScore(query, item.title);
-                const kwScore  = fuzzyScore(query, item.keywords).score;
-                const descScore = fuzzyScore(query, item.desc).score;
-                const best = Math.max(score, kwScore * 0.7, descScore * 0.5);
-                return { item, score: best, titleHl: score > 0 ? highlighted : escapeHtml(item.title) };
-            }).filter(r => r.score > 0)
-              .sort((a, b) => b.score - a.score)
-              .slice(0, 8);
+            const scored = rankResults(query, 8);
 
             const guessSection = document.getElementById('search-guess-section');
             const guessResults = document.getElementById('search-guess-results');
             const guessTitle   = document.getElementById('search-guess-title');
 
             if (scored.length > 0) {
-                guessTitle.innerHTML = `我猜你想找的是：<span class="text-blue-500">「${escapeHtml(query)}」</span>`;
+                // 最高分作為 100% 基準（相對相關度）
+                const maxScore = scored[0].score;
+                guessTitle.innerHTML = `🔍 搜尋「<span class="text-blue-500">${escapeHtml(query)}</span>」的相關結果`;
                 guessResults.innerHTML = scored.map(({ item: res, titleHl, score }) => {
                     const label = PAGE_LABEL[res.type] || res.type;
-                    const isCmd = !!res.isCommand;
-                    const barW = Math.min(100, Math.round((score / 120) * 100));
+                    const isCmd = (res.type === 'commands') || !!res.isCommand;
+                    const barW  = Math.max(8, Math.round((score / maxScore) * 100));
                     return `<div class="search-guess-card" onclick="navigateToResult('${escapeHtml(res.type)}','${escapeHtml(res.target)}',${isCmd});document.getElementById('search-guess-section').classList.remove('visible');">
                         <div class="flex items-center gap-2 mb-1">
                             <span style="font-size:10px;font-weight:700;color:#7c3aed;background:#f5f3ff;padding:1px 7px;border-radius:999px;">${label}</span>
-                            <div style="flex:1;height:4px;background:#e2e8f0;border-radius:999px;overflow:hidden;"><div style="width:${barW}%;height:100%;background:linear-gradient(90deg,#00AEEF,#003366);border-radius:999px;"></div></div>
+                            <div style="flex:1;height:4px;background:#e2e8f0;border-radius:999px;overflow:hidden;"><div style="width:${barW}%;height:100%;background:linear-gradient(90deg,#00AEEF,#003366);border-radius:999px;transition:width 0.4s;"></div></div>
                         </div>
                         <div class="font-bold text-gray-800 text-sm mb-0.5">${titleHl}</div>
                         <div class="text-xs text-gray-500">${escapeHtml(res.desc)}</div>
                     </div>`;
                 }).join('');
-                guessSection.classList.add('visible');
-                // 滾動到結果區
-                guessSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
             } else {
                 guessTitle.innerHTML = `找不到與「<span class="text-red-500">${escapeHtml(query)}</span>」相關的結果`;
                 guessResults.innerHTML = `<div class="text-gray-500 text-sm col-span-2 py-2">請嘗試不同的關鍵字，或直接瀏覽上方各頁面分類。</div>`;
-                guessSection.classList.add('visible');
-                guessSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
+            // ✅ 不滾動視窗，就地顯示結果
+            guessSection.classList.add('visible');
         }
 
         function handleGlobalSearch(input, suggestBoxId) {
@@ -1314,9 +1399,9 @@
             const suggestBox = document.getElementById(suggestBoxId);
             if (!query) { suggestBox.classList.add('hidden'); return; }
 
-            // 定位建議欄至輸入框正下方（所有尺寸都用 fixed 定位）
+            // 定位建議欄至輸入框正下方（fixed 定位，不受 overflow 影響）
             const rect = input.getBoundingClientRect();
-            suggestBox.style.top  = (rect.bottom + 2) + 'px';
+            suggestBox.style.top = (rect.bottom + 2) + 'px';
             if (window.innerWidth >= 768) {
                 suggestBox.style.left  = rect.left + 'px';
                 suggestBox.style.width = rect.width + 'px';
@@ -1325,7 +1410,7 @@
                 suggestBox.style.width = '';
             }
 
-            // 指令集搜尋：若 ALL_DATA 為空，從 DOM 中搜尋
+            // 指令集頁面：若 ALL_DATA 為空則回退到 DOM 搜尋
             if (suggestBoxId === 'innerSuggestions' && ALL_DATA.length === 0) {
                 const q = query.toLowerCase();
                 const domResults = [];
@@ -1333,7 +1418,7 @@
                     const cmdText = box.querySelector('.cmd-text')?.innerText || '';
                     const cmdDesc = box.querySelector('.cmd-desc')?.innerText || '';
                     if (cmdText.toLowerCase().includes(q) || cmdDesc.toLowerCase().includes(q)) {
-                        domResults.push({ cmdText, cmdDesc, box });
+                        domResults.push({ cmdText, cmdDesc });
                     }
                 });
                 if (domResults.length > 0) {
@@ -1361,21 +1446,12 @@
                 return;
             }
 
-            const scored = ALL_DATA.map(item => {
-                const haystack = [item.title, item.keywords, item.desc].join(' ');
-                const { score, highlighted } = fuzzyScore(query, item.title);
-                const kwScore = fuzzyScore(query, item.keywords).score;
-                const descScore = fuzzyScore(query, item.desc).score;
-                const best = Math.max(score, kwScore * 0.6, descScore * 0.4);
-                return { item, score: best, titleHl: score > 0 ? highlighted : escapeHtml(item.title) };
-            }).filter(r => r.score > 0)
-              .sort((a, b) => b.score - a.score)
-              .slice(0, 8);
-
+            // 一般搜尋建議下拉（使用新引擎）
+            const scored = rankResults(query, 8);
             if (scored.length > 0) {
                 suggestBox.innerHTML = scored.map(({ item: res, titleHl }) => {
                     const label = PAGE_LABEL[res.type] || res.type;
-                    const isCmd = !!res.isCommand;
+                    const isCmd = (res.type === 'commands') || !!res.isCommand;
                     return `<div class="suggestion-item" onclick="navigateToResult('${escapeHtml(res.type)}','${escapeHtml(res.target)}',${isCmd})">
                         <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
                             <span style="font-size:10px;font-weight:700;color:#7c3aed;background:#f5f3ff;padding:1px 6px;border-radius:999px;">${label}</span>
@@ -1394,6 +1470,8 @@
         function navigateToResult(page, targetId, isCommand) {
             document.querySelectorAll('.suggestion-box').forEach(b => b.classList.add('hidden'));
             document.querySelectorAll('#homeSearchInput, #innerSearchInput').forEach(el => el.value = '');
+            // 安全保險：type 為 commands 一律走指令搜尋
+            if (page === 'commands') isCommand = true;
 
             if (page === 'strategy') {
                 showPage('strategy');
