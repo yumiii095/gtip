@@ -69,17 +69,16 @@
         .accordion-item.accordion-active .accordion-header::after { transform: rotate(180deg); }
 
         .suggestion-box { position: fixed; background: white; border: 1px solid #ddd; z-index: 9999; box-shadow: 0 10px 25px -3px rgba(0,0,0,0.18); max-height: 55vh; overflow-y: auto; border-radius: 4px; }
-        /* ── 手機：改用 absolute 定位，脫離 iOS fixed 視窗計算問題 ── */
+        /* 手機：fixed 全寬，top 由 JS 計算（fixed 不受父層 overflow:hidden 裁切） */
         @media (max-width: 767px) {
             .suggestion-box {
-                position: absolute !important;
-                top: calc(100% + 4px) !important;
                 left: 0 !important;
                 right: 0 !important;
-                width: auto !important;
+                width: 100% !important;
                 max-height: 50vh;
-                border-radius: 4px;
-                box-shadow: 0 8px 24px -4px rgba(0,0,0,0.22);
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
             }
         }
         .suggestion-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #eee; }
@@ -92,6 +91,17 @@
         .dark-mode .search-guess-card { background: #1f2937; border-color: #374151; }
         .dark-mode .search-guess-card:hover { border-left-color: #60a5fa; }
         mark.fuzzy-hl { background: #fef08a; color: #713f12; border-radius: 2px; padding: 0 1px; font-weight: 800; }
+
+        /* ── 深色模式輸入框文字與背景 ── */
+        .dark-mode input[type="text"],
+        .dark-mode input:not([type]) {
+            color: #f3f4f6 !important;
+            background-color: #374151 !important;
+        }
+        .dark-mode input[type="text"]::placeholder,
+        .dark-mode input:not([type])::placeholder {
+            color: #9ca3af !important;
+        }
 
         /* ── 深色模式輸入框文字與背景 ── */
         .dark-mode input[type="text"],
@@ -1465,18 +1475,17 @@
 
             _lastQuery = query;
 
-            // 定位建議欄至輸入框正下方
-            // 桌機：fixed + JS 計算；手機：absolute 由 CSS 接管，不需 JS 干預
+            // 定位建議欄至輸入框正下方（position:fixed，top 一律由 JS 計算）
             const rect = input.getBoundingClientRect();
+            suggestBox.style.top = (rect.bottom + 2) + 'px';
             if (window.innerWidth >= 768) {
-                suggestBox.style.top   = (rect.bottom + 2) + 'px';
+                // 桌機：JS 控制左右寬度
                 suggestBox.style.left  = rect.left + 'px';
                 suggestBox.style.width = rect.width + 'px';
             } else {
-                // 清除任何殘留的 JS inline 樣式，交給 CSS absolute 定位
-                suggestBox.style.top   = '';
-                suggestBox.style.left  = '';
-                suggestBox.style.width = '';
+                // 手機：清除 JS inline left/width，由 CSS media query 接管全寬
+                suggestBox.style.removeProperty('left');
+                suggestBox.style.removeProperty('width');
             }
 
             // 指令集頁面：若 ALL_DATA 為空則回退到 DOM 搜尋
