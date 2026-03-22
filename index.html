@@ -171,23 +171,21 @@
         .news-dot { position: absolute; left: -7px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background-color: #00AEEF; border: 2px solid white; }
         .dark-mode .news-dot { border-color: #2d3748; }
 
-        /* ── Back-to-top button ── */
+        /* ── 回到頂部懸浮按鈕 ── */
         #back-to-top {
-            position: fixed; bottom: 28px; right: 24px; z-index: 999;
-            width: 46px; height: 46px; border-radius: 50%;
-            background: #003366; color: white;
-            border: none; cursor: pointer;
+            position: fixed; bottom: 28px; right: 28px; z-index: 980;
+            width: 48px; height: 48px; border-radius: 50%; border: none;
+            background: linear-gradient(135deg, #003366, #00AEEF);
+            color: white; font-size: 22px; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            font-size: 20px; line-height: 1;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+            box-shadow: 0 4px 16px rgba(0,51,102,0.4);
             opacity: 0; pointer-events: none;
-            transition: opacity 0.3s, transform 0.3s, background 0.2s;
-            transform: translateY(10px);
+            transition: opacity 0.3s, transform 0.25s;
         }
-        #back-to-top.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
-        #back-to-top:hover { background: #00AEEF; }
-        .dark-mode #back-to-top { background: #1e3a5f; }
-        .dark-mode #back-to-top:hover { background: #2563eb; }
+        #back-to-top.btt-visible { opacity: 1; pointer-events: auto; }
+        #back-to-top:hover  { transform: translateY(-4px) scale(1.06); }
+        #back-to-top:active { transform: scale(0.93); }
+        .dark-mode #back-to-top { background: linear-gradient(135deg, #1e3a5f, #2563eb); }
 
         
 
@@ -1066,12 +1064,9 @@
         </main>
     </div>
 
-    <!-- ── 回到頂部懸浮按鈕 ── -->
+    <!-- 回到頂部懸浮按鈕 -->
     <button id="back-to-top" aria-label="回到頂部" title="回到頂部導覽列"
             onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
-
-    <!-- ── Back-to-top ── -->
-    <button id="back-to-top" title="回到頂部" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
     <footer class="bg-gray-900 text-white py-12 text-center mt-20 edit-ignore" contenteditable="false">
         <p class="font-bold text-xl text-blue-400">Cobblemon 方可夢樂園</p>
@@ -1081,32 +1076,25 @@
     <script>
         let COMMANDS_DATA = [];
         let ALL_DATA = [];
-        let _lastSearchQuery = '';   // 記錄最後一次搜尋關鍵字，供跳轉後高亮用
 
-        // ── Back-to-top visibility ──
-        window.addEventListener('scroll', () => {
-            const btn = document.getElementById('back-to-top');
-            if (btn) btn.classList.toggle('visible', window.scrollY > 300);
-        }, { passive: true });
-        let _lastSearchQuery = ''; // 記錄最後一次搜尋詞，供正文高亮使用
+        // ── 搜尋詞記錄（供正文高亮使用）──
+        let _lastQuery = '';
 
-        /* ── 正文關鍵字高亮輔助 ─────────────────────────── */
-        /** 清除所有 cmd-text / cmd-desc 的 <mark> 高亮 */
-        function _clearCmdBoxHL() {
-            document.querySelectorAll('[data-hl-orig]').forEach(el => {
-                el.innerHTML = el.getAttribute('data-hl-orig');
-                el.removeAttribute('data-hl-orig');
+        // ── 正文高亮輔助函式 ──────────────────────────────
+        function _clearCmdHL() {
+            document.querySelectorAll('[data-orig-html]').forEach(function(el) {
+                el.innerHTML = el.getAttribute('data-orig-html');
+                el.removeAttribute('data-orig-html');
             });
         }
-        /** 對一組 cmd-box 元素，在 cmd-text / cmd-desc 中高亮 query */
-        function _applyCmdBoxHL(boxes, query) {
-            const terms = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
+        function _applyHL(boxes, query) {
+            var terms = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
             if (!terms.length) return;
-            boxes.forEach(box => {
-                ['.cmd-text', '.cmd-desc'].forEach(sel => {
-                    const span = box.querySelector(sel);
-                    if (!span || span.hasAttribute('data-hl-orig')) return;
-                    span.setAttribute('data-hl-orig', span.innerHTML);
+            boxes.forEach(function(box) {
+                ['.cmd-text', '.cmd-desc'].forEach(function(sel) {
+                    var span = box.querySelector(sel);
+                    if (!span || span.hasAttribute('data-orig-html')) return;
+                    span.setAttribute('data-orig-html', span.innerHTML);
                     span.innerHTML = highlightTerms(span.textContent, terms);
                 });
             });
@@ -1240,32 +1228,6 @@
 
         function escapeHtml(str) {
             return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-        }
-
-        /**
-         * 在正文中對已高亮的 .cmd-highlight 框，
-         * 把 .cmd-text / .cmd-desc 裡的關鍵字包上 <mark class="fuzzy-hl">
-         */
-        function highlightQueryInCmdBoxes(query) {
-            if (!query) return;
-            const terms = [query.toLowerCase()];
-            document.querySelectorAll('.cmd-highlight').forEach(box => {
-                ['.cmd-text', '.cmd-desc'].forEach(sel => {
-                    const el = box.querySelector(sel);
-                    if (!el) return;
-                    // 只操作純文字節點，避免破壞子元素
-                    el.innerHTML = highlightTerms(el.textContent, terms);
-                });
-            });
-        }
-
-        /** 清除上一次在正文中留下的 fuzzy-hl mark（還原純文字） */
-        function clearBodyHighlights() {
-            document.querySelectorAll('.cmd-text mark.fuzzy-hl, .cmd-desc mark.fuzzy-hl').forEach(mark => {
-                const parent = mark.parentNode;
-                parent.replaceChild(document.createTextNode(mark.textContent), mark);
-                parent.normalize();
-            });
         }
 
         // ═══════════════════════════════════════════════════
@@ -1427,13 +1389,9 @@
             tutorial: '🔰 入門教學', newbie: '🚩 快捷鍵'
         };
 
-        /** 取得全域評分結果（最多 limit 筆，score > 0）
-         *  @param {string}   query
-         *  @param {number}   limit
-         *  @param {Array}    [pool]  不傳則使用全部 ALL_DATA
-         */
-        function rankResults(query, limit = 8, pool = null) {
-            return (pool || ALL_DATA).map(item => {
+        /** 取得全域評分結果（最多 limit 筆，score > 0） */
+        function rankResults(query, limit = 8) {
+            return ALL_DATA.map(item => {
                 const { score, titleHl } = searchScore(query, item);
                 return { item, score, titleHl };
             }).filter(r => r.score > 0)
@@ -1445,8 +1403,7 @@
             const input = document.getElementById('homeSearchInput');
             const query = input.value.trim();
             if (!query) return;
-
-            _lastSearchQuery = query; // 記錄搜尋詞
+            _lastQuery = query;
             document.getElementById('homeSuggestions').classList.add('hidden');
 
             const scored = rankResults(query, 8);
@@ -1485,7 +1442,7 @@
             const suggestBox = document.getElementById(suggestBoxId);
             if (!query) { suggestBox.classList.add('hidden'); return; }
 
-            _lastSearchQuery = query; // 記錄搜尋詞
+            _lastQuery = query;
 
             // 定位建議欄至輸入框正下方（fixed 定位，不受 overflow 影響）
             const rect = input.getBoundingClientRect();
@@ -1510,40 +1467,37 @@
                     }
                 });
                 if (domResults.length > 0) {
-                    suggestBox.innerHTML = domResults.slice(0, 8).map(({ cmdText, cmdDesc }) =>
-                        `<div class="suggestion-item" onclick="
-                            _clearCmdBoxHL();
-                            document.getElementById('innerSuggestions').classList.add('hidden');
-                            document.getElementById('innerSearchInput').value='';
-                            var _hits=[];
-                            document.querySelectorAll('.cmd-box').forEach(b=>{
-                                b.classList.remove('cmd-highlight');
-                                if(b.querySelector('.cmd-text')?.textContent===\`${cmdText.replace(/`/g,'\\`')}\`){
-                                    b.classList.add('cmd-highlight');
-                                    b.closest('.accordion-item').classList.add('accordion-active');
-                                    _hits.push(b);
-                                }
-                            });
-                            if(_hits.length){
-                                setTimeout(()=>{
-                                    _applyCmdBoxHL(_hits,${JSON.stringify(query)});
-                                    _hits[0].scrollIntoView({behavior:'smooth',block:'center'});
-                                },350);
-                            }">
-                            <div class='font-bold text-gray-800'>${escapeHtml(cmdText)}</div>
-                            <div class='text-xs text-gray-500'>${escapeHtml(cmdDesc)}</div>
-                        </div>`
-                    ).join('');
+                    // 注意：onclick 用普通引號字串，避免模板字面量巢狀問題
+                    suggestBox.innerHTML = domResults.slice(0, 8).map(({ cmdText, cmdDesc }) => {
+                        const safeTxt = cmdText.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+                        return '<div class="suggestion-item" onclick="' +
+                            '_clearCmdHL();' +
+                            'document.getElementById(\'innerSuggestions\').classList.add(\'hidden\');' +
+                            'document.getElementById(\'innerSearchInput\').value=\'\';' +
+                            'var hits=[];' +
+                            'document.querySelectorAll(\'.cmd-box\').forEach(function(b){' +
+                                'b.classList.remove(\'cmd-highlight\');' +
+                                'if((b.querySelector(\'.cmd-text\')||{}).textContent===\'' + safeTxt + '\'){' +
+                                    'b.classList.add(\'cmd-highlight\');' +
+                                    'b.closest(\'.accordion-item\').classList.add(\'accordion-active\');' +
+                                    'hits.push(b);' +
+                                '}' +
+                            '});' +
+                            'if(hits.length){setTimeout(function(){_applyHL(hits,_lastQuery);hits[0].scrollIntoView({behavior:\'smooth\',block:\'center\'});},350);}' +
+                            '">' +
+                            '<div class="font-bold text-gray-800">' + escapeHtml(cmdText) + '</div>' +
+                            '<div class="text-xs text-gray-500">' + escapeHtml(cmdDesc) + '</div>' +
+                            '</div>';
+                    }).join('');
                     suggestBox.classList.remove('hidden');
                 } else {
-                    suggestBox.innerHTML = `<div class="suggestion-item text-gray-400 text-sm">找不到「${escapeHtml(query)}」相關指令</div>`;
+                    suggestBox.innerHTML = '<div class="suggestion-item text-gray-400 text-sm">找不到「' + escapeHtml(query) + '」相關指令</div>';
                     suggestBox.classList.remove('hidden');
                 }
                 return;
             }
 
-            // 指令集頁面（ALL_DATA 已載入）→ 僅顯示 commands 類型結果
-            // 首頁 → 顯示全部類型
+            // 搜尋建議下拉：指令集頁只顯示指令，首頁顯示全部
             const allScored = rankResults(query, 8);
             const scored = (suggestBoxId === 'innerSuggestions')
                 ? allScored.filter(r => r.item.type === 'commands' || !!r.item.isCommand)
@@ -1563,7 +1517,7 @@
                 }).join('');
                 suggestBox.classList.remove('hidden');
             } else {
-                const msg = (suggestBoxId === 'innerSuggestions') ? '找不到相關指令' : '找不到相關結果';
+                const msg = (suggestBoxId === 'innerSuggestions') ? '相關指令' : '相關結果';
                 suggestBox.innerHTML = `<div class="suggestion-item text-gray-400 text-sm">找不到「${escapeHtml(query)}」${msg}</div>`;
                 suggestBox.classList.remove('hidden');
             }
@@ -1572,7 +1526,7 @@
         function navigateToResult(page, targetId, isCommand) {
             document.querySelectorAll('.suggestion-box').forEach(b => b.classList.add('hidden'));
             document.querySelectorAll('#homeSearchInput, #innerSearchInput').forEach(el => el.value = '');
-            _clearCmdBoxHL(); // 清除上一次正文高亮
+            _clearCmdHL();
             // 安全保險：type 為 commands 一律走指令搜尋
             if (page === 'commands') isCommand = true;
 
@@ -1593,20 +1547,20 @@
             showPage(page);
             setTimeout(() => {
                 if (isCommand) {
-                    const hitBoxes = [];
+                    const hits = [];
                     document.querySelectorAll('.cmd-box').forEach(box => {
                         box.classList.remove('cmd-highlight');
                         if ((box.querySelector('.cmd-text')?.textContent || '').toLowerCase().includes(targetId.toLowerCase())) {
                             box.classList.add('cmd-highlight');
                             box.closest('.accordion-item').classList.add('accordion-active');
-                            hitBoxes.push(box);
+                            hits.push(box);
                         }
                     });
-                    if (hitBoxes.length) {
-                        // 等手風琴 CSS transition(0.3s) 結束後再滾動並高亮正文
+                    if (hits.length) {
+                        // 等手風琴動畫(0.3s)結束後再滾動並高亮正文
                         setTimeout(() => {
-                            _applyCmdBoxHL(hitBoxes, _lastSearchQuery || targetId);
-                            hitBoxes[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            _applyHL(hits, _lastQuery || targetId);
+                            hits[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
                         }, 350);
                     }
                 } else {
