@@ -1233,15 +1233,16 @@
             const container = document.getElementById('scSections');
             if (!container) return;
             const editing = isEditing();
-            const isOpen = editing || !!scSearch || scActiveTab !== 'all';
 
             // Assign real indices before filtering
             scData.forEach((sec, i) => { sec._i = i; });
 
+            // BUG3 FIX: In edit mode, bypass tab filter so newly added sections always appear
             const filtered = scData.filter(sec => {
-                if (scActiveTab !== 'all' && sec.cat !== scActiveTab) return false;
+                if (!editing && scActiveTab !== 'all' && sec.cat !== scActiveTab) return false;
                 if (!scSearch) return true;
                 const q = scSearch.toLowerCase();
+                // check if anything in this section matches
                 return sec.title.toLowerCase().includes(q) ||
                     sec.groups.some(g =>
                         (g.label || '').toLowerCase().includes(q) ||
@@ -1253,17 +1254,42 @@
             let html = '';
 
             if (editing) {
-                html += `<button class="sc-edit-btn sc-add-section-btn" onclick="scAddSection()">＋ 新增指令分類</button>`;
+                html += `<button class="sc-edit-btn sc-add-section-btn" onclick="scAddSection()" style="display:block">＋ 新增指令分類</button>`;
             }
 
-            if (!editing && filtered.length === 0) {
-                container.innerHTML = '<div class="sc-no-result">🔍 找不到相關指令，試試其他關鍵字</div>';
+            if (!editing && !scSearch && filtered.length === 0) {
+                container.innerHTML = html + '<div class="sc-no-result">🔍 找不到相關指令，試試其他關鍵字</div>';
                 return;
             }
 
+            // BUG2 FIX: when searching, only show cmd rows that actually match
+            const q = scSearch ? scSearch.toLowerCase() : '';
+            const isOpen = editing || !!scSearch || scActiveTab !== 'all';
+
             html += filtered.map(sec => {
                 const si = sec._i;
-                const cmdCount = sec.groups.reduce((a, g) => a + (g.cmds ? g.cmds.length : 0), 0);
+
+                // Build visible groups: when searching, filter to only matching cmd rows per group
+                const visibleGroups = sec.groups.map((g, gi) => {
+                    let visibleCmds = g.cmds || [];
+                    if (q && !editing) {
+                        // Keep only cmds that match the query (or if section/group title matches, show all)
+                        const sectionTitleMatches = sec.title.toLowerCase().includes(q);
+                        const groupLabelMatches = (g.label || '').toLowerCase().includes(q);
+                        if (!sectionTitleMatches && !groupLabelMatches) {
+                            visibleCmds = visibleCmds.filter(c =>
+                                c.cmd.toLowerCase().includes(q) || c.desc.toLowerCase().includes(q)
+                            );
+                        }
+                    }
+                    return { g, gi, visibleCmds };
+                }).filter(({ g, visibleCmds }) =>
+                    // Keep group if it has visible cmds, or has a note, or editing
+                    editing || visibleCmds.length > 0 || !!g.note
+                );
+
+                const cmdCount = visibleGroups.reduce((a, { visibleCmds }) => a + visibleCmds.length, 0);
+
                 return `
                 <div class="sc-section${isOpen ? ' open' : ''}" data-id="${sec.id}">
                     <div class="sc-sec-header" onclick="scToggle('${sec.id}')">
@@ -1276,10 +1302,13 @@
                         <span class="sc-chevron">▼</span>
                     </div>
                     <div class="sc-sec-body">
-                        ${sec.groups.map((g, gi) => `
+                        ${visibleGroups.map(({ g, gi, visibleCmds }) => `
                             <div class="sc-cmd-group">
                                 ${g.label ? `<div class="sc-cmd-group-label">${scHl(g.label)}</div>` : ''}
-                                ${(g.cmds || []).map((c, ci) => `
+                                ${visibleCmds.map((c, _ci) => {
+                                    // Use real index in g.cmds for edit mutations
+                                    const ci = (g.cmds || []).indexOf(c);
+                                    return `
                                     <div class="sc-cmd-row">
                                         ${editing
                                             ? `<input class="sc-edit-cmd-input" value="${scEscape(c.cmd)}" oninput="scData[${si}].groups[${gi}].cmds[${ci}].cmd=this.value" title="指令">
@@ -1289,9 +1318,9 @@
                                             : `<span class="sc-cmd">${scHl(c.cmd)}</span>
                                                <span class="sc-cmd-desc">${scHl(c.desc)}</span>
                                                <button class="sc-copy-btn" onclick="scCopyCmd('${safeCmd(c.cmd)}',this)" title="複製指令">📋</button>`}
-                                    </div>
-                                `).join('')}
-                                ${editing ? `<button class="sc-edit-btn" onclick="scAddCmd(${si},${gi})">＋ 新增指令列</button>` : ''}
+                                    </div>`;
+                                }).join('')}
+                                ${editing ? `<button class="sc-edit-btn" onclick="scAddCmd(${si},${gi})" style="display:block">＋ 新增指令列</button>` : ''}
                                 ${g.note ? `<div class="sc-note">${scEscape(g.note).replace(/\n/g,'<br>')}</div>` : ''}
                             </div>
                         `).join('')}
@@ -1299,6 +1328,9 @@
                 </div>`;
             }).join('');
 
+            if (filtered.length === 0 && !editing) {
+                html += '<div class="sc-no-result">🔍 找不到相關指令，試試其他關鍵字</div>';
+            }
             if (editing && filtered.length === 0) {
                 html += '<div class="sc-no-result" style="padding:20px 0;">尚無指令分類，請點擊上方「新增指令分類」</div>';
             }
@@ -1345,10 +1377,29 @@
         };
 
         window.scAddSection = function() {
+            // BUG3 FIX: reset to 'all' tab so the new section is always visible
+            scActiveTab = 'all';
+            document.querySelectorAll('#scTabs .sc-tab').forEach(t => t.classList.remove('active'));
+            const allTab = document.querySelector('#scTabs .sc-tab[data-cat="all"]');
+            if (allTab) allTab.classList.add('active');
+
             scData.push({
                 id: 'sec-' + Date.now(), icon: '🔧', title: '新章節', cat: 'special',
                 groups: [{ label: '指令列表', cmds: [{ cmd: '/新指令', desc: '功能描述' }] }]
             });
+            scRender();
+        };
+
+        // BUG1 FIX: expose public API so homepage search redirect can trigger highlight
+        window.scSetSearch = function(term) {
+            scSearch = term;
+            scActiveTab = 'all';
+            const el = document.getElementById('scSearch');
+            if (el) el.value = term;
+            // update tab UI
+            document.querySelectorAll('#scTabs .sc-tab').forEach(t => t.classList.remove('active'));
+            const allTab = document.querySelector('#scTabs .sc-tab[data-cat="all"]');
+            if (allTab) allTab.classList.add('active');
             scRender();
         };
 
@@ -1389,6 +1440,24 @@
                     scRender();
                 });
             }
+
+            // BUG1 FIX: wrap navigateToResult so commands-type results highlight in the commands page
+            // cobblemon.js (defer) runs before DOMContentLoaded, so its functions are already defined here
+            const _origNav = window.navigateToResult;
+            window.navigateToResult = function(type, target, arg) {
+                if (type === 'commands') {
+                    // Navigate to commands page first
+                    if (window.showPage) window.showPage('commands');
+                    // Find the matching search term from search_index or use target directly
+                    const idx = (window.__COBBLEMON_DATA__ && window.__COBBLEMON_DATA__.search_index) || [];
+                    const entry = idx.find(e => e.target === target && e.type === 'commands');
+                    const term = entry ? (entry.title || target) : target;
+                    // Apply search with slight delay to let page render
+                    setTimeout(() => { window.scSetSearch(term); }, 30);
+                } else if (_origNav) {
+                    _origNav(type, target, arg);
+                }
+            };
         });
 
         // Load from inline-embedded data (no fetch required)
