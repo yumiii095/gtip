@@ -1,5 +1,587 @@
 {
-  "commands": [],
+  "commands": [
+    {
+      "title": "展示寶可夢 / 展示物品",
+      "color": "text-purple-700",
+      "items": [
+        {
+          "cmd": "寶可夢展示",
+          "desc": "按鍵 C ➜ 寶可夢訊息 ➜ 右鍵寶可夢"
+        },
+        {
+          "cmd": "[i]",
+          "desc": "展示手上拿著的物品"
+        },
+        {
+          "cmd": "[inv]",
+          "desc": "展示個人背包內容"
+        },
+        {
+          "cmd": "[ender]",
+          "desc": "展示末影箱內容"
+        },
+        {
+          "cmd": "@[玩家ID]",
+          "desc": "標記並提醒在線的玩家"
+        }
+      ]
+    },
+    {
+      "title": "傳送 / 系統功能",
+      "color": "text-blue-900",
+      "items": [
+        {
+          "cmd": "/back",
+          "desc": "返回上一個紀錄點或死亡地點"
+        },
+        {
+          "cmd": "/dp",
+          "desc": "開啟地標傳送選單"
+        },
+        {
+          "cmd": "/warps",
+          "desc": "列出伺服器所有公共地標"
+        },
+        {
+          "cmd": "/spawn",
+          "desc": "回到主城 / 重生點"
+        },
+        {
+          "cmd": "/tpa [玩家ID]",
+          "desc": "請求傳送到該玩家位置"
+        },
+        {
+          "cmd": "/tpahere [玩家ID]",
+          "desc": "請求將玩家傳送至自己身旁"
+        }
+      ]
+    },
+    {
+      "title": "HOME 家園紀錄點",
+      "color": "text-blue-900",
+      "items": [
+        {
+          "cmd": "/sethome [名稱]",
+          "desc": "設置一個家園點"
+        },
+        {
+          "cmd": "/home [名稱]",
+          "desc": "傳送至指定家園點"
+        },
+        {
+          "cmd": "/home delete [名稱]",
+          "desc": "刪除指定家園點"
+        },
+        {
+          "cmd": "/homelist",
+          "desc": "查看所有家園點"
+        }
+      ]
+    },
+    {
+      "title": "任務 / 獎勵系統",
+      "color": "text-blue-900",
+      "items": [
+        {
+          "cmd": "/days",
+          "desc": "查看每日任務"
+        },
+        {
+          "cmd": "/vote",
+          "desc": "投票指令"
+        },
+        {
+          "cmd": "/pm",
+          "desc": "線上獎勵"
+        },
+        {
+          "cmd": "/pex",
+          "desc": "圖鑑系統（收集獎勵）"
+        },
+        {
+          "cmd": "/stattrak",
+          "desc": "查看閃光方塊保底次數"
+        },
+        {
+          "cmd": "/ob open",
+          "desc": "打開冰果任務介面"
+        }
+      ]
+    },
+    {
+      "title": "玩家 / 基礎指令",
+      "color": "text-blue-900",
+      "items": [
+        {
+          "cmd": "/wiki [英文名]",
+          "desc": "查看寶可夢資訊與生態域"
+        },
+        {
+          "cmd": "/cos",
+          "desc": "時裝系統"
+        },
+        {
+          "cmd": "/playerinv",
+          "desc": "開啟隨身倉庫"
+        },
+        {
+          "cmd": "/baltop",
+          "desc": "查看金錢排行榜"
+        },
+        {
+          "cmd": "/pvp",
+          "desc": "開關 PvP 功能"
+        },
+        {
+          "cmd": "/suicide",
+          "desc": "角色自殺（脫困用）"
+        },
+        {
+          "cmd": "/banlist",
+          "desc": "查看禁用物品名單"
+        }
+      ]
+    },
+    {
+      "title": "🏠 領地系統指令",
+      "color": "text-green-700",
+      "items": [
+        {
+          "cmd": "/res create [名稱]",
+          "desc": "建立領地"
+        },
+        {
+          "cmd": "/res remove [名稱]",
+          "desc": "移除所選領地"
+        },
+        {
+          "cmd": "/res tp [名稱]",
+          "desc": "回到領地"
+        },
+        {
+          "cmd": "/res tpset",
+          "desc": "設置傳送位置"
+        },
+        {
+          "cmd": "/res expand [格數]",
+          "desc": "擴張領地"
+        },
+        {
+          "cmd": "/res padd [玩家ID]",
+          "desc": "給予該玩家全部權限"
+        },
+        {
+          "cmd": "/res pset [玩家ID]",
+          "desc": "單獨設置該玩家權限"
+        }
+      ],
+      "isResidence": true
+    },
+    {
+      "title": "社交系統指令",
+      "color": "text-blue-900",
+      "items": [
+        {
+          "cmd": "/m [ID] [訊息]",
+          "desc": "私密訊息"
+        },
+        {
+          "cmd": "/r [訊息]",
+          "desc": "回覆最近密語"
+        },
+        {
+          "cmd": "/ignore [ID] [t|f]",
+          "desc": "屏蔽/解除屏蔽"
+        },
+        {
+          "cmd": "/ignorelist",
+          "desc": "查看屏蔽名單"
+        }
+      ]
+    }
+  ],
+  "serverCommands": [
+    {
+      "id": "social",
+      "icon": "💬",
+      "title": "私聊 / 社交系統",
+      "cat": "social",
+      "groups": [
+        {
+          "label": "私聊玩家",
+          "cmds": [
+            {
+              "cmd": "/message [玩家名]",
+              "desc": "私聊玩家（同 /msg /talk /tell）"
+            },
+            {
+              "cmd": "/msg [玩家名]",
+              "desc": "私聊玩家（/message 別名）"
+            },
+            {
+              "cmd": "/talk [玩家名]",
+              "desc": "私聊玩家（/message 別名）"
+            },
+            {
+              "cmd": "/tell [玩家名]",
+              "desc": "私聊玩家（/message 別名）"
+            },
+            {
+              "cmd": "/m [玩家名] [訊息]",
+              "desc": "快速單次私聊（後面加訊息）"
+            }
+          ]
+        },
+        {
+          "label": "私聊模式說明",
+          "note": "👉 後面加訊息 = 單次私聊　👉 不加訊息 = 進入持續私聊模式\n退出私聊：輸入 /message、/msg、/talk、/tell 或 /global（不帶參數）"
+        },
+        {
+          "label": "其他社交功能",
+          "cmds": [
+            {
+              "cmd": "/r [訊息]",
+              "desc": "快速回覆上一個私聊訊息"
+            },
+            {
+              "cmd": "/ignore [ID] [t|f]",
+              "desc": "屏蔽（t）/ 解除屏蔽（f）玩家"
+            },
+            {
+              "cmd": "/ignorelist",
+              "desc": "查看目前屏蔽名單"
+            },
+            {
+              "cmd": "@[玩家ID]",
+              "desc": "在聊天中標記（Mention）玩家"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "display",
+      "icon": "📦",
+      "title": "展示系統",
+      "cat": "display",
+      "groups": [
+        {
+          "label": "聊天框輸入關鍵字",
+          "cmds": [
+            {
+              "cmd": "[i]",
+              "desc": "展示手上目前持有的物品"
+            },
+            {
+              "cmd": "[inv]",
+              "desc": "展示目前背包完整內容"
+            },
+            {
+              "cmd": "[ender]",
+              "desc": "展示末影箱內容"
+            }
+          ]
+        },
+        {
+          "label": "寶可夢展示方式",
+          "note": "🎮 按 C 開啟寶可夢列表 → 點選想展示的寶可夢 → 按右鍵 即可展示給聊天中的所有玩家"
+        }
+      ]
+    },
+    {
+      "id": "teleport",
+      "icon": "🧭",
+      "title": "傳送 / 移動功能",
+      "cat": "teleport",
+      "groups": [
+        {
+          "label": "玩家之間傳送",
+          "cmds": [
+            {
+              "cmd": "/tpa [玩家]",
+              "desc": "申請傳送到指定玩家的位置"
+            },
+            {
+              "cmd": "/tpahere [玩家]",
+              "desc": "申請將指定玩家傳送到你身邊"
+            },
+            {
+              "cmd": "/back",
+              "desc": "返回上一個地點（死亡或傳送前的位置）"
+            }
+          ]
+        },
+        {
+          "label": "地點傳送",
+          "cmds": [
+            {
+              "cmd": "/spawn",
+              "desc": "傳送回主城出生點"
+            },
+            {
+              "cmd": "/dp",
+              "desc": "開啟地標選單"
+            },
+            {
+              "cmd": "/warps",
+              "desc": "查看所有公共傳送點列表"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "home",
+      "icon": "🏠",
+      "title": "HOME 家園系統",
+      "cat": "home",
+      "groups": [
+        {
+          "label": "家的設定與管理",
+          "cmds": [
+            {
+              "cmd": "/sethome [名稱]",
+              "desc": "在目前站立位置設定家（可設多個）"
+            },
+            {
+              "cmd": "/home [名稱]",
+              "desc": "傳送回指定名稱的家"
+            },
+            {
+              "cmd": "/home delete [名稱]",
+              "desc": "刪除指定名稱的家"
+            },
+            {
+              "cmd": "/homelist",
+              "desc": "查看所有已設定的家及其位置"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "economy",
+      "icon": "💰",
+      "title": "經濟系統",
+      "cat": "economy",
+      "groups": [
+        {
+          "label": "查詢金錢",
+          "cmds": [
+            {
+              "cmd": "/balance [玩家]",
+              "desc": "查詢自己或他人的餘額"
+            },
+            {
+              "cmd": "/bal [玩家]",
+              "desc": "查詢餘額（/balance 別名）"
+            },
+            {
+              "cmd": "/money [玩家]",
+              "desc": "查詢餘額（/balance 別名）"
+            }
+          ]
+        },
+        {
+          "label": "排行榜與詳細資訊",
+          "cmds": [
+            {
+              "cmd": "/baltop",
+              "desc": "查看伺服器金錢排行榜"
+            },
+            {
+              "cmd": "/balancetop",
+              "desc": "查看伺服器金錢排行榜（同 /baltop）"
+            },
+            {
+              "cmd": "/ne me",
+              "desc": "查看個人詳細經濟資訊"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "quest",
+      "icon": "🎁",
+      "title": "任務 / 獎勵",
+      "cat": "quest",
+      "groups": [
+        {
+          "label": "每日 / 定期獎勵",
+          "cmds": [
+            {
+              "cmd": "/days",
+              "desc": "每日任務（每天重置，記得領）"
+            },
+            {
+              "cmd": "/vote",
+              "desc": "投票支持伺服器以獲得獎勵"
+            },
+            {
+              "cmd": "/pm",
+              "desc": "在線時間累積獎勵"
+            }
+          ]
+        },
+        {
+          "label": "進度 / 系統",
+          "cmds": [
+            {
+              "cmd": "/pex",
+              "desc": "圖鑑系統（查看收集進度）"
+            },
+            {
+              "cmd": "/stattrak",
+              "desc": "閃光保底進度查詢"
+            },
+            {
+              "cmd": "/ob open",
+              "desc": "冰果任務開啟"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "player",
+      "icon": "🎮",
+      "title": "玩家功能",
+      "cat": "player",
+      "groups": [
+        {
+          "label": "狀態切換",
+          "cmds": [
+            {
+              "cmd": "/pvp",
+              "desc": "切換開啟 / 關閉 PVP 模式"
+            },
+            {
+              "cmd": "/afk",
+              "desc": "切換掛機狀態（讓其他玩家知道你離開）"
+            },
+            {
+              "cmd": "/suicide",
+              "desc": "自殺脫困（卡在地形或卡住時使用）"
+            }
+          ]
+        },
+        {
+          "label": "實用工具",
+          "cmds": [
+            {
+              "cmd": "/playerinv",
+              "desc": "開啟隨身倉庫"
+            },
+            {
+              "cmd": "/wiki [英文名]",
+              "desc": "查詢寶可夢詳細資料（請輸入英文名稱）"
+            },
+            {
+              "cmd": "/cos",
+              "desc": "開啟時裝系統"
+            },
+            {
+              "cmd": "/discord",
+              "desc": "取得 Discord 社群連結"
+            },
+            {
+              "cmd": "/banlist",
+              "desc": "查看伺服器禁用物品清單"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lock",
+      "icon": "🔒",
+      "title": "鎖箱 / 權限",
+      "cat": "lock",
+      "groups": [
+        {
+          "label": "鎖箱指令",
+          "cmds": [
+            {
+              "cmd": "/lock [3/4] [玩家名]",
+              "desc": "對著鎖箱牌子輸入，設定第 3 或 4 行可開啟的玩家"
+            }
+          ]
+        },
+        {
+          "label": "使用說明",
+          "note": "👉 站在箱子旁邊的告示牌前輸入指令\n👉 數字 3 或 4 代表要寫入告示牌的第幾行\n👉 填入玩家名後，該玩家即可開啟此箱子"
+        }
+      ]
+    },
+    {
+      "id": "land",
+      "icon": "🏡",
+      "title": "領地系統（Residence）",
+      "cat": "land",
+      "groups": [
+        {
+          "label": "操作說明",
+          "note": "🛠 工具：木鋤頭\n🖱 左鍵點擊 = 選擇第 1 個角落　右鍵點擊 = 選擇第 2 個角落\n選好兩個對角後，再輸入 /res create 建立領地"
+        },
+        {
+          "label": "領地管理",
+          "cmds": [
+            {
+              "cmd": "/res create [名稱]",
+              "desc": "建立領地（需先用木鋤頭框選範圍）"
+            },
+            {
+              "cmd": "/res remove [名稱]",
+              "desc": "刪除指定領地"
+            },
+            {
+              "cmd": "/res tp [名稱]",
+              "desc": "傳送到指定領地"
+            },
+            {
+              "cmd": "/res tpset",
+              "desc": "設定領地的傳送落點（站在想傳送到的位置輸入）"
+            },
+            {
+              "cmd": "/res expand [格數]",
+              "desc": "向你目前面對的方向擴張領地範圍"
+            }
+          ]
+        },
+        {
+          "label": "領地權限設定",
+          "cmds": [
+            {
+              "cmd": "/res padd [玩家]",
+              "desc": "給予指定玩家此領地的全部權限"
+            },
+            {
+              "cmd": "/res pset [玩家]",
+              "desc": "單獨設定指定玩家的特定權限項目"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "special",
+      "icon": "🔧",
+      "title": "特殊 / 除錯功能",
+      "cat": "special",
+      "groups": [
+        {
+          "label": "除錯指令",
+          "cmds": [
+            {
+              "cmd": "/megafix",
+              "desc": "解除 Mega 進化卡住的異常狀態"
+            }
+          ]
+        }
+      ]
+    }
+  ],
   "search_index": [
     {
       "type": "strategy",
