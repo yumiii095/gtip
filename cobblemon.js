@@ -64,14 +64,23 @@ function escapeHtml(str) {
         .replace(/"/g, '&quot;');
 }
 
-/**
- * 把搜尋關鍵字在文字裡出現的地方全部標黃色（給 _applyHL 用）
- * terms = 字詞陣列，長詞優先標，避免短詞搶先
- */
+// 把一段文字切成一個個小詞，標點和空白都當分隔符
+function tokenize(text) {
+    if (!text) return [];
+    return text.toLowerCase()
+        .split(/[\s\u3000,，、。！？/\[\]()（）]+/)
+        .filter(t => t.length > 0);
+}
+
+// 把搜尋關鍵字在文字裡出現的地方全部標黃色
 function highlightTerms(text, terms) {
-    if (!terms || !terms.length) return escapeHtml(text);
+    if (!terms.length) return escapeHtml(text);
+
+    // 長的詞優先標，避免被短詞搶先覆蓋
     const sorted = [...new Set(terms)].sort((a, b) => b.length - a.length);
     const lower  = text.toLowerCase();
+
+    // 用一個布林陣列記錄哪些字要標色
     const marks  = new Array(text.length).fill(false);
     for (const term of sorted) {
         let idx = 0;
@@ -80,27 +89,8 @@ function highlightTerms(text, terms) {
             idx += term.length;
         }
     }
-    let result = '', inMark = false;
-    for (let i = 0; i < text.length; i++) {
-        const ch = escapeHtml(text[i]);
-        if (marks[i]  && !inMark) { result += '<mark class="fuzzy-hl">'; inMark = true; }
-        if (!marks[i] &&  inMark) { result += '</mark>'; inMark = false; }
-        result += ch;
-    }
-    if (inMark) result += '</mark>';
-    return result;
-}
 
-/**
- * 用 Fuse.js 回傳的字元位置陣列來標色（給搜尋結果建議用）
- * indices = [[start, end], ...]  (包含，如 Fuse 所回傳)
- */
-function highlightFuse(text, indices) {
-    if (!indices || !indices.length) return escapeHtml(text);
-    const marks = new Array(text.length).fill(false);
-    indices.forEach(([s, e]) => {
-        for (let i = s; i <= e; i++) marks[i] = true;
-    });
+    // 掃一遍，連續要標色的地方包上 <mark>
     let result = '', inMark = false;
     for (let i = 0; i < text.length; i++) {
         const ch = escapeHtml(text[i]);
@@ -114,61 +104,107 @@ function highlightFuse(text, indices) {
 
 
 /* ════════════════════════════════════════════════════
-   3. SEARCH ENGINE — Fuse.js 模糊搜尋核心
+   3. SEARCH ENGINE — 搜尋評分核心
 ════════════════════════════════════════════════════ */
 
-// Fuse.js 實例，在資料載入後初始化
-let _fuseInstance = null;
+/**
+ * 幫每一筆資料算「和這次搜尋有多符合」的分數
+ *
+ * 加分規則（分數越高越靠前）：
+ *   A. 完整關鍵字出現在標題/標籤    +300~500
+ *   B. 逐字拆開後各字出現在哪
+ *      · 標籤完全吻合                +100/字
+ *      · 標題包含                    +80/字（開頭還多 +50）
+ *      · 標籤部分包含                +55/字
+ *      · 說明包含                    +20/字
+ *   C. 只找到部分字時整體打折
+ *   D. 標題開頭就符合再加 +60
+ */
+function searchScore(query, item) {
+    const q = query.toLowerCase().trim();
+    if (!q || !item) return { score: 0, titleHl: escapeHtml(item?.title || '') };
 
-// Fuse.js 設定
-const FUSE_OPTIONS = {
-    includeScore    : true,   // 回傳符合分數（0 = 完全符合，1 = 完全不符）
-    includeMatches  : true,   // 回傳命中的字元位置，用來標色
-    ignoreLocation  : true,   // 不偏好字串頭部的命中（CJK 文字不分詞首）
-    minMatchCharLength: 1,    // 最少一個字就算命中
-    threshold       : 0.45,  // 容忍度：0 最嚴格、1 全接受；0.45 對中文效果較佳
-    distance        : 200,    // ignoreLocation=true 時這個值影響較小，保留備用
-    useExtendedSearch: false, // 不需要特殊語法（'、!、^…）
-    keys: [
-        { name: 'title',    weight: 0.50 },  // 標題命中，最重要
-        { name: 'keywords', weight: 0.35 },  // 關鍵字標籤次之
-        { name: 'desc',     weight: 0.15 },  // 說明文字輔助
-    ],
-};
+    const titleL = (item.title    || '').toLowerCase();
+    const kwL    = (item.keywords || '').toLowerCase();
+    const descL  = (item.desc     || '').toLowerCase();
+    const kwTokenSet = new Set(tokenize(kwL));
+    const qTokens    = q.split(/\s+/).filter(Boolean);
 
-// 在資料載入後呼叫，把 ALL_DATA 建成 Fuse 索引
-function initFuse() {
-    if (typeof Fuse === 'undefined') {
-        console.warn('[Search] Fuse.js 未載入，搜尋功能停用');
-        return;
+    let score = 0;
+    const matchedTerms = []; // 找到的詞，之後拿來標黃色
+
+    // ── A. 整句符合 ──────────────────────────────────
+    if      (titleL === q)          { score += 500; matchedTerms.push(q); }
+    else if (titleL.startsWith(q))  { score += 360; matchedTerms.push(q); }
+    else if (titleL.includes(q))    { score += 300; matchedTerms.push(q); }
+
+    if (kwL.includes(q) && !titleL.includes(q))                       { score += 200; matchedTerms.push(q); }
+    if (descL.includes(q) && !titleL.includes(q) && !kwL.includes(q)) { score +=  80; matchedTerms.push(q); }
+
+    // ── B. 逐字計分 ──────────────────────────────────
+    let tokenHits = 0;
+    for (const token of qTokens) {
+        if (!token) continue;
+        let hit = false;
+
+        // 標籤有這個字
+        if (kwTokenSet.has(token)) {
+            score += 100; hit = true;
+            if (!matchedTerms.includes(token)) matchedTerms.push(token);
+        } else if (kwL.includes(token)) {
+            score += 55; hit = true;
+            if (!matchedTerms.includes(token)) matchedTerms.push(token);
+        }
+
+        // 標題有這個字（在詞首加分）
+        if (titleL.includes(token)) {
+            const isPrefix = titleL.startsWith(token)
+                || titleL.includes(' ' + token)
+                || titleL.includes('/' + token);
+            score += 80 + (isPrefix ? 50 : 0);
+            hit = true;
+            if (!matchedTerms.includes(token)) matchedTerms.push(token);
+        }
+
+        // 說明有這個字
+        if (descL.includes(token)) {
+            score += 20; hit = true;
+            if (!matchedTerms.includes(token)) matchedTerms.push(token);
+        }
+
+        if (hit) tokenHits++;
     }
-    _fuseInstance = new Fuse(ALL_DATA, FUSE_OPTIONS);
+
+    // ── C. 只搜到部分字時打折 ─────────────────────────
+    if (qTokens.length > 1) {
+        const coverage = tokenHits / qTokens.length;
+        if      (coverage === 0)  score = 0;
+        else if (coverage < 0.5)  score = Math.floor(score * 0.05); // 幾乎沒中，幾乎不顯示
+        else if (coverage < 1.0)  score = Math.floor(score * (0.2 + 0.8 * coverage));
+    }
+
+    // ── D. 標題開頭就符合，再加分 ────────────────────
+    if (score > 0 && titleL.startsWith(q)) score += 60;
+
+    // 完全沒中就直接回傳負分
+    if (score <= 0 && tokenHits === 0 && !titleL.includes(q) && !kwL.includes(q))
+        return { score: -1, titleHl: escapeHtml(item.title) };
+
+    return {
+        score,
+        titleHl: matchedTerms.length
+            ? highlightTerms(item.title, matchedTerms)
+            : escapeHtml(item.title),
+    };
 }
 
-/**
- * 用 Fuse.js 搜尋，回傳最多 limit 筆
- * 回傳格式：[{ item, score, titleHl }]
- *   item    — 原始資料物件（type, target, title, desc, keywords, isCommand…）
- *   score   — 0（完全不符）至 1（完全符合），已從 Fuse 的反向分數轉換
- *   titleHl — 帶 <mark> 高亮標記的標題 HTML
- */
+// 把全站資料都算一次分，只回傳分數 > 0 的，分數高的排前面
 function rankResults(query, limit = 8) {
-    if (!_fuseInstance || !query.trim()) return [];
-
-    const raw = _fuseInstance.search(query, { limit });
-
-    return raw.map(r => {
-        // Fuse 分數 0=完美、1=最差 → 反轉為 1=完美、0=最差，讓上層代碼能直接比大小
-        const score = 1 - (r.score ?? 1);
-
-        // 找 title 欄位的命中位置來標色
-        const titleMatch = (r.matches || []).find(m => m.key === 'title');
-        const titleHl    = titleMatch
-            ? highlightFuse(r.item.title, titleMatch.indices)
-            : escapeHtml(r.item.title);
-
-        return { item: r.item, score, titleHl };
-    });
+    return ALL_DATA
+        .map(item => { const { score, titleHl } = searchScore(query, item); return { item, score, titleHl }; })
+        .filter(r => r.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, limit);
 }
 
 
@@ -998,7 +1034,7 @@ function extractStrategiesFromDOM() {
     return (window.STRATEGIES_DATA || []).filter(s => remaining.has(s.id));
 }
 
-// 確認發佈：新增一則公告、存檔，然後下載更新後的 JSON 和 HTML
+// 確認發佈：新增一則公告、存檔，然後下載更新後的 JSON、HTML 和 cobblemon.js
 function executeFinalSave() {
     const summary = document.getElementById('modal-summary').value || '攻略站內容更新';
     const detail  = document.getElementById('modal-detail').value;
@@ -1032,23 +1068,64 @@ function executeFinalSave() {
     closeModal();
     toggleEditMode(false);
 
-    // 下載資料 JSON
-    const jsonBlob = new Blob([JSON.stringify({
-        commands     : extractCommandsFromDOM(),
-        search_index : ALL_DATA,
-        strategies   : extractStrategiesFromDOM(),
-    }, null, 2)], { type: 'application/json' });
+    // ── BUG1 FIX：回到首頁，確保下載的 HTML 預設顯示首頁 ──────────
+    showPage('home');
+
+    // ── BUG2 FIX：同步指令集編輯結果到 ALL_DATA（攻略部分） ──────────
+    // 重建 ALL_DATA 中 strategy 類型的條目，以反映新增/刪除的攻略
+    const strategyEntries = extractStrategiesFromDOM().map(s => ({
+        type     : 'strategy',
+        target   : s.id,
+        keywords : s.title,
+        title    : s.title.replace(/^[\p{Emoji}✨⚔️💰🛒🥚📊🌿🏆🗺️💎⚡📖]+\s*/u, ''),
+        desc     : (function () {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = s.html;
+            return (tmp.innerText || tmp.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 80);
+        })(),
+    }));
+    // 保留非 strategy 的條目，把 strategy 換成最新的
+    ALL_DATA = [
+        ...ALL_DATA.filter(e => e.type !== 'strategy'),
+        ...strategyEntries,
+    ];
+
+    // 取得最新的指令集資料（含指令集頁的 serverCommands）
+    const serverCmds = window.scData || [];
+
+    // ── 下載資料 JSON ──────────────────────────────────────────────
+    const jsonPayload = {
+        commands       : extractCommandsFromDOM(),
+        serverCommands : serverCmds,
+        search_index   : ALL_DATA,
+        strategies     : extractStrategiesFromDOM(),
+    };
+    const jsonBlob = new Blob([JSON.stringify(jsonPayload, null, 2)], { type: 'application/json' });
     Object.assign(document.createElement('a'), {
         href: URL.createObjectURL(jsonBlob), download: 'cobblemon_data.json',
     }).click();
 
-    // 下載頁面 HTML（稍微延遲，避免兩個下載同時觸發搶到）
+    // ── 下載 index.html（稍微延遲）─────────────────────────────────
+    // BUG1 FIX：此時已切回首頁，snapshot 會正確顯示首頁
     setTimeout(() => {
         Object.assign(document.createElement('a'), {
             href     : URL.createObjectURL(new Blob(['<!DOCTYPE html>\n' + document.documentElement.outerHTML], { type: 'text/html' })),
             download : 'index.html',
         }).click();
     }, 300);
+
+    // ── BUG3 FIX：下載 cobblemon.js ───────────────────────────────
+    setTimeout(() => {
+        fetch('cobblemon.js')
+            .then(r => r.text())
+            .then(src => {
+                Object.assign(document.createElement('a'), {
+                    href     : URL.createObjectURL(new Blob([src], { type: 'application/javascript' })),
+                    download : 'cobblemon.js',
+                }).click();
+            })
+            .catch(() => console.warn('[Save] 無法下載 cobblemon.js'));
+    }, 600);
 }
 
 // 手動新增一張空白公告卡片（編輯模式用）
@@ -1173,6 +1250,13 @@ window.onload = async function () {
         COMMANDS_DATA          = data.commands      || [];
         ALL_DATA               = data.search_index  || [];
         window.STRATEGIES_DATA = data.strategies    || [];
+
+        // BUG2 FIX：如果 JSON 裡有最新的 serverCommands（儲存發佈後的版本），
+        // 覆蓋 index.html 內嵌的舊資料，確保指令集編輯結果能正確顯示
+        if (Array.isArray(data.serverCommands) && data.serverCommands.length > 0) {
+            window.scData = data.serverCommands.map(s => Object.assign({}, s));
+            if (typeof window.scRender === 'function') window.scRender();
+        }
     } catch (e) {
         // 讀不到 JSON 也不會壞掉，只是沒有資料
         console.error('JSON 載入失敗：', e);
