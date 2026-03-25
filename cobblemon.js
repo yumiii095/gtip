@@ -995,13 +995,30 @@ function openPublishModal() { document.getElementById('confirm-modal').style.dis
 // 關掉發佈確認視窗
 function closeModal()       { document.getElementById('confirm-modal').style.display = 'none'; }
 
-// 根據選擇的更新類型（大 / 小）預覽下一個版本號
+// 根據選擇的更新類型（改版 / 更新 / 維護）預覽下一個版本號
 function updateVersionPreview(type) {
-    document.getElementById('modal-version').value = 'v' + (
-        type === 'major'
-            ? (Math.floor(baseVersion) + 1).toFixed(1) // 大更新：整數 +1
-            : (baseVersion + 0.1).toFixed(1)           // 小更新：+0.1
-    );
+    const versionEl       = document.getElementById('modal-version');
+    const maintenanceRow  = document.getElementById('modal-maintenance-row');
+
+    if (type === 'maintenance') {
+        // 維護：版號不變，欄位鎖定
+        versionEl.value    = 'v' + baseVersion.toFixed(1);
+        versionEl.readOnly = true;
+        versionEl.style.opacity = '0.55';
+        versionEl.title    = '維護模式不更新版本號';
+        if (maintenanceRow) maintenanceRow.classList.remove('hidden');
+    } else {
+        // 改版 / 更新：正常計算版號
+        versionEl.value    = 'v' + (
+            type === 'major'
+                ? (Math.floor(baseVersion) + 1).toFixed(1) // 改版：整數 +1
+                : (baseVersion + 0.1).toFixed(1)           // 更新：+0.1
+        );
+        versionEl.readOnly = false;
+        versionEl.style.opacity = '';
+        versionEl.title    = '';
+        if (maintenanceRow) maintenanceRow.classList.add('hidden');
+    }
 }
 
 // 把頁面上現在的指令列表全部讀出來，整理成 JSON 格式
@@ -1034,37 +1051,53 @@ function extractStrategiesFromDOM() {
     return (window.STRATEGIES_DATA || []).filter(s => remaining.has(s.id));
 }
 
-// 確認發佈：新增一則公告、存檔，然後下載更新後的 JSON、HTML 和 cobblemon.js
+// 確認發佈：新增一則公告（依類型）、存檔，然後下載更新後的 JSON、HTML 和 cobblemon.js
 function executeFinalSave() {
-    const summary = document.getElementById('modal-summary').value || '攻略站內容更新';
-    const detail  = document.getElementById('modal-detail').value;
-    const version = document.getElementById('modal-version').value;
+    const summary    = document.getElementById('modal-summary').value || '攻略站內容更新';
+    const detail     = document.getElementById('modal-detail').value;
+    const version    = document.getElementById('modal-version').value;
+    const updateType = document.querySelector('input[name="update-type"]:checked')?.value || 'minor';
+
+    // 維護模式：依勾選決定是否新增公告
+    const publishAnnouncement = updateType !== 'maintenance'
+        || (document.getElementById('modal-publish-maintenance')?.checked ?? true);
+
     const dateStr = new Date().toLocaleDateString('zh-TW', {
         timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit',
     }).replace(/\//g, '-');
 
+    // 各類型對應的顯示樣式
+    const badgeMap = {
+        major       : { label: '改版',   badgeCls: 'bg-red-600',    borderCls: 'border-red-500',    dotCls: '!bg-red-500'    },
+        minor       : { label: '更新',   badgeCls: 'bg-blue-600',   borderCls: 'border-blue-500',   dotCls: '!bg-blue-500'   },
+        maintenance : { label: '維護',   badgeCls: 'bg-yellow-600', borderCls: 'border-yellow-500', dotCls: '!bg-yellow-500' },
+    };
+    const badge = badgeMap[updateType] || badgeMap.minor;
+
     const newsContainer = document.getElementById('news-container');
     if (newsContainer.querySelector('p.italic')) newsContainer.innerHTML = ''; // 清掉預設佔位文字
 
-    // 建立新的公告卡片加到最上面
-    const log = document.createElement('div');
-    log.className    = 'bg-white border-l-4 border-red-500 shadow-md p-6';
-    log.style.position = 'relative';
-    log.innerHTML = `
-        <button class="edit-ui admin-btn admin-btn-delete absolute top-3 right-3"
-            onclick="this.closest('#news-container > div').remove()" contenteditable="false">[x] 刪除</button>
-        <div class="mb-3">
-            <span class="bg-red-600 text-white text-xs px-2 py-1 font-bold whitespace-nowrap">系統更新</span>
-            <h3 class="inline text-xl font-bold text-blue-900 uppercase ml-2">${version} - ${summary}</h3>
-        </div>
-        <div class="news-item ml-2 pb-1">
-            <div class="news-dot !bg-red-500"></div>
-            <p class="text-gray-700 text-sm">${detail}</p>
-        </div>
-        <div class="text-right mt-2">
-            <span class="text-gray-400 text-xs font-bold">${dateStr}</span>
-        </div>`;
-    newsContainer.prepend(log);
+    // 建立公告卡片（若維護且不勾選則略過）
+    if (publishAnnouncement) {
+        const log = document.createElement('div');
+        log.className    = `bg-white border-l-4 ${badge.borderCls} shadow-md p-6`;
+        log.style.position = 'relative';
+        log.innerHTML = `
+            <button class="edit-ui admin-btn admin-btn-delete absolute top-3 right-3"
+                onclick="this.closest('#news-container > div').remove()" contenteditable="false">[x] 刪除</button>
+            <div class="mb-3">
+                <span class="${badge.badgeCls} text-white text-xs px-2 py-1 font-bold whitespace-nowrap">${badge.label}</span>
+                <h3 class="inline text-xl font-bold text-blue-900 uppercase ml-2">${version} - ${summary}</h3>
+            </div>
+            <div class="news-item ml-2 pb-1">
+                <div class="news-dot ${badge.dotCls}"></div>
+                <p class="text-gray-700 text-sm">${detail}</p>
+            </div>
+            <div class="text-right mt-2">
+                <span class="text-gray-400 text-xs font-bold">${dateStr}</span>
+            </div>`;
+        newsContainer.prepend(log);
+    }
     closeModal();
     toggleEditMode(false);
 

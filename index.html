@@ -552,14 +552,30 @@
             <div class="space-y-4 mb-6">
                 <div>
                     <label class="block text-sm font-bold mb-2">更新類型：</label>
-                    <div class="flex gap-4">
-                        <label class="flex-1 border p-2 rounded cursor-pointer text-center bg-gray-50 hover:bg-gray-100 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
-                            <input type="radio" name="update-type" value="major" onclick="updateVersionPreview('major')" class="hidden" contenteditable="false"> 大更新
+                    <div class="flex gap-3">
+                        <label class="flex-1 border p-2 rounded cursor-pointer text-center bg-gray-50 hover:bg-gray-100 has-[:checked]:border-red-500 has-[:checked]:bg-red-50">
+                            <input type="radio" name="update-type" value="major" onclick="updateVersionPreview('major')" class="hidden" contenteditable="false">
+                            <span class="font-bold text-sm">改版</span>
+                            <div class="text-xs text-gray-400 mt-0.5">版號 +1.0</div>
                         </label>
                         <label class="flex-1 border p-2 rounded cursor-pointer text-center bg-gray-50 hover:bg-gray-100 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
-                            <input type="radio" name="update-type" value="minor" onclick="updateVersionPreview('minor')" checked="" class="hidden" contenteditable="false"> 小更新
+                            <input type="radio" name="update-type" value="minor" onclick="updateVersionPreview('minor')" checked="" class="hidden" contenteditable="false">
+                            <span class="font-bold text-sm">更新</span>
+                            <div class="text-xs text-gray-400 mt-0.5">版號 +0.1</div>
+                        </label>
+                        <label class="flex-1 border p-2 rounded cursor-pointer text-center bg-gray-50 hover:bg-gray-100 has-[:checked]:border-yellow-500 has-[:checked]:bg-yellow-50">
+                            <input type="radio" name="update-type" value="maintenance" onclick="updateVersionPreview('maintenance')" class="hidden" contenteditable="false">
+                            <span class="font-bold text-sm">維護</span>
+                            <div class="text-xs text-gray-400 mt-0.5">版號不變</div>
                         </label>
                     </div>
+                </div>
+                <div id="modal-maintenance-row" class="hidden">
+                    <label class="flex items-center gap-2 cursor-pointer select-none p-2 border rounded bg-yellow-50 border-yellow-200">
+                        <input type="checkbox" id="modal-publish-maintenance" contenteditable="false" checked>
+                        <span class="text-sm font-medium text-yellow-800">發布維護公告</span>
+                        <span class="text-xs text-yellow-600 ml-1">（不勾選則靜默儲存，不新增公告）</span>
+                    </label>
                 </div>
                 <div>
                     <label class="block text-sm font-bold mb-1">版本號（可手動修改）：</label>
