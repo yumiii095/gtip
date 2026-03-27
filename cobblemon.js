@@ -544,17 +544,24 @@ function initStrategies() {
     const container = document.getElementById('strategy-container');
     if (!container) return;
 
-    // JSON 還沒載入時，只幫現有的靜態卡片加上點擊事件
-    if (!window.STRATEGIES_DATA) {
-        container.querySelectorAll('.strat-card').forEach(card => {
-            if (card._stratListenerAdded) return; // 避免重複綁
-            card._stratListenerAdded = true;
-            card.addEventListener('click', e => {
-                if (e.target.classList.contains('admin-btn')) return;
+    // ── 事件委派：只綁一次在 container 上 ──────────────────────────────────
+    // 無論卡片是靜態 HTML 還是 JS 動態渲染，點擊都能正確觸發
+    if (!container._stratDelegateAdded) {
+        container._stratDelegateAdded = true;
+        container.addEventListener('click', e => {
+            if (e.target.closest('.admin-btn')) return; // 刪除按鈕不開 modal
+            const card = e.target.closest('.strat-card');
+            if (!card) return;
+
+            // 從記憶體找完整攻略資料
+            const strat = (window.STRATEGIES_DATA || []).find(s => s.id === card.id);
+            if (strat) {
+                openStratModal(strat);
+            } else {
+                // JSON 尚未載入時，用靜態卡片文字暫時顯示
                 const title   = card.querySelector('.strat-card-title')?.innerText || '攻略';
                 const preview = card.querySelector('.strat-card-preview')?.innerText || '';
                 const icon    = card.querySelector('.strat-card-icon')?.innerText    || '📖';
-                // 沒有完整資料，只顯示預覽文字加提示
                 openStratModal({
                     id   : card.id,
                     title,
@@ -565,12 +572,14 @@ function initStrategies() {
                                 <p class="text-yellow-700 text-sm mt-1">請確認 JSON 檔案已正確放置於同目錄下，重新整理頁面即可載入完整內容。</p>
                             </div>`,
                 });
-            });
+            }
         });
-        return;
     }
 
-    // 清空後重新依資料渲染每張卡片
+    // JSON 尚未載入 → 靜態卡片已由上方委派處理，不需額外綁定
+    if (!window.STRATEGIES_DATA) return;
+
+    // 清空後重新依資料渲染每張卡片（點擊由上方委派統一處理）
     container.innerHTML = '';
     window.STRATEGIES_DATA.forEach((strat, idx) => {
         const icon    = _stratIcons[idx % _stratIcons.length];
@@ -585,10 +594,6 @@ function initStrategies() {
             <div class="strat-card-title">${strat.title.replace(/^[\p{Emoji}✨⚔️💰🛒🥚📊🌿🏆🗺️💎⚡📖]+\s*/u, '')}</div>
             <div class="strat-card-preview">${preview}</div>
             <span class="strat-card-arrow">›</span>`;
-        card.addEventListener('click', e => {
-            if (e.target.classList.contains('admin-btn')) return;
-            openStratModal(strat);
-        });
         container.appendChild(card);
     });
 }
@@ -1127,7 +1132,9 @@ function executeFinalSave() {
     const serverCmds = window.scData || [];
 
     // ── 下載資料 JSON ──────────────────────────────────────────────
+    // data_version 供 _checkAndRefreshIfNeeded() 比對，偵測到新版本時強制重新整理
     const jsonPayload = {
+        data_version   : version,              // 例如 "v1.3"，每次發佈都會更新
         commands       : extractCommandsFromDOM(),
         serverCommands : serverCmds,
         search_index   : ALL_DATA,
@@ -1274,27 +1281,87 @@ window.addEventListener('scroll', () => {
    12. INIT — 頁面載入初始化
 ════════════════════════════════════════════════════ */
 
-// 頁面載入完成：讀 JSON 資料，然後渲染指令集和攻略卡片
-window.onload = async function () {
+/**
+ * ── 版本比對與強制重新整理 ────────────────────────────────────────
+ *
+ * 流程：
+ *   1. fetch cobblemon_data.json?_=<timestamp>（bypass 瀏覽器快取）
+ *   2. 讀取 JSON 裡的 data_version（由 executeFinalSave 寫入，例如 "v1.3"）
+ *   3. 比對 localStorage 記錄的版本
+ *   4. 版本不同 → 清除 Cache API 快取 → location.reload(true) 強制從伺服器重載
+ *   5. 版本相同 → 直接回傳資料，繼續正常初始化
+ *
+ * 回傳值：
+ *   - 資料物件（data）：版本相同時，直接拿來用，不必再 fetch 一次
+ *   - null：版本不同正在重載，或 fetch 失敗
+ */
+async function _checkAndRefreshIfNeeded() {
     try {
-        const res = await fetch('cobblemon_data.json');
-        if (!res.ok) throw new Error('無法載入 cobblemon_data.json');
+        const res = await fetch('cobblemon_data.json?_=' + Date.now(), {
+            cache: 'no-store',   // 明確要求不用任何快取
+        });
+        if (!res.ok) throw new Error('fetch failed ' + res.status);
         const data = await res.json();
+
+        const serverVer = String(data.data_version || '');
+        const localVer  = localStorage.getItem('cobblemon_data_version') || '';
+
+        if (serverVer && serverVer !== localVer) {
+            // ── 版本不同：清快取，強制重載 ─────────────────────────────
+            localStorage.setItem('cobblemon_data_version', serverVer);
+            console.info('[Cobblemon] 版本更新', localVer || '(無)', '→', serverVer, '，強制重新整理…');
+
+            // 清除 Service Worker / Cache API 快取（若存在）
+            if ('caches' in window) {
+                const names = await caches.keys().catch(() => []);
+                await Promise.all(names.map(n => caches.delete(n)));
+            }
+
+            location.reload(true);   // true = 跳過瀏覽器快取，直接向伺服器取檔
+            return null;             // reload 後以下程式碼不再執行
+        }
+
+        // ── 版本相同，直接回傳資料 ─────────────────────────────────────
+        return data;
+
+    } catch (e) {
+        // 網路錯誤或 JSON 解析失敗，不阻擋頁面運作
+        console.warn('[Cobblemon] 版本檢查失敗，略過強制重整：', e.message);
+        return null;
+    }
+}
+
+// 頁面載入完成：版本比對 → 讀資料 → 渲染
+window.onload = async function () {
+
+    // 1. 版本比對（若需要重載，函式會自動觸發並回傳 null）
+    let data = await _checkAndRefreshIfNeeded();
+
+    // 2. 若版本比對失敗（網路錯誤），改用一般 fetch 嘗試取得資料
+    if (!data) {
+        try {
+            const res = await fetch('cobblemon_data.json');
+            if (res.ok) data = await res.json();
+        } catch (e) {
+            console.error('[Cobblemon] JSON 載入失敗：', e);
+        }
+    }
+
+    // 3. 將資料存入全域變數
+    if (data) {
         COMMANDS_DATA          = data.commands      || [];
         ALL_DATA               = data.search_index  || [];
         window.STRATEGIES_DATA = data.strategies    || [];
 
-        // BUG2 FIX：如果 JSON 裡有最新的 serverCommands（儲存發佈後的版本），
-        // 覆蓋 index.html 內嵌的舊資料，確保指令集編輯結果能正確顯示
+        // 若 JSON 有最新的 serverCommands，覆蓋 index.html 內嵌的舊資料
         if (Array.isArray(data.serverCommands) && data.serverCommands.length > 0) {
             window.scData = data.serverCommands.map(s => Object.assign({}, s));
             if (typeof window.scRender === 'function') window.scRender();
         }
-    } catch (e) {
-        // 讀不到 JSON 也不會壞掉，只是沒有資料
-        console.error('JSON 載入失敗：', e);
     }
-    initFuse();      // 用 ALL_DATA 建立 Fuse.js 搜尋索引
+
+    // 4. 初始化各模組
+    initFuse();
     initCommands();
     initStrategies();
 };
