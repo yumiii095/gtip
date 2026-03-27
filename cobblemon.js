@@ -1222,6 +1222,15 @@ function toggleMobileMenu() {
    11. EVENTS — 全域事件監聽
 ════════════════════════════════════════════════════ */
 
+// 攻略卡片 click 委派必須在 DOM ready 後立刻綁定，
+// 不能等 window.onload（JSON fetch 完才觸發），
+// 否則使用者在 JSON 載入前點擊靜態卡片會完全沒反應。
+// 第二次（JSON 載入後）呼叫 initStrategies() 時，
+// _stratDelegateAdded 旗標會防止重複綁定，只做卡片重新渲染。
+document.addEventListener('DOMContentLoaded', function () {
+    initStrategies();
+});
+
 // 選取文字時，讓浮動格式工具列出現在選取範圍正上方
 document.addEventListener('selectionchange', () => {
     if (!document.body.classList.contains('editing-active')) return;
