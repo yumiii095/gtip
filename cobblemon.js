@@ -791,7 +791,7 @@ function insertTip() {
     const el = document.createElement('div');
     el.className = 'mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 text-gray-800';
     el.setAttribute('contenteditable', 'true');
-    el.innerHTML = '💡 在此輸入文字...';
+    el.innerHTML = '💡 <b>小提醒：</b>在此輸入文字...';
     _insertAtCursor(el);
 }
 
@@ -800,7 +800,7 @@ function insertNotice() {
     const el = document.createElement('div');
     el.className = 'notice-block';
     el.setAttribute('contenteditable', 'true');
-    el.innerHTML = '<div class="notice-title">⚠️</div><p>在此輸入注意事項內容...</p>';
+    el.innerHTML = '<div class="notice-title">⚠️ 注意事項</div><p>在此輸入注意事項內容...</p>';
     _insertAtCursor(el);
 }
 
