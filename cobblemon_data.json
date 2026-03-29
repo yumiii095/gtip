@@ -391,44 +391,6 @@
         }
       ],
       "_i": 9
-    },
-    {
-      "id": "sec-1774697795410",
-      "icon": "🔧",
-      "title": "雕塑版權保護系統",
-      "cat": "special",
-      "groups": [
-        {
-          "label": "指令列表",
-          "cmds": [
-            {
-              "cmd": "/cb claim",
-              "desc": "認領你正在看的雕塑方塊"
-            },
-            {
-              "cmd": "/cb claimhand",
-              "desc": "認領手中的雕塑方塊"
-            },
-            {
-              "cmd": "/cb setcopyable true/false",
-              "desc": "設定作品是否允許他人(所有人)編輯或複製 預設不允許"
-            },
-            {
-              "cmd": "/cb trust [玩家]",
-              "desc": "授權其他玩家編輯你的所有版權聲明作品"
-            },
-            {
-              "cmd": "/cb untrust [玩家]",
-              "desc": "撤銷授權"
-            },
-            {
-              "cmd": "/cb trustlist",
-              "desc": "檢視你的授權列表"
-            }
-          ]
-        }
-      ],
-      "_i": 10
     }
   ],
   "search_index": [
@@ -929,10 +891,15 @@
   ],
   "strategies": [
     {
+      "id": "strat-enhance",
+      "title": "🔥 強化煤炭",
+      "html": "<h3 class=\"text-2xl font-bold text-purple-900 mb-6 flex items-center\">🔥 強化煤炭</h3>\n<div class=\"space-y-6 text-gray-700 leading-relaxed\">\n  <div>\n    <p class=\"font-bold text-blue-800 mb-2\">📌 可強化的裝備</p>\n    <div class=\"flex flex-wrap gap-2\">\n      <span class=\"bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-semibold\">🛡️ 護甲</span>\n      <span class=\"bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-semibold\">⚔️ 武器</span>\n      <span class=\"bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-semibold\">🏹 弓箭</span>\n      <span class=\"bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-semibold\">🔨 槌子</span>\n      <span class=\"bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-semibold\">🔱 三叉戟</span>\n      <span class=\"bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-semibold\">🪓 斧頭</span>\n    </div>\n    <p class=\"text-sm text-gray-500 mt-2\">斧頭、武器、三叉戟強化攻擊力；護甲強化護甲值</p>\n  </div>\n\n  <div>\n    <p class=\"font-bold text-blue-800 mb-2\">📖 使用方法</p>\n    <ol class=\"list-decimal list-inside space-y-1 text-sm\">\n      <li>放入原版熔爐</li>\n      <li>將裝備放在<b>燒製</b>的位置</li>\n      <li>將炉岩碳放在<b>燃料</b>位置</li>\n      <li>燒完後從輸出欄取出強化後的裝備</li>\n    </ol>\n    <div class=\"mt-3 p-3 bg-blue-50 border-l-4 border-blue-400 rounded-r text-sm\">\n      <b>💊 可搭配強化藥劑</b>：喝下藥水可提升強化成功率！\n    </div>\n  </div>\n\n  <div>\n    <p class=\"font-bold text-blue-800 mb-2\">💎 炉岩碳種類</p>\n    <div class=\"space-y-2\">\n      <div class=\"flex items-center gap-3 p-3 bg-gray-50 rounded-lg\">\n        <span class=\"text-xl\">⚫</span>\n        <div>\n          <p class=\"font-bold text-sm\">普通炉岩碳</p>\n          <p class=\"text-xs text-gray-500\">機率最低｜獲得：挖礦、釣魚、擊殺所有怪物</p>\n        </div>\n      </div>\n      <div class=\"flex items-center gap-3 p-3 bg-blue-50 rounded-lg\">\n        <span class=\"text-xl\">🔵</span>\n        <div>\n          <p class=\"font-bold text-sm\">高級炉岩碳</p>\n          <p class=\"text-xs text-gray-500\">成功率 110%｜獲得：<code class=\"bg-gray-200 px-1 rounded\">/pm</code> 線上獎勵領取</p>\n        </div>\n      </div>\n      <div class=\"flex items-center gap-3 p-3 bg-yellow-50 rounded-lg\">\n        <span class=\"text-xl\">⭐</span>\n        <div>\n          <p class=\"font-bold text-sm\">特級炉岩碳</p>\n          <p class=\"text-xs text-gray-500\">成功率 150%｜獲得：VIP2 / VIP3 專屬</p>\n        </div>\n      </div>\n      <div class=\"flex items-center gap-3 p-3 bg-green-50 rounded-lg\">\n        <span class=\"text-xl\">💊</span>\n        <div>\n          <p class=\"font-bold text-sm\">強化藥劑</p>\n          <p class=\"text-xs text-gray-500\">獲得：<code class=\"bg-gray-200 px-1 rounded\">/pm</code> 線上獎勵領取</p>\n        </div>\n      </div>\n    </div>\n  </div>\n\n  <div class=\"mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-r\">\n    💡 <b>建議在 +7 之後再使用高級炉岩碳</b><br>\n    <span class=\"text-sm text-gray-600\">+7 以後等級開始會掉級，+11 以後開始可能<b>爆裝</b>，請謹慎使用！</span>\n  </div>\n</div>"
+    },
+    {
       "id": "strat-money",
       "title": "💰 賺錢小技巧",
       "class": "class=\"bg-white border shadow-sm p-8 relative\"",
-      "html": "<h3 class=\"text-2xl font-bold text-purple-900 mb-6 flex items-center\">💰 賺錢小技巧</h3>\n                    <div class=\"space-y-6 text-gray-700 leading-relaxed\">\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">1. 解冰果</p>\n                            <p>按C開啟選單➡️ 左方點選最新資訊➡️ 打開冰果任務（或/ob open ）</p>\n                        </div>\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">2. 投票赚金幣</p>\n                            <p>在主城輸入/vote 到網站後輸入ID驗證就可以拿投票積分 1點積分可以兌換300 或是兌換其他好物（百變怪）每日都可以投1票</p>\n                        </div>\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">3.線上獎勵赚金幣</p>\n                            <p>輸入/pm 可以觀看線上獎勵 點擊領取到郵箱領出來就可以了</p>\n                        </div>\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">4.全球市場（GTS)</p>\n                            <p>可以把自己的寶可夢或物品出售上去<br>（有毅力可以找個村莊刷個修補村民）</p></div>\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">5.商店收購</p>\n                            <p>有些玩家商店會收購材料或方塊，可以蒐集需要的物品至玩家商店販售</p>\n                        </div>\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">6.設置箱子商店</p>\n                            <p>可以透過「<a href=\"javascript:void(0)\" onclick=\"navigateToResult('strategy', 'strat-chestshop', false)\" class=\"text-blue-500 underline hover:text-blue-700 font-bold\">箱子商店</a>」建立自己的自動化店面。</p><p><br></p><p><span style=\"color: rgb(30, 64, 175); font-weight: 700;\">7.完成每日任務</span></p><p><strike>輸入/days查看每日任務</strike>（因為冰果指令占用，現在暫時只能在零區/sever areazero才能查看）</p>\n                        </div>\n                    </div>"
+      "html": "<h3 class=\"text-2xl font-bold text-purple-900 mb-6 flex items-center\">💰 賺錢小技巧</h3>\n                    <div class=\"space-y-6 text-gray-700 leading-relaxed\">\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">1. 解冰果</p>\n                            <p>按C開啟選單➡️ 左方點選最新資訊➡️ 打開冰果任務（或/ob open ）</p>\n                        </div>\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">2. 投票赚金幣</p>\n                            <p>在主城輸入/vote 到網站後輸入ID驗證就可以拿投票積分 1點積分可以兌換300 或是兌換其他好物（百變怪）每日都可以投1票</p>\n                        </div>\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">3.線上獎勵赚金幣</p>\n                            <p>輸入/pm 可以觀看線上獎勵 點擊領取到郵箱領出來就可以了</p>\n                        </div>\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">4.全球市場（GTS)</p>\n                            <p>可以把自己的寶可夢或物品出售上去<br>（有毅力可以找個村莊刷個修補村民）</p>\n                        </div>\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">5.幫工</p>\n                            <p>伺服器有時會有玩家招工人（可能幫忙蓋房子挖石頭）</p>\n                        </div>\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">6.商店收購</p>\n                            <p>有些玩家商店會收購材料或方塊，可以蒐集需要的物品至玩家商店販售</p>\n                        </div>\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">7.設置箱子商店</p>\n                            <p>可以透過「<a href=\"javascript:void(0)\" onclick=\"navigateToResult('strategy', 'strat-chestshop', false)\" class=\"text-blue-500 underline hover:text-blue-700 font-bold\">箱子商店</a>」建立自己的自動化店面。</p>\n                        </div>\n                    </div>"
     },
     {
       "id": "strat-chestshop",
