@@ -23,25 +23,16 @@
    1. STATE — 全域狀態與資料
 ════════════════════════════════════════════════════ */
 
-// 從 JSON 讀進來的指令資料
 let COMMANDS_DATA  = [];
-// 搜尋用的全站資料（含所有頁面的條目）
 let ALL_DATA       = [];
-// 記住上次搜尋了什麼字，高亮用
 let _lastQuery     = '';
-// 目前版本號，發佈時用來加 0.1
 let baseVersion    = 1.0;
-// FAQ 拖拉排序的實例，關閉編輯模式時要清掉
 let faqSortable    = null;
-// 編輯模式下攔截 Enter 鍵的監聽器（離開時移除）
 let _enterGuard    = null;
-// 目前打開的攻略，儲存時要知道要存哪一筆
 let _activeStrat   = null;
 
-// 攻略卡片的圖示，依順序輪流套用
 const _stratIcons = ['📖','⚔️','💰','🛒','🥚','📊','🌿','✨','🏆','🗺️','💎','⚡'];
 
-// 每個頁面在搜尋結果裡顯示的標籤名稱
 const PAGE_LABEL = {
     strategy : '⚔️ 攻略',
     faq      : '❓ 常見問題',
@@ -55,7 +46,6 @@ const PAGE_LABEL = {
    2. UTILS — 通用工具函式
 ════════════════════════════════════════════════════ */
 
-// 把特殊字元換成安全的寫法，避免顯示跑掉
 function escapeHtml(str) {
     return String(str)
         .replace(/&/g, '&amp;')
@@ -64,7 +54,6 @@ function escapeHtml(str) {
         .replace(/"/g, '&quot;');
 }
 
-// 把一段文字切成一個個小詞，標點和空白都當分隔符
 function tokenize(text) {
     if (!text) return [];
     return text.toLowerCase()
@@ -72,15 +61,10 @@ function tokenize(text) {
         .filter(t => t.length > 0);
 }
 
-// 把搜尋關鍵字在文字裡出現的地方全部標黃色
 function highlightTerms(text, terms) {
     if (!terms.length) return escapeHtml(text);
-
-    // 長的詞優先標，避免被短詞搶先覆蓋
     const sorted = [...new Set(terms)].sort((a, b) => b.length - a.length);
     const lower  = text.toLowerCase();
-
-    // 用一個布林陣列記錄哪些字要標色
     const marks  = new Array(text.length).fill(false);
     for (const term of sorted) {
         let idx = 0;
@@ -89,8 +73,6 @@ function highlightTerms(text, terms) {
             idx += term.length;
         }
     }
-
-    // 掃一遍，連續要標色的地方包上 <mark>
     let result = '', inMark = false;
     for (let i = 0; i < text.length; i++) {
         const ch = escapeHtml(text[i]);
@@ -107,19 +89,6 @@ function highlightTerms(text, terms) {
    3. SEARCH ENGINE — 搜尋評分核心
 ════════════════════════════════════════════════════ */
 
-/**
- * 幫每一筆資料算「和這次搜尋有多符合」的分數
- *
- * 加分規則（分數越高越靠前）：
- *   A. 完整關鍵字出現在標題/標籤    +300~500
- *   B. 逐字拆開後各字出現在哪
- *      · 標籤完全吻合                +100/字
- *      · 標題包含                    +80/字（開頭還多 +50）
- *      · 標籤部分包含                +55/字
- *      · 說明包含                    +20/字
- *   C. 只找到部分字時整體打折
- *   D. 標題開頭就符合再加 +60
- */
 function searchScore(query, item) {
     const q = query.toLowerCase().trim();
     if (!q || !item) return { score: 0, titleHl: escapeHtml(item?.title || '') };
@@ -131,9 +100,8 @@ function searchScore(query, item) {
     const qTokens    = q.split(/\s+/).filter(Boolean);
 
     let score = 0;
-    const matchedTerms = []; // 找到的詞，之後拿來標黃色
+    const matchedTerms = [];
 
-    // ── A. 整句符合 ──────────────────────────────────
     if      (titleL === q)          { score += 500; matchedTerms.push(q); }
     else if (titleL.startsWith(q))  { score += 360; matchedTerms.push(q); }
     else if (titleL.includes(q))    { score += 300; matchedTerms.push(q); }
@@ -141,13 +109,11 @@ function searchScore(query, item) {
     if (kwL.includes(q) && !titleL.includes(q))                       { score += 200; matchedTerms.push(q); }
     if (descL.includes(q) && !titleL.includes(q) && !kwL.includes(q)) { score +=  80; matchedTerms.push(q); }
 
-    // ── B. 逐字計分 ──────────────────────────────────
     let tokenHits = 0;
     for (const token of qTokens) {
         if (!token) continue;
         let hit = false;
 
-        // 標籤有這個字
         if (kwTokenSet.has(token)) {
             score += 100; hit = true;
             if (!matchedTerms.includes(token)) matchedTerms.push(token);
@@ -156,7 +122,6 @@ function searchScore(query, item) {
             if (!matchedTerms.includes(token)) matchedTerms.push(token);
         }
 
-        // 標題有這個字（在詞首加分）
         if (titleL.includes(token)) {
             const isPrefix = titleL.startsWith(token)
                 || titleL.includes(' ' + token)
@@ -166,7 +131,6 @@ function searchScore(query, item) {
             if (!matchedTerms.includes(token)) matchedTerms.push(token);
         }
 
-        // 說明有這個字
         if (descL.includes(token)) {
             score += 20; hit = true;
             if (!matchedTerms.includes(token)) matchedTerms.push(token);
@@ -175,18 +139,15 @@ function searchScore(query, item) {
         if (hit) tokenHits++;
     }
 
-    // ── C. 只搜到部分字時打折 ─────────────────────────
     if (qTokens.length > 1) {
         const coverage = tokenHits / qTokens.length;
         if      (coverage === 0)  score = 0;
-        else if (coverage < 0.5)  score = Math.floor(score * 0.05); // 幾乎沒中，幾乎不顯示
+        else if (coverage < 0.5)  score = Math.floor(score * 0.05);
         else if (coverage < 1.0)  score = Math.floor(score * (0.2 + 0.8 * coverage));
     }
 
-    // ── D. 標題開頭就符合，再加分 ────────────────────
     if (score > 0 && titleL.startsWith(q)) score += 60;
 
-    // 完全沒中就直接回傳負分
     if (score <= 0 && tokenHits === 0 && !titleL.includes(q) && !kwL.includes(q))
         return { score: -1, titleHl: escapeHtml(item.title) };
 
@@ -198,7 +159,6 @@ function searchScore(query, item) {
     };
 }
 
-// 把全站資料都算一次分，只回傳分數 > 0 的，分數高的排前面
 function rankResults(query, limit = 8) {
     return ALL_DATA
         .map(item => { const { score, titleHl } = searchScore(query, item); return { item, score, titleHl }; })
@@ -212,43 +172,35 @@ function rankResults(query, limit = 8) {
    4. SEARCH UI — 搜尋建議 / 執行搜尋
 ════════════════════════════════════════════════════ */
 
-// 讓建議框緊貼在搜尋框正下方（手機直接全寬）
 function _positionSuggestionBox(input, box) {
     const rect = input.getBoundingClientRect();
     box.style.top = (rect.bottom + 2) + 'px';
     if (window.innerWidth >= 768) {
-        // 電腦版：對齊搜尋框的左邊與寬度
         box.style.left  = rect.left + 'px';
         box.style.right = '';
         box.style.width = rect.width + 'px';
     } else {
-        // 手機版：CSS 已設全寬，這裡清掉 JS 覆寫的值就好
         box.style.removeProperty('left');
         box.style.removeProperty('right');
         box.style.removeProperty('width');
     }
 }
 
-// 每次搜尋框打字就跑這裡，更新下拉建議清單
 function handleGlobalSearch(input, suggestBoxId) {
     const query      = input.value.trim();
     const suggestBox = document.getElementById(suggestBoxId);
 
-    // 沒字就把建議框收起來
     if (!query) { suggestBox.classList.add('hidden'); return; }
 
     _lastQuery = query;
     _positionSuggestionBox(input, suggestBox);
 
-    // 指令集頁面但 JSON 還沒載入，改用直接掃頁面上的元素
     if (suggestBoxId === 'innerSuggestions' && ALL_DATA.length === 0) {
         _handleDomCommandSearch(query, suggestBox);
         return;
     }
 
-    // 算分、過濾、填入建議清單
     const allScored = rankResults(query, 8);
-    // 指令集頁只顯示指令類的結果
     const scored = (suggestBoxId === 'innerSuggestions')
         ? allScored.filter(r => r.item.type === 'commands' || !!r.item.isCommand)
         : allScored;
@@ -266,14 +218,12 @@ function handleGlobalSearch(input, suggestBoxId) {
             </div>`;
         }).join('');
     } else {
-        // 沒有結果就顯示提示文字
         const msg = (suggestBoxId === 'innerSuggestions') ? '相關指令' : '相關結果';
         suggestBox.innerHTML = `<div class="suggestion-item text-gray-400 text-sm">找不到「${escapeHtml(query)}」${msg}</div>`;
     }
     suggestBox.classList.remove('hidden');
 }
 
-// JSON 沒載入時的備用：直接掃頁面上已顯示的指令來搜尋
 function _handleDomCommandSearch(query, suggestBox) {
     const q = query.toLowerCase();
     const domResults = [];
@@ -285,7 +235,6 @@ function _handleDomCommandSearch(query, suggestBox) {
     });
 
     if (domResults.length > 0) {
-        // 點選後：清除舊高亮 → 找到對應指令 → 展開並滾到那裡
         suggestBox.innerHTML = domResults.slice(0, 8).map(({ cmdText, cmdDesc }) => {
             const safeTxt = cmdText.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
             return '<div class="suggestion-item" onclick="' +
@@ -313,14 +262,12 @@ function _handleDomCommandSearch(query, suggestBox) {
     suggestBox.classList.remove('hidden');
 }
 
-// 按下搜尋按鈕（或 Enter）後，在頁面上顯示完整結果區塊
 function executeHomeSearch() {
     const input = document.getElementById('homeSearchInput');
     const query = input.value.trim();
     if (!query) return;
 
     _lastQuery = query;
-    // 按下搜尋後先把建議框關掉
     document.getElementById('homeSuggestions').classList.add('hidden');
 
     const scored       = rankResults(query, 8);
@@ -329,12 +276,12 @@ function executeHomeSearch() {
     const guessTitle   = document.getElementById('search-guess-title');
 
     if (scored.length > 0) {
-        const maxScore = scored[0].score; // 用最高分當 100% 基準，算相對比例
+        const maxScore = scored[0].score;
         guessTitle.innerHTML = `🔍 搜尋「<span class="text-blue-500">${escapeHtml(query)}</span>」的相關結果`;
         guessResults.innerHTML = scored.map(({ item: res, titleHl, score }) => {
             const label = PAGE_LABEL[res.type] || res.type;
             const isCmd = (res.type === 'commands') || !!res.isCommand;
-            const barW  = Math.max(8, Math.round((score / maxScore) * 100)); // 相關度進度條寬度
+            const barW  = Math.max(8, Math.round((score / maxScore) * 100));
             return `<div class="search-guess-card" onclick="navigateToResult('${escapeHtml(res.type)}','${escapeHtml(res.target)}',${isCmd});document.getElementById('search-guess-section').classList.remove('visible');">
                 <div class="flex items-center gap-2 mb-1">
                     <span style="font-size:10px;font-weight:700;color:#7c3aed;background:#f5f3ff;padding:1px 7px;border-radius:999px;">${label}</span>
@@ -350,23 +297,19 @@ function executeHomeSearch() {
         guessTitle.innerHTML = `找不到與「<span class="text-red-500">${escapeHtml(query)}</span>」相關的結果`;
         guessResults.innerHTML = `<div class="text-gray-500 text-sm col-span-2 py-2">請嘗試不同的關鍵字，或直接瀏覽上方各頁面分類。</div>`;
     }
-    guessSection.classList.add('visible'); // 顯示結果區塊
+    guessSection.classList.add('visible');
 }
 
-// 點擊搜尋結果後，跳去對應頁面並捲到那個元素
 function navigateToResult(page, targetId, isCommand) {
-    // 關掉建議框，清空搜尋欄
     document.querySelectorAll('.suggestion-box').forEach(b => b.classList.add('hidden'));
     document.querySelectorAll('#homeSearchInput, #innerSearchInput').forEach(el => el.value = '');
     _clearCmdHL();
 
-    // 指令集頁一律走指令搜尋流程
     if (page === 'commands') isCommand = true;
 
     if (page === 'strategy') {
         showPage('strategy');
         setTimeout(() => {
-            // 優先從記憶體找攻略資料，找不到就用 ID 捲到卡片
             const strat = (window.STRATEGIES_DATA || []).find(s => s.id === targetId);
             if (strat) {
                 openStratModal(strat);
@@ -382,7 +325,6 @@ function navigateToResult(page, targetId, isCommand) {
         if (isCommand) {
             _highlightAndScrollToCommand(targetId);
         } else {
-            // 非指令：閃藍邊框再捲過去
             const el = document.getElementById(targetId);
             if (el) {
                 el.classList.add('ring-4', 'ring-blue-200');
@@ -393,19 +335,17 @@ function navigateToResult(page, targetId, isCommand) {
     }, 300);
 }
 
-// 在指令集頁找到目標指令，展開手風琴並滾到那裡
 function _highlightAndScrollToCommand(targetId) {
     const hits = [];
     document.querySelectorAll('.cmd-box').forEach(box => {
         box.classList.remove('cmd-highlight');
         if ((box.querySelector('.cmd-text')?.textContent || '').toLowerCase().includes(targetId.toLowerCase())) {
             box.classList.add('cmd-highlight');
-            box.closest('.accordion-item').classList.add('accordion-active'); // 展開群組
+            box.closest('.accordion-item').classList.add('accordion-active');
             hits.push(box);
         }
     });
     if (hits.length) {
-        // 等手風琴展開動畫跑完再捲過去（約 0.3s）
         setTimeout(() => {
             _applyHL(hits, _lastQuery || targetId);
             hits[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -418,13 +358,11 @@ function _highlightAndScrollToCommand(targetId) {
    5. COMMANDS — 指令集初始化與操作
 ════════════════════════════════════════════════════ */
 
-// 把 JSON 裡的指令資料渲染成頁面上的手風琴列表
 function initCommands() {
     const container = document.getElementById('accordion-container');
     if (!container) return;
     container.innerHTML = '';
     COMMANDS_DATA.forEach(cat => {
-        // 住宅指令群組需要額外顯示工具說明
         let itemsHtml = cat.isResidence
             ? `<div class="mb-4 p-3 bg-orange-50 border border-orange-200 text-sm font-bold text-orange-800">🛠️ 工具：木鋤頭<br>🖱️ 左鍵點擊：第 1 點 / 右鍵點擊：第 2 點</div>`
             : '';
@@ -444,12 +382,10 @@ function initCommands() {
     });
 }
 
-// 點標題列就展開或收合那個指令群組
 function toggleAccordion(header) {
     header.closest('.accordion-item').classList.toggle('accordion-active');
 }
 
-// 複製指令文字，成功後按鈕短暫變成「✓ 已複製」
 function copyCmd(btn) {
     const text = btn.closest('.cmd-box').querySelector('.cmd-text').innerText;
     const feedback = () => {
@@ -457,7 +393,6 @@ function copyCmd(btn) {
         btn.classList.add('copied');
         setTimeout(() => { btn.textContent = '複製'; btn.classList.remove('copied'); }, 1800);
     };
-    // 優先用新版 clipboard API，不支援的話用舊方法
     navigator.clipboard?.writeText(text).then(feedback).catch(() => {
         const ta = Object.assign(document.createElement('textarea'), { value: text });
         ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px';
@@ -468,7 +403,6 @@ function copyCmd(btn) {
     });
 }
 
-// 在按鈕前插入一列新的空白指令列（編輯模式用）
 function addCmdRow(btn) {
     const row = document.createElement('div');
     row.className = 'cmd-box';
@@ -479,7 +413,6 @@ function addCmdRow(btn) {
     btn.insertAdjacentElement('beforebegin', row);
 }
 
-// 新增一個空白區塊（問答 / 攻略 / 指令群組），編輯模式用
 function addNewSection(containerId, type) {
     const container = document.getElementById(containerId);
     const el = document.createElement('div');
@@ -492,7 +425,6 @@ function addNewSection(containerId, type) {
             <div class="text-gray-700 space-y-2"><p>內容填寫...</p></div>`;
 
     } else if (type === 'strategy') {
-        // 攻略不用建 DOM 元素，直接加進記憶體然後重新渲染
         const newId   = 'strat-new-' + Date.now();
         const newStrat = {
             id    : newId,
@@ -520,7 +452,6 @@ function addNewSection(containerId, type) {
     }
 
     container.prepend(el);
-    // 如果正在編輯模式，新加的區塊也要可以直接點擊修改
     if (document.body.classList.contains('editing-active')) {
         el.querySelectorAll('.accordion-header,.cmd-text,.cmd-desc,h3,p')
           .forEach(n => { n.contentEditable = 'true'; });
@@ -532,33 +463,27 @@ function addNewSection(containerId, type) {
    6. STRATEGIES — 攻略卡片與 Modal
 ════════════════════════════════════════════════════ */
 
-// 把攻略的 HTML 內容轉成純文字，截取前 100 字當預覽
 function _stratPreview(html) {
     const tmp = document.createElement('div');
     tmp.innerHTML = html;
     return (tmp.innerText || tmp.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 100);
 }
 
-// 把記憶體裡的攻略資料渲染成卡片
 function initStrategies() {
     const container = document.getElementById('strategy-container');
     if (!container) return;
 
-    // ── 事件委派：只綁一次在 container 上 ──────────────────────────────────
-    // 無論卡片是靜態 HTML 還是 JS 動態渲染，點擊都能正確觸發
     if (!container._stratDelegateAdded) {
         container._stratDelegateAdded = true;
         container.addEventListener('click', e => {
-            if (e.target.closest('.admin-btn')) return; // 刪除按鈕不開 modal
+            if (e.target.closest('.admin-btn')) return;
             const card = e.target.closest('.strat-card');
             if (!card) return;
 
-            // 從記憶體找完整攻略資料
             const strat = (window.STRATEGIES_DATA || []).find(s => s.id === card.id);
             if (strat) {
                 openStratModal(strat);
             } else {
-                // JSON 尚未載入時，用靜態卡片文字暫時顯示
                 const title   = card.querySelector('.strat-card-title')?.innerText || '攻略';
                 const preview = card.querySelector('.strat-card-preview')?.innerText || '';
                 const icon    = card.querySelector('.strat-card-icon')?.innerText    || '📖';
@@ -576,10 +501,8 @@ function initStrategies() {
         });
     }
 
-    // JSON 尚未載入 → 靜態卡片已由上方委派處理，不需額外綁定
     if (!window.STRATEGIES_DATA) return;
 
-    // 清空後重新依資料渲染每張卡片（點擊由上方委派統一處理）
     container.innerHTML = '';
     window.STRATEGIES_DATA.forEach((strat, idx) => {
         const icon    = _stratIcons[idx % _stratIcons.length];
@@ -598,7 +521,6 @@ function initStrategies() {
     });
 }
 
-// 打開攻略彈出視窗，編輯模式下同時顯示編輯工具列
 function openStratModal(strat) {
     _activeStrat = strat;
     const modal     = document.getElementById('strat-modal');
@@ -609,33 +531,29 @@ function openStratModal(strat) {
 
     if (isEditing) {
         body.setAttribute('contenteditable', 'true');
-        // 按鈕跟輸入框不能被編輯，獨立標成不可編輯
         body.querySelectorAll('button, input, .edit-ui').forEach(el => el.setAttribute('contenteditable', 'false'));
     } else {
         body.removeAttribute('contenteditable');
     }
 
     modal.classList.add('open');
-    document.body.style.overflow = 'hidden'; // 背景不能滾動
+    document.body.style.overflow = 'hidden';
     if (isEditing) setTimeout(_setupImgDropTargets, 50);
 }
 
-// 把編輯過的攻略內容存回記憶體，並重新渲染卡片
 function saveStratEdits() {
     if (!_activeStrat) return;
     const body  = document.getElementById('strat-modal-body');
-    // 複製一份再移除編輯工具列，避免工具列內容被存進去
     const clone = body.cloneNode(true);
     clone.querySelectorAll('.edit-ui').forEach(el => el.remove());
     const h3 = clone.querySelector('h3');
     _activeStrat.title = h3 ? h3.innerText.trim() : _activeStrat.title;
     _activeStrat.html  = clone.innerHTML.trim();
-    initStrategies(); // 重繪卡片
+    initStrategies();
     const btn = document.querySelector('[onclick="saveStratEdits()"]');
     if (btn) { btn.textContent = '✅ 已儲存'; setTimeout(() => { if (btn) btn.textContent = '💾 儲存'; }, 1500); }
 }
 
-// 關掉攻略視窗，背景恢復可以滾動
 function closeStratModal() {
     document.getElementById('strat-modal').classList.remove('open');
     document.getElementById('strat-modal-body').removeAttribute('contenteditable');
@@ -643,7 +561,6 @@ function closeStratModal() {
     _activeStrat = null;
 }
 
-// 在攻略編輯區插入從本機選的圖片
 function insertStrategyImage(input) {
     if (!input.files?.[0]) return;
     const reader = new FileReader();
@@ -663,23 +580,67 @@ function insertStrategyImage(input) {
    7. EDIT MODE — 編輯模式、格式工具列
 ════════════════════════════════════════════════════ */
 
-// 開啟或關閉編輯模式
+// ── [修改3] 手機點頁腳5次開啟編輯模式 ─────────────────────────────
+let _footerTapCount = 0;
+let _footerTapTimer = null;
+
+function _initFooterTapSecret() {
+    const footer = document.querySelector('footer');
+    if (!footer) return;
+    // 讓頁腳可點擊但不顯示任何視覺提示
+    footer.style.cursor = 'default';
+    footer.style.userSelect = 'none';
+    footer.addEventListener('click', function(e) {
+        // 已在編輯模式就不再累計
+        if (document.body.classList.contains('editing-active')) return;
+
+        _footerTapCount++;
+        clearTimeout(_footerTapTimer);
+
+        if (_footerTapCount >= 5) {
+            _footerTapCount = 0;
+            toggleEditMode(true);
+            // 給手機一點視覺回饋
+            _showToast('✏️ 編輯模式已開啟');
+        } else {
+            // 2秒內沒繼續點就重置計數
+            _footerTapTimer = setTimeout(() => { _footerTapCount = 0; }, 2000);
+        }
+    });
+}
+
+// 短暫顯示一個浮動提示（手機友善）
+function _showToast(msg) {
+    const toast = document.createElement('div');
+    toast.textContent = msg;
+    toast.style.cssText = [
+        'position:fixed', 'bottom:80px', 'left:50%', 'transform:translateX(-50%)',
+        'background:rgba(0,0,0,0.8)', 'color:#fff', 'padding:10px 20px',
+        'border-radius:20px', 'font-size:14px', 'font-weight:700',
+        'z-index:99999', 'pointer-events:none',
+        'transition:opacity 0.4s',
+    ].join(';');
+    document.body.appendChild(toast);
+    setTimeout(() => { toast.style.opacity = '0'; }, 1600);
+    setTimeout(() => { toast.remove(); }, 2100);
+}
+
 function toggleEditMode(enable) {
     const body = document.body;
     if (enable) {
         body.classList.add('editing-active');
-        body.contentEditable = 'true'; // 整個頁面可以打字
-        // 但按鈕、標頭、頁腳等不該被編輯的部分要保護起來
+        body.contentEditable = 'true';
         document.querySelectorAll('.edit-ignore,.edit-ui,header,nav,button,kbd,footer,.drag-handle,input,textarea,#confirm-modal,.format-toolbar')
             .forEach(el => { el.contentEditable = 'false'; });
 
-        // 讓常見問題列表可以拖拉排序
         const faqContainer = document.getElementById('faq-container');
         if (faqContainer && typeof Sortable !== 'undefined') {
             faqSortable = new Sortable(faqContainer, { animation: 150, handle: '.drag-handle', ghostClass: 'sortable-ghost' });
         }
 
-        // 從最新一則公告讀目前版本號，方便發佈時自動加 0.1
+        // ── [修改2] 指令集群組內的指令列可拖動排序 ─────────────
+        _initScCmdSortables();
+
         const firstNews = document.querySelector('#news-container h3');
         if (firstNews) {
             const m = firstNews.innerText.match(/v(\d+(\.\d+)?)/);
@@ -687,7 +648,6 @@ function toggleEditMode(enable) {
         }
         updateVersionPreview('minor');
 
-        // 標題列按 Enter 不換行，改成直接離開那個欄位
         _enterGuard = e => {
             if (e.key !== 'Enter') return;
             const el = e.target;
@@ -706,17 +666,97 @@ function toggleEditMode(enable) {
         body.classList.remove('editing-active');
         body.contentEditable = 'false';
         if (faqSortable) { faqSortable.destroy(); faqSortable = null; }
+
+        // 清除所有指令列排序實例
+        _destroyScCmdSortables();
+
         if (_enterGuard) { document.removeEventListener('keydown', _enterGuard); _enterGuard = null; }
     }
 }
 
-// 套用粗體、斜體等格式（工具列按鈕呼叫）
+// ── [修改2] 指令集群組內指令排序相關函式 ──────────────────────────
+
+// 儲存每個群組的 Sortable 實例，離開編輯模式時清除
+let _scCmdSortables = [];
+
+function _initScCmdSortables() {
+    _destroyScCmdSortables();
+    if (typeof Sortable === 'undefined') return;
+
+    // 對每個 sc-sec-body 內的每個 sc-cmd-group 啟用排序
+    document.querySelectorAll('#scSections .sc-sec-body').forEach(body => {
+        body.querySelectorAll('.sc-cmd-group').forEach(group => {
+            // 找出群組內所有指令列
+            const rows = Array.from(group.querySelectorAll('.sc-cmd-row'));
+            if (rows.length < 2) return; // 只有一列不需要排序
+
+            // 給群組加上拖移把手（編輯模式限定）
+            rows.forEach(row => {
+                if (!row.querySelector('.sc-drag-handle')) {
+                    const handle = document.createElement('span');
+                    handle.className = 'sc-drag-handle';
+                    handle.textContent = '⠿';
+                    handle.style.cssText = 'cursor:grab;color:#93c5fd;font-size:14px;padding:0 6px;flex-shrink:0;touch-action:none;';
+                    handle.setAttribute('contenteditable', 'false');
+                    row.prepend(handle);
+                }
+            });
+
+            const sortable = new Sortable(group, {
+                animation    : 150,
+                handle       : '.sc-drag-handle',
+                draggable    : '.sc-cmd-row',
+                ghostClass   : 'sortable-ghost',
+                onEnd        : function(evt) {
+                    // 同步更新 window.scData 中對應的指令順序
+                    _syncScCmdOrder(group);
+                },
+            });
+            _scCmdSortables.push(sortable);
+        });
+    });
+}
+
+// 把 DOM 的指令列順序同步回 window.scData
+function _syncScCmdOrder(groupEl) {
+    // 找到這個 group 屬於哪個 section
+    const secEl  = groupEl.closest('.sc-section');
+    if (!secEl) return;
+    const secId = secEl.dataset.id;
+    const sec   = (window.scData || []).find(s => s.id === secId);
+    if (!sec) return;
+
+    // 找是第幾個 group（在 sc-sec-body 中的 index）
+    const bodyEl   = secEl.querySelector('.sc-sec-body');
+    const groups   = Array.from(bodyEl.querySelectorAll('.sc-cmd-group'));
+    const groupIdx = groups.indexOf(groupEl);
+    if (groupIdx < 0 || !sec.groups[groupIdx]) return;
+
+    // 讀出 DOM 目前的指令順序，更新到 scData
+    const newOrder = Array.from(groupEl.querySelectorAll('.sc-cmd-row')).map(row => {
+        const cmdEl  = row.querySelector('.sc-cmd, .sc-edit-cmd-input');
+        const descEl = row.querySelector('.sc-cmd-desc, .sc-edit-desc-input');
+        return {
+            cmd  : cmdEl  ? (cmdEl.value  || cmdEl.textContent || '').trim() : '',
+            desc : descEl ? (descEl.value || descEl.textContent || '').trim() : '',
+        };
+    }).filter(c => c.cmd);
+
+    sec.groups[groupIdx].cmds = newOrder;
+}
+
+function _destroyScCmdSortables() {
+    _scCmdSortables.forEach(s => { try { s.destroy(); } catch(e) {} });
+    _scCmdSortables = [];
+    // 移除所有拖移把手
+    document.querySelectorAll('.sc-drag-handle').forEach(h => h.remove());
+}
+
 function applyFormat(command, value = null) {
     document.execCommand(command, false, value);
     updateFormatState();
 }
 
-// 更新工具列按鈕的樣式，讓已套用的格式顯示成「按下去」的狀態
 function updateFormatState() {
     try {
         ['bold','italic','underline','strikeThrough'].forEach(cmd => {
@@ -727,7 +767,6 @@ function updateFormatState() {
     } catch (e) {}
 }
 
-// 產生攻略視窗頂部的編輯工具列 HTML
 function _buildModalEditBar() {
     return `<div class="edit-ui" contenteditable="false"
         style="position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:4px;background:#0f172a;padding:8px 12px;border-radius:10px;margin-bottom:14px;flex-wrap:wrap;box-shadow:0 4px 14px rgba(0,0,0,0.3);">
@@ -772,7 +811,6 @@ function _buildModalEditBar() {
     </div>`;
 }
 
-// 把元素插入到游標目前停留的位置
 function _insertAtCursor(el) {
     const sel = window.getSelection();
     if (sel && sel.rangeCount) {
@@ -786,7 +824,6 @@ function _insertAtCursor(el) {
     }
 }
 
-// 插入黃色小提醒方塊
 function insertTip() {
     const el = document.createElement('div');
     el.className = 'mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 text-gray-800';
@@ -795,7 +832,6 @@ function insertTip() {
     _insertAtCursor(el);
 }
 
-// 插入橘色注意事項方塊
 function insertNotice() {
     const el = document.createElement('div');
     el.className = 'notice-block';
@@ -804,14 +840,12 @@ function insertNotice() {
     _insertAtCursor(el);
 }
 
-// 插入一條水平分隔線
 function insertHRule() {
     const hr = document.createElement('hr');
     hr.style.cssText = 'border:none;border-top:2px solid #e2e8f0;margin:16px 0;';
     _insertAtCursor(hr);
 }
 
-// 把選取的文字包上超連結（在新分頁開啟）
 function insertLink() {
     const url = prompt('輸入連結網址：', 'https://');
     if (!url) return;
@@ -821,14 +855,12 @@ function insertLink() {
     });
 }
 
-// 從網址插入圖片
 function insertImageFromUrl() {
     const url = prompt('輸入圖片網址：', 'https://');
     if (!url) return;
     _createDraggableImage(url, '網路圖片');
 }
 
-// 從本機選檔插入圖片
 function insertEditableImage(input) {
     if (!input.files?.[0]) return;
     const reader = new FileReader();
@@ -836,7 +868,6 @@ function insertEditableImage(input) {
     reader.readAsDataURL(input.files[0]);
 }
 
-// 清除指令列上的搜尋高亮（還原原本的 HTML）
 function _clearCmdHL() {
     document.querySelectorAll('[data-orig-html]').forEach(el => {
         el.innerHTML = el.getAttribute('data-orig-html');
@@ -844,7 +875,6 @@ function _clearCmdHL() {
     });
 }
 
-// 把搜尋關鍵字在指令列上標黃色（先備份原本的 HTML）
 function _applyHL(boxes, query) {
     const terms = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
     if (!terms.length) return;
@@ -852,7 +882,7 @@ function _applyHL(boxes, query) {
         ['.cmd-text', '.cmd-desc'].forEach(sel => {
             const span = box.querySelector(sel);
             if (!span || span.hasAttribute('data-orig-html')) return;
-            span.setAttribute('data-orig-html', span.innerHTML); // 備份原始內容
+            span.setAttribute('data-orig-html', span.innerHTML);
             span.innerHTML = highlightTerms(span.textContent, terms);
         });
     });
@@ -863,9 +893,7 @@ function _applyHL(boxes, query) {
    8. IMAGE EDITOR — 可拖曳 / 可縮放圖片
 ════════════════════════════════════════════════════ */
 
-// 建立一張可以拖動位置、拖動角落調整大小的圖片
 function _createDraggableImage(src, name) {
-    // 最外層容器，負責拖放
     const wrapper = document.createElement('div');
     wrapper.className = 'drag-img img-center edit-ui-img';
     wrapper.setAttribute('contenteditable', 'false');
@@ -877,13 +905,11 @@ function _createDraggableImage(src, name) {
     img.alt   = name;
     img.style.cssText = 'max-width:100%;border-radius:6px;display:inline-block;';
 
-    // 右下角的縮放把手
     const resizeHandle = Object.assign(document.createElement('div'), {
         className : 'img-resize-handle',
         title     : '拖曳調整大小',
     });
 
-    // 圖片上方的對齊與尺寸工具列（點圖片才顯示）
     const imgToolbar = document.createElement('div');
     imgToolbar.className = 'img-toolbar';
     imgToolbar.setAttribute('contenteditable', 'false');
@@ -903,7 +929,6 @@ function _createDraggableImage(src, name) {
     wrapper.appendChild(img);
     wrapper.appendChild(resizeHandle);
 
-    // 點圖片選取它（顯示工具列），點其他地方取消選取
     img.addEventListener('click', e => {
         if (!document.body.classList.contains('editing-active')) return;
         e.stopPropagation();
@@ -915,7 +940,6 @@ function _createDraggableImage(src, name) {
             document.querySelectorAll('.selected-img').forEach(i => i.classList.remove('selected-img'));
     });
 
-    // 拖右下角縮放圖片寬度
     let _resizing = false, _startX, _startW;
     resizeHandle.addEventListener('mousedown', e => {
         if (!document.body.classList.contains('editing-active')) return;
@@ -931,12 +955,11 @@ function _createDraggableImage(src, name) {
         document.addEventListener('mouseup', () => { _resizing = false; document.removeEventListener('mousemove', onMove); }, { once: true });
     });
 
-    // 拖整張圖片到新位置
     wrapper.addEventListener('dragstart', e => {
         if (!document.body.classList.contains('editing-active')) return;
         e.dataTransfer.effectAllowed = 'move';
         e.dataTransfer.setData('text/plain', '');
-        wrapper.style.opacity = '0.5'; // 半透明表示正在拖
+        wrapper.style.opacity = '0.5';
         window._dragImgEl = wrapper;
     });
     wrapper.addEventListener('dragend', () => {
@@ -946,13 +969,12 @@ function _createDraggableImage(src, name) {
     });
 
     _insertAtCursor(wrapper);
-    img.classList.add('selected-img'); // 插入後自動選取
+    img.classList.add('selected-img');
 }
 
-// 讓所有可編輯區域都能接受圖片拖放
 function _setupImgDropTargets() {
     document.querySelectorAll('[contenteditable="true"]').forEach(zone => {
-        if (zone._imgDropReady) return; // 已設定過就跳過
+        if (zone._imgDropReady) return;
         zone._imgDropReady = true;
         zone.addEventListener('dragover', e => {
             if (window._dragImgEl) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
@@ -961,7 +983,6 @@ function _setupImgDropTargets() {
             if (!window._dragImgEl) return;
             e.preventDefault();
             const el = window._dragImgEl;
-            // 抓游標所在位置，把圖片插到那裡
             let range;
             if      (document.caretRangeFromPoint)    range = document.caretRangeFromPoint(e.clientX, e.clientY);
             else if (document.caretPositionFromPoint) {
@@ -969,13 +990,12 @@ function _setupImgDropTargets() {
                 if (pos) { range = document.createRange(); range.setStart(pos.offsetNode, pos.offset); }
             }
             if (range) { range.collapse(true); range.insertNode(el); }
-            else zone.appendChild(el); // 抓不到游標就放到最後
+            else zone.appendChild(el);
             window._dragImgEl = null;
         });
     });
 }
 
-// 設定圖片靠左、靠右或置中
 function setImgAlign(btn, align) {
     const wrapper = btn.closest('.drag-img');
     wrapper.classList.remove('img-float-left', 'img-float-right', 'img-center');
@@ -984,7 +1004,6 @@ function setImgAlign(btn, align) {
                           : 'display:block;text-align:center;margin:8px auto;max-width:100%;';
 }
 
-// 設定圖片寬度（25% / 50% / 100%）
 function setImgWidth(btn, w) {
     const img = btn.closest('.drag-img').querySelector('img');
     img.style.width = w; img.style.maxWidth = '100%';
@@ -995,29 +1014,24 @@ function setImgWidth(btn, w) {
    9. ADMIN — 發佈、存檔、版本管理
 ════════════════════════════════════════════════════ */
 
-// 打開發佈確認視窗
 function openPublishModal() { document.getElementById('confirm-modal').style.display = 'flex'; }
-// 關掉發佈確認視窗
 function closeModal()       { document.getElementById('confirm-modal').style.display = 'none'; }
 
-// 根據選擇的更新類型（改版 / 更新 / 維護）預覽下一個版本號
 function updateVersionPreview(type) {
     const versionEl       = document.getElementById('modal-version');
     const maintenanceRow  = document.getElementById('modal-maintenance-row');
 
     if (type === 'maintenance') {
-        // 維護：版號不變，欄位鎖定
         versionEl.value    = 'v' + baseVersion.toFixed(1);
         versionEl.readOnly = true;
         versionEl.style.opacity = '0.55';
         versionEl.title    = '維護模式不更新版本號';
         if (maintenanceRow) maintenanceRow.classList.remove('hidden');
     } else {
-        // 改版 / 更新：正常計算版號
         versionEl.value    = 'v' + (
             type === 'major'
-                ? (Math.floor(baseVersion) + 1).toFixed(1) // 改版：整數 +1
-                : (baseVersion + 0.1).toFixed(1)           // 更新：+0.1
+                ? (Math.floor(baseVersion) + 1).toFixed(1)
+                : (baseVersion + 0.1).toFixed(1)
         );
         versionEl.readOnly = false;
         versionEl.style.opacity = '';
@@ -1026,7 +1040,6 @@ function updateVersionPreview(type) {
     }
 }
 
-// 把頁面上現在的指令列表全部讀出來，整理成 JSON 格式
 function extractCommandsFromDOM() {
     return Array.from(document.querySelectorAll('#accordion-container .accordion-item')).flatMap(item => {
         const header = item.querySelector('.accordion-header');
@@ -1042,13 +1055,11 @@ function extractCommandsFromDOM() {
                 }))
                 .filter(i => i.cmd),
         };
-        // 住宅指令群組要特別標記
         if (item.querySelector('.bg-orange-50.border.border-orange-200')) cat.isResidence = true;
         return [cat];
     });
 }
 
-// 取得目前頁面上還存在的攻略（被刪除的不要）
 function extractStrategiesFromDOM() {
     const remaining = new Set(
         Array.from(document.querySelectorAll('#strategy-container > .strat-card[id]')).map(c => c.id)
@@ -1056,14 +1067,12 @@ function extractStrategiesFromDOM() {
     return (window.STRATEGIES_DATA || []).filter(s => remaining.has(s.id));
 }
 
-// 確認發佈：新增一則公告（依類型）、存檔，然後下載更新後的 JSON、HTML 和 cobblemon.js
 function executeFinalSave() {
     const summary    = document.getElementById('modal-summary').value || '攻略站內容更新';
     const detail     = document.getElementById('modal-detail').value;
     const version    = document.getElementById('modal-version').value;
     const updateType = document.querySelector('input[name="update-type"]:checked')?.value || 'minor';
 
-    // 維護模式：依勾選決定是否新增公告
     const publishAnnouncement = updateType !== 'maintenance'
         || (document.getElementById('modal-publish-maintenance')?.checked ?? true);
 
@@ -1071,7 +1080,6 @@ function executeFinalSave() {
         timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit',
     }).replace(/\//g, '-');
 
-    // 各類型對應的顯示樣式
     const badgeMap = {
         major       : { label: '改版',   badgeCls: 'bg-red-600',    borderCls: 'border-red-500',    dotCls: '!bg-red-500'    },
         minor       : { label: '更新',   badgeCls: 'bg-blue-600',   borderCls: 'border-blue-500',   dotCls: '!bg-blue-500'   },
@@ -1080,9 +1088,8 @@ function executeFinalSave() {
     const badge = badgeMap[updateType] || badgeMap.minor;
 
     const newsContainer = document.getElementById('news-container');
-    if (newsContainer.querySelector('p.italic')) newsContainer.innerHTML = ''; // 清掉預設佔位文字
+    if (newsContainer.querySelector('p.italic')) newsContainer.innerHTML = '';
 
-    // 建立公告卡片（若維護且不勾選則略過）
     if (publishAnnouncement) {
         const log = document.createElement('div');
         log.className    = `bg-white border-l-4 ${badge.borderCls} shadow-md p-6`;
@@ -1106,11 +1113,12 @@ function executeFinalSave() {
     closeModal();
     toggleEditMode(false);
 
-    // ── BUG1 FIX：回到首頁，確保下載的 HTML 預設顯示首頁 ──────────
+    // ── [修改1] 先確保切回首頁（淺色模式狀態） ─────────────────────
+    // 同時確保 dark-mode class 不存在，讓下載的 HTML 預設為淺色模式
+    document.body.classList.remove('dark-mode');
+    document.getElementById('mode-knob').innerText = '🌙';
     showPage('home');
 
-    // ── BUG2 FIX：同步指令集編輯結果到 ALL_DATA（攻略部分） ──────────
-    // 重建 ALL_DATA 中 strategy 類型的條目，以反映新增/刪除的攻略
     const strategyEntries = extractStrategiesFromDOM().map(s => ({
         type     : 'strategy',
         target   : s.id,
@@ -1122,19 +1130,15 @@ function executeFinalSave() {
             return (tmp.innerText || tmp.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 80);
         })(),
     }));
-    // 保留非 strategy 的條目，把 strategy 換成最新的
     ALL_DATA = [
         ...ALL_DATA.filter(e => e.type !== 'strategy'),
         ...strategyEntries,
     ];
 
-    // 取得最新的指令集資料（含指令集頁的 serverCommands）
     const serverCmds = window.scData || [];
 
-    // ── 下載資料 JSON ──────────────────────────────────────────────
-    // data_version 供 _checkAndRefreshIfNeeded() 比對，偵測到新版本時強制重新整理
     const jsonPayload = {
-        data_version   : version,              // 例如 "v1.3"，每次發佈都會更新
+        data_version   : version,
         commands       : extractCommandsFromDOM(),
         serverCommands : serverCmds,
         search_index   : ALL_DATA,
@@ -1145,8 +1149,6 @@ function executeFinalSave() {
         href: URL.createObjectURL(jsonBlob), download: 'cobblemon_data.json',
     }).click();
 
-    // ── 下載 index.html（稍微延遲）─────────────────────────────────
-    // BUG1 FIX：此時已切回首頁，snapshot 會正確顯示首頁
     setTimeout(() => {
         Object.assign(document.createElement('a'), {
             href     : URL.createObjectURL(new Blob(['<!DOCTYPE html>\n' + document.documentElement.outerHTML], { type: 'text/html' })),
@@ -1154,7 +1156,6 @@ function executeFinalSave() {
         }).click();
     }, 300);
 
-    // ── BUG3 FIX：下載 cobblemon.js ───────────────────────────────
     setTimeout(() => {
         fetch('cobblemon.js')
             .then(r => r.text())
@@ -1168,7 +1169,6 @@ function executeFinalSave() {
     }, 600);
 }
 
-// 手動新增一張空白公告卡片（編輯模式用）
 function addNewsCard() {
     const dateStr = new Date().toLocaleDateString('zh-TW', {
         timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit',
@@ -1197,22 +1197,19 @@ function addNewsCard() {
    10. UI HELPERS — 頁面切換、深色模式等
 ════════════════════════════════════════════════════ */
 
-// 切換深色 / 淺色模式，同時換按鈕圖示
 function toggleDarkMode() {
     document.body.classList.toggle('dark-mode');
     document.getElementById('mode-knob').innerText =
         document.body.classList.contains('dark-mode') ? '🌙' : '☀️';
 }
 
-// 切換到指定頁面，其他頁面全部隱藏，並捲回頂部
 function showPage(pageId) {
     document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
     document.getElementById(pageId + '-page')?.classList.remove('hidden');
     window.scrollTo(0, 0);
-    document.getElementById('mobile-menu').classList.remove('open'); // 手機選單也收起來
+    document.getElementById('mobile-menu').classList.remove('open');
 }
 
-// 展開或收合手機版漢堡選單
 function toggleMobileMenu() {
     document.getElementById('mobile-menu').classList.toggle('open');
 }
@@ -1222,16 +1219,12 @@ function toggleMobileMenu() {
    11. EVENTS — 全域事件監聽
 ════════════════════════════════════════════════════ */
 
-// 攻略卡片 click 委派必須在 DOM ready 後立刻綁定，
-// 不能等 window.onload（JSON fetch 完才觸發），
-// 否則使用者在 JSON 載入前點擊靜態卡片會完全沒反應。
-// 第二次（JSON 載入後）呼叫 initStrategies() 時，
-// _stratDelegateAdded 旗標會防止重複綁定，只做卡片重新渲染。
 document.addEventListener('DOMContentLoaded', function () {
     initStrategies();
+    // [修改3] 初始化頁腳5連點開啟編輯模式
+    _initFooterTapSecret();
 });
 
-// 選取文字時，讓浮動格式工具列出現在選取範圍正上方
 document.addEventListener('selectionchange', () => {
     if (!document.body.classList.contains('editing-active')) return;
     updateFormatState();
@@ -1248,13 +1241,10 @@ document.addEventListener('selectionchange', () => {
     }
 });
 
-// 點擊事件：關掉浮動工具列 / 關掉搜尋建議框
 document.addEventListener('mousedown', e => {
-    // 點浮動工具列外面就把它收起來
     const ft = document.getElementById('float-toolbar');
     if (ft && !ft.contains(e.target)) ft.classList.remove('visible');
 
-    // 點搜尋框和建議框以外的地方，把建議框關掉
     if (!e.target.closest('.suggestion-box')
         && !e.target.closest('#homeSearchInput')
         && !e.target.closest('#innerSearchInput')) {
@@ -1262,7 +1252,6 @@ document.addEventListener('mousedown', e => {
     }
 });
 
-// 鍵盤快捷鍵：Ctrl+Shift+K 開編輯模式，Esc 關攻略視窗
 window.addEventListener('keydown', e => {
     if (e.ctrlKey && e.shiftKey && e.code === 'KeyK') {
         e.preventDefault();
@@ -1271,12 +1260,10 @@ window.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeStratModal();
 });
 
-// 捲動時：更新回頂部按鈕的顯示，以及搜尋建議框的位置
 window.addEventListener('scroll', () => {
     const btn = document.getElementById('back-to-top');
     if (btn) btn.classList.toggle('btt-visible', window.scrollY > 280);
 
-    // 建議框用 fixed 定位，捲動後要手動重算位置才不會飄走
     ['homeSearchInput', 'innerSearchInput'].forEach(id => {
         const input = document.getElementById(id);
         const box   = document.getElementById(id === 'homeSearchInput' ? 'homeSuggestions' : 'innerSuggestions');
@@ -1290,24 +1277,10 @@ window.addEventListener('scroll', () => {
    12. INIT — 頁面載入初始化
 ════════════════════════════════════════════════════ */
 
-/**
- * ── 版本比對與強制重新整理 ────────────────────────────────────────
- *
- * 流程：
- *   1. fetch cobblemon_data.json?_=<timestamp>（bypass 瀏覽器快取）
- *   2. 讀取 JSON 裡的 data_version（由 executeFinalSave 寫入，例如 "v1.3"）
- *   3. 比對 localStorage 記錄的版本
- *   4. 版本不同 → 清除 Cache API 快取 → location.reload(true) 強制從伺服器重載
- *   5. 版本相同 → 直接回傳資料，繼續正常初始化
- *
- * 回傳值：
- *   - 資料物件（data）：版本相同時，直接拿來用，不必再 fetch 一次
- *   - null：版本不同正在重載，或 fetch 失敗
- */
 async function _checkAndRefreshIfNeeded() {
     try {
         const res = await fetch('cobblemon_data.json?_=' + Date.now(), {
-            cache: 'no-store',   // 明確要求不用任何快取
+            cache: 'no-store',
         });
         if (!res.ok) throw new Error('fetch failed ' + res.status);
         const data = await res.json();
@@ -1316,37 +1289,30 @@ async function _checkAndRefreshIfNeeded() {
         const localVer  = localStorage.getItem('cobblemon_data_version') || '';
 
         if (serverVer && serverVer !== localVer) {
-            // ── 版本不同：清快取，強制重載 ─────────────────────────────
             localStorage.setItem('cobblemon_data_version', serverVer);
             console.info('[Cobblemon] 版本更新', localVer || '(無)', '→', serverVer, '，強制重新整理…');
 
-            // 清除 Service Worker / Cache API 快取（若存在）
             if ('caches' in window) {
                 const names = await caches.keys().catch(() => []);
                 await Promise.all(names.map(n => caches.delete(n)));
             }
 
-            location.reload(true);   // true = 跳過瀏覽器快取，直接向伺服器取檔
-            return null;             // reload 後以下程式碼不再執行
+            location.reload(true);
+            return null;
         }
 
-        // ── 版本相同，直接回傳資料 ─────────────────────────────────────
         return data;
 
     } catch (e) {
-        // 網路錯誤或 JSON 解析失敗，不阻擋頁面運作
         console.warn('[Cobblemon] 版本檢查失敗，略過強制重整：', e.message);
         return null;
     }
 }
 
-// 頁面載入完成：版本比對 → 讀資料 → 渲染
 window.onload = async function () {
 
-    // 1. 版本比對（若需要重載，函式會自動觸發並回傳 null）
     let data = await _checkAndRefreshIfNeeded();
 
-    // 2. 若版本比對失敗（網路錯誤），改用一般 fetch 嘗試取得資料
     if (!data) {
         try {
             const res = await fetch('cobblemon_data.json');
@@ -1356,20 +1322,17 @@ window.onload = async function () {
         }
     }
 
-    // 3. 將資料存入全域變數
     if (data) {
         COMMANDS_DATA          = data.commands      || [];
         ALL_DATA               = data.search_index  || [];
         window.STRATEGIES_DATA = data.strategies    || [];
 
-        // 若 JSON 有最新的 serverCommands，覆蓋 index.html 內嵌的舊資料
         if (Array.isArray(data.serverCommands) && data.serverCommands.length > 0) {
             window.scData = data.serverCommands.map(s => Object.assign({}, s));
             if (typeof window.scRender === 'function') window.scRender();
         }
     }
 
-    // 4. 初始化各模組
     initFuse();
     initCommands();
     initStrategies();
