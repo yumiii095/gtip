@@ -441,6 +441,24 @@
         }
       ],
       "_i": 10
+    },
+    {
+      "id": "sec-1774974099450",
+      "icon": "🔧",
+      "title": "釣魚系統",
+      "cat": "special",
+      "groups": [
+        {
+          "label": "指令列表",
+          "cmds": [
+            {
+              "cmd": "/lfish catalog",
+              "desc": "查看釣魚目錄介面"
+            }
+          ]
+        }
+      ],
+      "_i": 11
     }
   ],
   "search_index": [
