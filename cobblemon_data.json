@@ -895,24 +895,10 @@
     },
     {
       "type": "strategy",
-      "target": "strat-new-1775807362224",
-      "keywords": "新攻略標題",
-      "title": "新攻略標題",
-      "desc": "新攻略標題內容填寫..."
-    },
-    {
-      "type": "strategy",
-      "target": "strat-new-1775807350009",
-      "keywords": "新攻略標題",
-      "title": "新攻略標題",
-      "desc": "新攻略標題內容填寫..."
-    },
-    {
-      "type": "strategy",
-      "target": "strat-new-1775806447420",
-      "keywords": "新攻略標題",
-      "title": "新攻略標題",
-      "desc": "新攻略標題內容填寫..."
+      "target": "strat-new-1775808319815",
+      "keywords": "抓寶可夢的技巧教學",
+      "title": "抓寶可夢的技巧教學",
+      "desc": "抓寶可夢的技巧教學1️⃣ 先把血量壓低（最重要）將寶可夢 打到紅血或黃血血量越低，捕捉成功率越高建議招式：催眠麻痺冰凍睡眠（成功率最高）2️⃣ 善用異常狀態📌"
     },
     {
       "type": "strategy",
@@ -994,22 +980,10 @@
   ],
   "strategies": [
     {
-      "id": "strat-new-1775807362224",
-      "title": "新攻略標題",
-      "icon": "📖",
-      "html": "<h3 class=\"text-2xl font-bold text-purple-900 mb-6 flex items-center\">新攻略標題</h3><div class=\"text-gray-700\"><p>內容填寫...</p></div>"
-    },
-    {
-      "id": "strat-new-1775807350009",
-      "title": "新攻略標題",
-      "icon": "📖",
-      "html": "<h3 class=\"text-2xl font-bold text-purple-900 mb-6 flex items-center\">新攻略標題</h3><div class=\"text-gray-700\"><p>內容填寫...</p></div>"
-    },
-    {
-      "id": "strat-new-1775806447420",
-      "title": "新攻略標題",
-      "icon": "📖",
-      "html": "<h3 class=\"text-2xl font-bold text-purple-900 mb-6 flex items-center\">新攻略標題</h3><div class=\"text-gray-700\"><p>內容填寫...</p></div>"
+      "id": "strat-new-1775808319815",
+      "title": "抓寶可夢的技巧教學",
+      "icon": "⚔️",
+      "html": "<h3 class=\"text-2xl font-bold text-purple-900 mb-6 flex items-center\">抓寶可夢的技巧教學</h3><div class=\"text-gray-700\"><p>1️⃣ 先把血量壓低（最重要）</p><p>將寶可夢 打到紅血或黃血</p><p>血量越低，捕捉成功率越高</p><p><font color=\"#e11d48\" style=\"background-color: rgb(254, 240, 138);\"><b>建議招式：</b></font></p><p><u><b>催眠</b></u></p><p><u><b>麻痺</b></u></p><p><u><b>冰凍</b></u></p><p><u><b>睡眠（成功率最高）</b></u></p><p><br></p><p><br></p><p>2️⃣ 善用異常狀態</p><p>📌 捕捉成功率加成（由高到低）：</p><p>😴 睡眠</p><p>🧊 冰凍</p><p>⚡ 麻痺</p><p>🔥 灼傷 / ☠ 中毒（不推薦，會扣血）</p><p>👉 睡眠 + 紅血 = 最好抓</p><p><br></p><p><br></p><p>3️⃣ 選對精靈球很重要</p><p>常用捕捉球建議：</p><p>🟡 先機球：第一回合5倍高倍機率，一回合後就是1倍&nbsp;</p><p><div class=\"mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 text-gray-800\" style=\"\">💡 退出戰鬥再次戰鬥就可以刷新</div></p><p><br></p><p>🟣 夢境球：睡眠狀態加成</p><p>🔵 等級球：等級差距大時</p><p>🟠 計時球：回合數越多越好</p><p><br></p><p><br></p><p>4️⃣ 清怪刷新技巧（必學）</p><p>👉 沒看到想抓的寶可夢時：</p><p>把周圍寶可夢清掉</p><p>讓系統重新刷新</p><p>刷怪效率會大幅提升</p><p><br></p><p><br></p><p>5️⃣ 新手推薦抓寶配置</p><p>📌 建議隊伍：</p><p>1 隻能 <font color=\"#e11d48\" style=\"background-color: rgb(254, 240, 138);\"><b>催眠 / 麻痺</b></font> 的寶可夢</p><p>1 隻能 <b><font color=\"#e11d48\" style=\"background-color: rgb(254, 240, 138);\">點到尾指</font></b> 的寶可夢</p><p>最佳寶可夢 <b><font color=\"#e11d48\" style=\"background-color: rgb(254, 240, 138);\">斗笠菇</font></b>&nbsp; 可以學習<b><font color=\"#e11d48\" style=\"background-color: rgb(254, 240, 138);\">蘑菇包子</font></b> 和 <b><font color=\"#e11d48\" style=\"background-color: rgb(254, 240, 138);\">點到尾指</font></b></p><p>斗笠菇本身學不到點到尾指 可以用空白技能碟(空白TR)複製別隻的點到尾指給他</p><p>可以讓對方又打殘血的寶可夢</p><div><br></div></div>"
     },
     {
       "id": "strat-new-1775801215364",
@@ -1026,7 +1000,7 @@
     {
       "id": "strat-money",
       "title": "💰 賺錢小技巧",
-      "icon": "🛒",
+      "icon": "💰",
       "html": "<h3 class=\"text-2xl font-bold text-purple-900 mb-6 flex items-center\">💰 賺錢小技巧</h3>\n                    <div class=\"space-y-6 text-gray-700 leading-relaxed\">\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">1. 解冰果</p>\n                            <p>按C開啟選單➡️ 左方點選最新資訊➡️ 打開冰果任務（或/ob open ）</p>\n                        </div>\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">2. 投票赚金幣</p>\n                            <p>在主城輸入/vote 到網站後輸入ID驗證就可以拿投票積分 1點積分可以兌換300 或是兌換其他好物（百變怪）每日都可以投1票</p>\n                        </div>\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">3.線上獎勵赚金幣</p>\n                            <p>輸入/pm 可以觀看線上獎勵 點擊領取到郵箱領出來就可以了</p>\n                        </div>\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">4.全球市場（GTS)</p>\n                            <p>可以把自己的寶可夢或物品出售上去<br>（有毅力可以找個村莊刷個修補村民）</p></div>\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">5.商店收購</p>\n                            <p>有些玩家商店會收購材料或方塊，可以蒐集需要的物品至玩家商店販售</p>\n                        </div>\n                        <div>\n                            <p class=\"font-bold text-blue-800 mb-1\">6.設置箱子商店</p>\n                            <p>可以透過「<a href=\"javascript:void(0)\" onclick=\"navigateToResult('strategy', 'strat-chestshop', false)\" class=\"text-blue-500 underline hover:text-blue-700 font-bold\">箱子商店</a>」建立自己的自動化店面。</p><p><br></p><p><span style=\"color: rgb(30, 64, 175); font-weight: 700;\">7.完成每日任務</span></p><p><strike>輸入/days查看每日任務</strike>（因為冰果指令占用，現在暫時只能在零區/sever areazero才能查看）</p>\n                        </div>\n                    </div>"
     },
     {
