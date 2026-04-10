@@ -505,15 +505,18 @@ function initStrategies() {
 
     container.innerHTML = '';
     window.STRATEGIES_DATA.forEach((strat, idx) => {
-        const icon    = _stratIcons[idx % _stratIcons.length];
+        // 保留已儲存的 icon，若無則從預設陣列取得
+        if (!strat.icon) strat.icon = _stratIcons[idx % _stratIcons.length];
+        const icon    = strat.icon;
         const preview = _stratPreview(strat.html);
         const card    = document.createElement('div');
         card.id        = strat.id;
         card.className = 'strat-card';
+        const isEditing = document.body.classList.contains('editing-active');
         card.innerHTML = `
             <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px"
                 onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon">${icon}</div>
+            <div class="strat-card-icon" ${isEditing ? `onclick="event.stopPropagation();_openStratIconPicker(this,'${strat.id}')" style="cursor:pointer;title='點擊更換圖示'"` : ''}>${icon}${isEditing ? '<span style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;">✏️</span>' : ''}</div>
             <div class="strat-card-title">${strat.title.replace(/^[\p{Emoji}✨⚔️💰🛒🥚📊🌿🏆🗺️💎⚡📖]+\s*/u, '')}</div>
             <div class="strat-card-preview">${preview}</div>
             <span class="strat-card-arrow">›</span>`;
@@ -538,7 +541,29 @@ function openStratModal(strat) {
 
     modal.classList.add('open');
     document.body.style.overflow = 'hidden';
-    if (isEditing) setTimeout(_setupImgDropTargets, 50);
+    if (isEditing) {
+        setTimeout(_setupImgDropTargets, 50);
+        // 支援直接貼上圖片（Ctrl+V）
+        if (!body._pasteImgHandler) {
+            body._pasteImgHandler = function(e) {
+                if (!document.body.classList.contains('editing-active')) return;
+                const items = (e.clipboardData || e.originalEvent?.clipboardData)?.items;
+                if (!items) return;
+                for (const item of items) {
+                    if (item.type.startsWith('image/')) {
+                        e.preventDefault();
+                        const file = item.getAsFile();
+                        if (!file) continue;
+                        const reader = new FileReader();
+                        reader.onload = ev => _createDraggableImage(ev.target.result, '貼上圖片');
+                        reader.readAsDataURL(file);
+                        break;
+                    }
+                }
+            };
+            body.addEventListener('paste', body._pasteImgHandler);
+        }
+    }
 }
 
 function saveStratEdits() {
@@ -559,6 +584,67 @@ function closeStratModal() {
     document.getElementById('strat-modal-body').removeAttribute('contenteditable');
     document.body.style.overflow = '';
     _activeStrat = null;
+}
+
+// 攻略卡片圖示選擇器
+const _allStratIcons = ['📖','⚔️','💰','🛒','🥚','📊','🌿','✨','🏆','🗺️','💎','⚡',
+    '🔥','❄️','💧','🌊','⚡','🌟','🎯','🛡️','🗡️','🧪','🧬','🌐','🎮','🏅','🎁','🌸','🐉'];
+
+function _openStratIconPicker(iconEl, stratId) {
+    if (!document.body.classList.contains('editing-active')) return;
+    // 移除舊的 picker
+    document.querySelectorAll('._strat-icon-picker').forEach(p => p.remove());
+
+    const picker = document.createElement('div');
+    picker.className = '_strat-icon-picker';
+    picker.setAttribute('contenteditable', 'false');
+    picker.style.cssText = [
+        'position:fixed','z-index:99999','background:#1e293b',
+        'border:1.5px solid #3b82f6','border-radius:12px','padding:10px',
+        'display:flex','flex-wrap:wrap','gap:6px','max-width:260px',
+        'box-shadow:0 8px 32px rgba(0,0,0,0.45)',
+    ].join(';');
+
+    _allStratIcons.forEach(emoji => {
+        const btn = document.createElement('button');
+        btn.textContent = emoji;
+        btn.setAttribute('contenteditable', 'false');
+        btn.style.cssText = 'font-size:1.5rem;background:none;border:none;cursor:pointer;padding:4px;border-radius:6px;transition:background 0.15s;';
+        btn.onmouseenter = () => { btn.style.background = '#334155'; };
+        btn.onmouseleave = () => { btn.style.background = 'none'; };
+        btn.onmousedown = e => {
+            e.preventDefault();
+            e.stopPropagation();
+            // 更新資料
+            const strat = (window.STRATEGIES_DATA || []).find(s => s.id === stratId);
+            if (strat) strat.icon = emoji;
+            // 更新卡片上的顯示（只更新 icon div 文字節點）
+            const textNode = iconEl.firstChild;
+            if (textNode && textNode.nodeType === Node.TEXT_NODE) {
+                textNode.nodeValue = emoji;
+            } else {
+                iconEl.innerHTML = emoji + (iconEl.querySelector('span')?.outerHTML || '');
+            }
+            picker.remove();
+        };
+        picker.appendChild(btn);
+    });
+
+    // 定位到圖示旁
+    const rect = iconEl.getBoundingClientRect();
+    picker.style.top  = Math.min(rect.bottom + 6, window.innerHeight - 200) + 'px';
+    picker.style.left = Math.max(4, rect.left) + 'px';
+
+    document.body.appendChild(picker);
+
+    // 點擊其他地方關閉
+    const closeHandler = e => {
+        if (!picker.contains(e.target) && e.target !== iconEl) {
+            picker.remove();
+            document.removeEventListener('mousedown', closeHandler, true);
+        }
+    };
+    setTimeout(() => document.addEventListener('mousedown', closeHandler, true), 10);
 }
 
 function insertStrategyImage(input) {
@@ -1064,7 +1150,12 @@ function extractStrategiesFromDOM() {
     const remaining = new Set(
         Array.from(document.querySelectorAll('#strategy-container > .strat-card[id]')).map(c => c.id)
     );
-    return (window.STRATEGIES_DATA || []).filter(s => remaining.has(s.id));
+    return (window.STRATEGIES_DATA || []).filter(s => remaining.has(s.id)).map(s => ({
+        id    : s.id,
+        title : s.title,
+        icon  : s.icon || '📖',
+        html  : s.html,
+    }));
 }
 
 function executeFinalSave() {

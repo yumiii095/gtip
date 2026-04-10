@@ -377,7 +377,9 @@
             background: linear-gradient(90deg, #7c3aed, #a855f7);
         }
         .strat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(124,58,237,0.15); border-color: #a855f7; }
-        .strat-card-icon { font-size: 2rem; margin-bottom: 12px; }
+        .strat-card-icon { font-size: 2rem; margin-bottom: 12px; position: relative; }
+        body.editing-active .strat-card-icon { cursor: pointer; }
+        #commands-page .sc-sec-icon { position: relative; }
         .strat-card-title { font-family: 'Syne', 'Noto Sans TC', sans-serif; font-weight: 800; font-size: 1rem; color: #4c1d95; margin-bottom: 8px; line-height: 1.4; }
         .strat-card-preview { font-size: 0.8rem; color: #6b7280; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
         .strat-card-arrow { position: absolute; bottom: 16px; right: 18px; color: #a855f7; font-size: 1.2rem; transition: transform 0.2s; }
@@ -1959,7 +1961,7 @@
                 return `
                 <div class="sc-section${isOpen ? ' open' : ''}" data-id="${sec.id}">
                     <div class="sc-sec-header" onclick="scToggle('${sec.id}')">
-                        <span class="sc-sec-icon">${scEscape(sec.icon)}</span>
+                        <span class="sc-sec-icon" ${editing ? `onclick="event.stopPropagation();_openScIconPicker(this,${si})" style="cursor:pointer;position:relative;" title="點擊更換圖示"` : ''}>${scEscape(sec.icon)}${editing ? '<span style="position:absolute;top:-4px;left:-2px;font-size:9px;background:rgba(0,0,0,0.55);color:#fff;border-radius:3px;padding:0 3px;pointer-events:none;">✏️</span>' : ''}</span>
                         ${editing
                             ? `<input class="sc-edit-title-input" value="${scEscape(sec.title)}" onclick="event.stopPropagation()" oninput="scData[${si}].title=this.value">`
                             : `<span class="sc-sec-title">${scHl(sec.title)}</span>`}
@@ -2069,6 +2071,55 @@
 
         // BUG2 FIX: 暴露 scRender 供 cobblemon.js 的 window.onload 更新資料後呼叫
         window.scRender = scRender;
+
+        // 指令集章節圖示選擇器
+        const _scAllIcons = ['💬','📦','🧭','🏠','💰','🎁','🎮','🔒','🏡','🔧','⚔️','📖',
+            '🌿','✨','🏆','🗺️','💎','⚡','🔥','❄️','💧','🌊','🌟','🎯','🛡️','🗡️','🧪','🧬','🌐','🏅','🌸','🐉'];
+
+        window._openScIconPicker = function(iconEl, si) {
+            if (!document.body.classList.contains('editing-active')) return;
+            document.querySelectorAll('._sc-icon-picker').forEach(p => p.remove());
+
+            const picker = document.createElement('div');
+            picker.className = '_sc-icon-picker';
+            picker.style.cssText = [
+                'position:fixed','z-index:99999','background:#1e293b',
+                'border:1.5px solid #3b82f6','border-radius:12px','padding:10px',
+                'display:flex','flex-wrap:wrap','gap:6px','max-width:260px',
+                'box-shadow:0 8px 32px rgba(0,0,0,0.45)',
+            ].join(';');
+
+            _scAllIcons.forEach(emoji => {
+                const btn = document.createElement('button');
+                btn.textContent = emoji;
+                btn.style.cssText = 'font-size:1.4rem;background:none;border:none;cursor:pointer;padding:4px;border-radius:6px;transition:background 0.15s;';
+                btn.onmouseenter = () => { btn.style.background = '#334155'; };
+                btn.onmouseleave = () => { btn.style.background = 'none'; };
+                btn.onmousedown = e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (window.scData && window.scData[si]) {
+                        window.scData[si].icon = emoji;
+                        scRender();
+                    }
+                    picker.remove();
+                };
+                picker.appendChild(btn);
+            });
+
+            const rect = iconEl.getBoundingClientRect();
+            picker.style.top  = Math.min(rect.bottom + 6, window.innerHeight - 220) + 'px';
+            picker.style.left = Math.max(4, rect.left) + 'px';
+            document.body.appendChild(picker);
+
+            const closeHandler = e => {
+                if (!picker.contains(e.target) && e.target !== iconEl) {
+                    picker.remove();
+                    document.removeEventListener('mousedown', closeHandler, true);
+                }
+            };
+            setTimeout(() => document.addEventListener('mousedown', closeHandler, true), 10);
+        };
 
         // Re-render when edit mode toggled
         document.addEventListener('DOMContentLoaded', function() {
