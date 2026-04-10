@@ -413,6 +413,14 @@ function addCmdRow(btn) {
     btn.insertAdjacentElement('beforebegin', row);
 }
 
+// 將 STRATEGIES_DATA 同步為 DOM 中實際存在的攻略（過濾掉已被刪除的）
+function _syncStrategiesDataFromDOM() {
+    const existing = new Set(
+        Array.from(document.querySelectorAll('#strategy-container > .strat-card[id]')).map(c => c.id)
+    );
+    window.STRATEGIES_DATA = (window.STRATEGIES_DATA || []).filter(s => existing.has(s.id));
+}
+
 function addNewSection(containerId, type) {
     const container = document.getElementById(containerId);
     const el = document.createElement('div');
@@ -428,10 +436,13 @@ function addNewSection(containerId, type) {
         const newId   = 'strat-new-' + Date.now();
         const newStrat = {
             id    : newId,
+            icon  : '📖',
             title : '新攻略標題',
             html  : '<h3 class="text-2xl font-bold text-purple-900 mb-6 flex items-center">新攻略標題</h3><div class="text-gray-700"><p>內容填寫...</p></div>',
         };
         if (!window.STRATEGIES_DATA) window.STRATEGIES_DATA = [];
+        // 只保留 DOM 中還存在的攻略，確保已刪除的不會復活
+        _syncStrategiesDataFromDOM();
         window.STRATEGIES_DATA.unshift(newStrat);
         initStrategies();
         return;
@@ -516,7 +527,7 @@ function initStrategies() {
         card.innerHTML = `
             <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px"
                 onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" ${isEditing ? `onclick="event.stopPropagation();_openStratIconPicker(this,'${strat.id}')" style="cursor:pointer;title='點擊更換圖示'"` : ''}>${icon}${isEditing ? '<span style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;">✏️</span>' : ''}</div>
+            <div class="strat-card-icon" ${isEditing ? `onclick="event.stopPropagation();_openStratIconPicker(this,'${strat.id}')" style="cursor:pointer;"` : ''}>${icon}${isEditing ? '<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;">✏️</span>' : ''}</div>
             <div class="strat-card-title">${strat.title.replace(/^[\p{Emoji}✨⚔️💰🛒🥚📊🌿🏆🗺️💎⚡📖]+\s*/u, '')}</div>
             <div class="strat-card-preview">${preview}</div>
             <span class="strat-card-arrow">›</span>`;
@@ -570,7 +581,14 @@ function saveStratEdits() {
     if (!_activeStrat) return;
     const body  = document.getElementById('strat-modal-body');
     const clone = body.cloneNode(true);
+    // 移除所有編輯 UI 元素（工具列、刪除按鈕、鉛筆標記等）
     clone.querySelectorAll('.edit-ui').forEach(el => el.remove());
+    // 移除 contenteditable 屬性，避免儲存後重新開啟時內容變成可編輯狀態
+    clone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+    // 清除小提醒/注意事項中的 position:relative style（由 insertTip/insertNotice 加入）
+    clone.querySelectorAll('.mt-4.bg-yellow-50, .notice-block').forEach(el => {
+        el.style.removeProperty('position');
+    });
     const h3 = clone.querySelector('h3');
     _activeStrat.title = h3 ? h3.innerText.trim() : _activeStrat.title;
     _activeStrat.html  = clone.innerHTML.trim();
@@ -913,16 +931,22 @@ function _insertAtCursor(el) {
 function insertTip() {
     const el = document.createElement('div');
     el.className = 'mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 text-gray-800';
+    el.style.cssText = 'position:relative;';
     el.setAttribute('contenteditable', 'true');
-    el.innerHTML = '💡 <b>小提醒：</b>在此輸入文字...';
+    el.innerHTML = '<button class="edit-ui" contenteditable="false" onmousedown="event.preventDefault();event.stopPropagation();this.parentElement.remove()" '
+        + 'style="position:absolute;top:4px;right:6px;background:none;border:none;color:#ef4444;font-size:13px;cursor:pointer;line-height:1;padding:2px 5px;border-radius:4px;" title="刪除">✕</button>'
+        + '💡 <b>小提醒：</b>在此輸入文字...';
     _insertAtCursor(el);
 }
 
 function insertNotice() {
     const el = document.createElement('div');
     el.className = 'notice-block';
+    el.style.cssText = 'position:relative;';
     el.setAttribute('contenteditable', 'true');
-    el.innerHTML = '<div class="notice-title">⚠️ 注意事項</div><p>在此輸入注意事項內容...</p>';
+    el.innerHTML = '<button class="edit-ui" contenteditable="false" onmousedown="event.preventDefault();event.stopPropagation();this.parentElement.remove()" '
+        + 'style="position:absolute;top:4px;right:6px;background:none;border:none;color:#ef4444;font-size:13px;cursor:pointer;line-height:1;padding:2px 5px;border-radius:4px;" title="刪除">✕</button>'
+        + '<div class="notice-title">⚠️ 注意事項</div><p>在此輸入注意事項內容...</p>';
     _insertAtCursor(el);
 }
 
@@ -1203,6 +1227,8 @@ function executeFinalSave() {
     }
     closeModal();
     toggleEditMode(false);
+    // 確保已刪除的攻略不被寫入 JSON
+    _syncStrategiesDataFromDOM();
 
     // ── [修改1] 先確保切回首頁（淺色模式狀態） ─────────────────────
     // 同時確保 dark-mode class 不存在，讓下載的 HTML 預設為淺色模式
