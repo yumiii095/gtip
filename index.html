@@ -558,17 +558,14 @@
                         <label class="flex-1 border p-2 rounded cursor-pointer text-center bg-gray-50 hover:bg-gray-100 has-[:checked]:border-red-500 has-[:checked]:bg-red-50">
                             <input type="radio" name="update-type" value="major" onclick="updateVersionPreview('major')" class="hidden" contenteditable="false">
                             <span class="font-bold text-sm">改版</span>
-                            <div class="text-xs text-gray-400 mt-0.5">版號 +1.0</div>
                         </label>
                         <label class="flex-1 border p-2 rounded cursor-pointer text-center bg-gray-50 hover:bg-gray-100 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
                             <input type="radio" name="update-type" value="minor" onclick="updateVersionPreview('minor')" checked="" class="hidden" contenteditable="false">
                             <span class="font-bold text-sm">更新</span>
-                            <div class="text-xs text-gray-400 mt-0.5">版號 +0.1</div>
                         </label>
                         <label class="flex-1 border p-2 rounded cursor-pointer text-center bg-gray-50 hover:bg-gray-100 has-[:checked]:border-yellow-500 has-[:checked]:bg-yellow-50">
                             <input type="radio" name="update-type" value="maintenance" onclick="updateVersionPreview('maintenance')" class="hidden" contenteditable="false">
                             <span class="font-bold text-sm">維護</span>
-                            <div class="text-xs text-gray-400 mt-0.5">版號不變</div>
                         </label>
                     </div>
                 </div>
@@ -1820,7 +1817,13 @@
     <footer class="bg-gray-900 text-white py-12 text-center mt-20 edit-ignore" contenteditable="false" style="cursor: default; user-select: none;">
         <p class="font-bold text-xl text-blue-400">Cobblemon 方可夢樂園</p>
         <p class="text-gray-500 text-sm mt-3 px-6 leading-relaxed">本站由玩家自發性維護，<br>非官方（伺服器管理團隊）直接運營。</p>
+        <p class="text-gray-600 text-xs mt-4" id="busuanzi-footer">
+            👣 累計訪客：<span id="busuanzi_value_site_uv" class="text-gray-400">--</span> 人
+            &nbsp;｜&nbsp;
+            📄 累計瀏覽：<span id="busuanzi_value_site_pv" class="text-gray-400">--</span> 次
+        </p>
     </footer>
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
     <!-- Server Commands data (embedded to avoid fetch/CORS issues) -->
     <script>

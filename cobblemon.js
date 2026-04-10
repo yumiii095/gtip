@@ -1342,6 +1342,39 @@ document.addEventListener('DOMContentLoaded', function () {
     _initFooterTapSecret();
 });
 
+// 攔截 contenteditable 區域的貼上，清除 emoji 被包上的黑底 span
+document.addEventListener('paste', function(e) {
+    const target = e.target;
+    if (!target.closest('[contenteditable="true"]')) return;
+    // 若剪貼簿只有純文字，不做特殊處理（讓瀏覽器預設行為跑）
+    const clipData = e.clipboardData || window.clipboardData;
+    if (!clipData) return;
+    const html = clipData.getData('text/html');
+    const text = clipData.getData('text/plain');
+    // 只有在有 HTML 且包含可能帶樣式的 span 時才攔截
+    if (!html || !html.includes('background')) return;
+    e.preventDefault();
+    // 解析 HTML，移除所有 background-color 及 color 樣式，再插入
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    div.querySelectorAll('[style]').forEach(el => {
+        el.style.removeProperty('background-color');
+        el.style.removeProperty('background');
+        // 如果是 emoji（只含 emoji 字元），也移除 color
+        const txt = el.textContent || '';
+        if (/^\p{Emoji}/u.test(txt)) el.style.removeProperty('color');
+        // 若 style 清空了，移除 style 屬性
+        if (!el.getAttribute('style').trim()) el.removeAttribute('style');
+    });
+    // 移除空的 span 包裹（把內容提升）
+    div.querySelectorAll('span:not([class]):not([id])').forEach(span => {
+        if (!span.getAttribute('style')) {
+            span.replaceWith(...span.childNodes);
+        }
+    });
+    document.execCommand('insertHTML', false, div.innerHTML);
+});
+
 document.addEventListener('selectionchange', () => {
     if (!document.body.classList.contains('editing-active')) return;
     updateFormatState();
