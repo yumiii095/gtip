@@ -789,10 +789,14 @@ function toggleEditMode(enable) {
         };
         document.addEventListener('keydown', _enterGuard);
         setTimeout(_setupImgDropTargets, 100);
+        renderAdSidebar();
+        renderSponsorGrid();
 
     } else {
         body.classList.remove('editing-active');
         body.contentEditable = 'false';
+        renderAdSidebar();
+        renderSponsorGrid();
         if (faqSortable) { faqSortable.destroy(); faqSortable = null; }
 
         // 清除所有指令列排序實例
@@ -1173,6 +1177,147 @@ function setImgWrap(btn, side) {
 
 
 /* ════════════════════════════════════════════════════
+   8b. ADS — 羊羔廣告管理
+════════════════════════════════════════════════════ */
+
+window.ADS_DATA = window.ADS_DATA || [];
+
+function _saveAds() {
+    try {
+        localStorage.setItem('cobblemon_ads', JSON.stringify(window.ADS_DATA));
+    } catch(e) {}
+}
+
+function _loadAds() {
+    try {
+        const saved = localStorage.getItem('cobblemon_ads');
+        if (saved) window.ADS_DATA = JSON.parse(saved);
+    } catch(e) {}
+}
+
+function initAds() {
+    _loadAds();
+    renderAdSidebar();
+    renderSponsorGrid();
+}
+
+// 渲染首頁側欄廣告
+function renderAdSidebar() {
+    const container = document.getElementById('ad-container');
+    if (!container) return;
+    const isEditing = document.body.classList.contains('editing-active');
+
+    if (window.ADS_DATA.length === 0) {
+        container.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">目前沒有廣告</p>';
+        return;
+    }
+
+    container.innerHTML = window.ADS_DATA.map((ad, i) => `
+        <div class="ad-card" onclick="_openAdDetail(${i})">
+            ${isEditing ? `<button class="edit-ui ad-card-delete" onmousedown="event.stopPropagation();event.preventDefault();deleteAd(${i})">✕</button>` : ''}
+            <div class="ad-card-badge">廣告</div>
+            <div class="ad-card-title">${_escHtml(ad.title)}</div>
+            <div class="ad-card-sub">${_escHtml(ad.subtitle || '點擊了解詳情')}</div>
+        </div>
+    `).join('');
+}
+
+// 渲染贊助分頁廣告格
+function renderSponsorGrid() {
+    const grid = document.getElementById('sponsor-ad-grid');
+    if (!grid) return;
+    const isEditing = document.body.classList.contains('editing-active');
+
+    if (window.ADS_DATA.length === 0) {
+        grid.innerHTML = '<div class="col-span-full text-center text-gray-400 py-16"><p class="text-4xl mb-3">🐑</p><p>目前沒有廣告，管理員可從首頁新增。</p></div>';
+        return;
+    }
+
+    grid.innerHTML = window.ADS_DATA.map((ad, i) => `
+        <div class="sponsor-slot" id="sponsor-slot-${i}" onclick="_openAdDetail(${i})">
+            ${isEditing ? `<button class="edit-ui ad-card-delete" style="position:absolute;top:8px;right:8px;" onmousedown="event.stopPropagation();event.preventDefault();deleteAd(${i})">✕</button>` : ''}
+            <div class="text-3xl mb-3">${_escHtml(ad.icon || '🌟')}</div>
+            <div class="font-bold text-amber-700 text-lg">${_escHtml(ad.title)}</div>
+            <div class="text-amber-600 text-sm mt-1">${_escHtml(ad.subtitle || '')}</div>
+        </div>
+    `).join('');
+}
+
+function _escHtml(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// 點廣告：彈出詳情（首頁側欄 or 贊助頁）
+function _openAdDetail(idx) {
+    const ad = window.ADS_DATA[idx];
+    if (!ad) return;
+
+    // 如果在贊助頁，顯示詳情面板
+    const sponsorPage = document.getElementById('sponsor-page');
+    if (sponsorPage && !sponsorPage.classList.contains('hidden')) {
+        // 高亮對應廣告位
+        document.querySelectorAll('.sponsor-slot').forEach(s => s.classList.remove('highlighted'));
+        const slot = document.getElementById('sponsor-slot-' + idx);
+        if (slot) slot.classList.add('highlighted');
+
+        const panel = document.getElementById('sponsor-detail-panel');
+        document.getElementById('sponsor-detail-title').textContent = ad.title;
+        document.getElementById('sponsor-detail-content').textContent = ad.content || '（無詳細內容）';
+        panel.classList.remove('hidden');
+        panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else {
+        // 從首頁側欄點擊 → 跳轉到贊助頁並高亮
+        showPage('sponsor');
+        setTimeout(() => {
+            renderSponsorGrid();
+            const slot = document.getElementById('sponsor-slot-' + idx);
+            if (slot) slot.classList.add('highlighted');
+            const panel = document.getElementById('sponsor-detail-panel');
+            document.getElementById('sponsor-detail-title').textContent = ad.title;
+            document.getElementById('sponsor-detail-content').textContent = ad.content || '（無詳細內容）';
+            panel.classList.remove('hidden');
+            panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 50);
+    }
+}
+
+// 新增廣告（管理員）
+function addAdCard() {
+    if (!document.body.classList.contains('editing-active')) return;
+
+    const title = prompt('廣告標題：');
+    if (!title) return;
+    const subtitle = prompt('廣告副標題（顯示在側欄，可留空）：') || '';
+    const icon = prompt('廣告圖示 emoji（例如 🌟、🐑、⚔️，可留空）：') || '🌟';
+    const content = prompt('廣告詳細內容（點進去才看到）：') || '';
+
+    const ad = {
+        id: 'ad-' + Date.now(),
+        title: title.trim(),
+        subtitle: subtitle.trim(),
+        icon: icon.trim() || '🌟',
+        content: content.trim(),
+    };
+
+    window.ADS_DATA.push(ad);
+    _saveAds();
+    renderAdSidebar();
+    renderSponsorGrid();
+}
+
+// 刪除廣告（管理員）
+function deleteAd(idx) {
+    if (!document.body.classList.contains('editing-active')) return;
+    if (!confirm('確定要刪除此廣告？')) return;
+    window.ADS_DATA.splice(idx, 1);
+    _saveAds();
+    renderAdSidebar();
+    renderSponsorGrid();
+    document.getElementById('sponsor-detail-panel')?.classList.add('hidden');
+}
+
+/* ════════════════════════════════════════════════════
    9. ADMIN — 發佈、存檔、版本管理
 ════════════════════════════════════════════════════ */
 
@@ -1390,6 +1535,7 @@ function toggleMobileMenu() {
 
 document.addEventListener('DOMContentLoaded', function () {
     initStrategies();
+    initAds();
     // [修改3] 初始化頁腳5連點開啟編輯模式
     _initFooterTapSecret();
 });
