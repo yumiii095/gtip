@@ -1248,62 +1248,69 @@ function _escHtml(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// 點廣告：彈出詳情（首頁側欄 or 贊助頁）
+// 點廣告：彈出詳情彈窗（仿攻略彈窗）
 function _openAdDetail(idx) {
     const ad = window.ADS_DATA[idx];
     if (!ad) return;
+    openAdDetailModal(ad);
+}
 
-    // 如果在贊助頁，顯示詳情面板
-    const sponsorPage = document.getElementById('sponsor-page');
-    if (sponsorPage && !sponsorPage.classList.contains('hidden')) {
-        // 高亮對應廣告位
-        document.querySelectorAll('.sponsor-slot').forEach(s => s.classList.remove('highlighted'));
-        const slot = document.getElementById('sponsor-slot-' + idx);
-        if (slot) slot.classList.add('highlighted');
+function openAdDetailModal(ad) {
+    const modal = document.getElementById('ad-detail-modal');
+    if (!modal) return;
+    document.getElementById('ad-detail-icon').textContent = ad.icon || '🌟';
+    document.getElementById('ad-detail-title').textContent = ad.title || '';
+    document.getElementById('ad-detail-subtitle').textContent = ad.subtitle || '';
+    document.getElementById('ad-detail-content').textContent = ad.content || '（無詳細內容）';
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
 
-        const panel = document.getElementById('sponsor-detail-panel');
-        document.getElementById('sponsor-detail-title').textContent = ad.title;
-        document.getElementById('sponsor-detail-content').textContent = ad.content || '（無詳細內容）';
-        panel.classList.remove('hidden');
-        panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    } else {
-        // 從首頁側欄點擊 → 跳轉到贊助頁並高亮
-        showPage('sponsor');
-        setTimeout(() => {
-            renderSponsorGrid();
-            const slot = document.getElementById('sponsor-slot-' + idx);
-            if (slot) slot.classList.add('highlighted');
-            const panel = document.getElementById('sponsor-detail-panel');
-            document.getElementById('sponsor-detail-title').textContent = ad.title;
-            document.getElementById('sponsor-detail-content').textContent = ad.content || '（無詳細內容）';
-            panel.classList.remove('hidden');
-            panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 50);
-    }
+function closeAdDetailModal() {
+    const modal = document.getElementById('ad-detail-modal');
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = '';
 }
 
 // 新增廣告（管理員）
 function addAdCard() {
     if (!document.body.classList.contains('editing-active')) return;
+    openAdFormModal();
+}
 
-    const title = prompt('廣告標題：');
-    if (!title) return;
-    const subtitle = prompt('廣告副標題（顯示在側欄，可留空）：') || '';
-    const icon = prompt('廣告圖示 emoji（例如 🌟、🐑、⚔️，可留空）：') || '🌟';
-    const content = prompt('廣告詳細內容（點進去才看到）：') || '';
+function openAdFormModal() {
+    const modal = document.getElementById('ad-form-modal');
+    if (!modal) return;
+    // Clear form
+    document.getElementById('ad-form-title').value = '';
+    document.getElementById('ad-form-subtitle').value = '';
+    document.getElementById('ad-form-icon').value = '🌟';
+    document.getElementById('ad-form-content').value = '';
+    modal.style.display = 'flex';
+}
+
+function closeAdFormModal() {
+    const modal = document.getElementById('ad-form-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+function submitAdForm() {
+    const title = document.getElementById('ad-form-title').value.trim();
+    if (!title) { alert('請填寫廣告標題！'); return; }
+    const subtitle = document.getElementById('ad-form-subtitle').value.trim();
+    const icon = document.getElementById('ad-form-icon').value.trim() || '🌟';
+    const content = document.getElementById('ad-form-content').value.trim();
 
     const ad = {
         id: 'ad-' + Date.now(),
-        title: title.trim(),
-        subtitle: subtitle.trim(),
-        icon: icon.trim() || '🌟',
-        content: content.trim(),
+        title, subtitle, icon, content,
     };
 
     window.ADS_DATA.push(ad);
     _saveAds();
     renderAdSidebar();
     renderSponsorGrid();
+    closeAdFormModal();
 }
 
 // 刪除廣告（管理員）
@@ -1314,7 +1321,7 @@ function deleteAd(idx) {
     _saveAds();
     renderAdSidebar();
     renderSponsorGrid();
-    document.getElementById('sponsor-detail-panel')?.classList.add('hidden');
+    closeAdDetailModal();
 }
 
 /* ════════════════════════════════════════════════════
@@ -1428,9 +1435,15 @@ function executeFinalSave() {
     _syncStrategiesDataFromDOM();
 
     // ── [修改1] 先確保切回首頁（淺色模式狀態） ─────────────────────
-    // 同時確保 dark-mode class 不存在，讓下載的 HTML 預設為淺色模式
-    document.body.classList.remove('dark-mode');
-    document.getElementById('mode-knob').innerText = '🌙';
+    // 還原深色/淺色模式偏好設定
+    const _savedDark = (() => { try { return localStorage.getItem('cobblemon_dark'); } catch(e) { return null; } })();
+    if (_savedDark === '1') {
+        document.body.classList.add('dark-mode');
+        document.getElementById('mode-knob').innerText = '☀️';
+    } else {
+        document.body.classList.remove('dark-mode');
+        document.getElementById('mode-knob').innerText = '🌙';
+    }
     showPage('home');
 
     const strategyEntries = extractStrategiesFromDOM().map(s => ({
@@ -1513,8 +1526,9 @@ function addNewsCard() {
 
 function toggleDarkMode() {
     document.body.classList.toggle('dark-mode');
-    document.getElementById('mode-knob').innerText =
-        document.body.classList.contains('dark-mode') ? '🌙' : '☀️';
+    const isDark = document.body.classList.contains('dark-mode');
+    document.getElementById('mode-knob').innerText = isDark ? '☀️' : '🌙';
+    try { localStorage.setItem('cobblemon_dark', isDark ? '1' : '0'); } catch(e) {}
 }
 
 function showPage(pageId) {
