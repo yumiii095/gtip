@@ -1772,13 +1772,37 @@ window.addEventListener('scroll', () => {
    12. 頁面載入初始化
 ════════════════════════════════════════════════════ */
 
-async function _checkAndRefreshIfNeeded() {
+/* ── 以串流方式讀取大型 JSON，避免單次 res.json() 在 25MB 檔案上卡死 ── */
+async function _fetchLargeJson(url) {
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) throw new Error('fetch failed ' + res.status);
+
+    /* 若瀏覽器支援 ReadableStream，先把位元組全部收完再解析，
+       這樣可以避免部分瀏覽器在 res.json() 中途 timeout 的問題 */
+    if (res.body && typeof TextDecoder !== 'undefined') {
+        const reader  = res.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        const chunks  = [];
+        let done = false;
+        while (!done) {
+            const { value, done: d } = await reader.read();
+            done = d;
+            if (value) chunks.push(decoder.decode(value, { stream: !done }));
+        }
+        return JSON.parse(chunks.join(''));
+    }
+
+    /* 降級：直接呼叫 res.json()（舊瀏覽器） */
+    return res.json();
+}
+
+window.onload = async function () {
+
+    let data = null;
+
     try {
-        const res = await fetch('cobblemon_data.json?_=' + Date.now(), {
-            cache: 'no-store',
-        });
-        if (!res.ok) throw new Error('fetch failed ' + res.status);
-        const data = await res.json();
+        /* 只 fetch 一次，解析後同時做版本檢查 */
+        data = await _fetchLargeJson('cobblemon_data.json?_=' + Date.now());
 
         const serverVer = String(data.data_version || '');
         const localVer  = localStorage.getItem('cobblemon_data_version') || '';
@@ -1786,41 +1810,27 @@ async function _checkAndRefreshIfNeeded() {
         if (serverVer && serverVer !== localVer) {
             localStorage.setItem('cobblemon_data_version', serverVer);
             console.info('[Cobblemon] 版本更新', localVer || '(無)', '→', serverVer, '，強制重新整理…');
-
             if ('caches' in window) {
                 const names = await caches.keys().catch(() => []);
                 await Promise.all(names.map(n => caches.delete(n)));
             }
-
             location.reload(true);
-            return null;
+            return;
         }
-
-        return data;
-
     } catch (e) {
-        console.warn('[Cobblemon] 版本檢查失敗，略過強制重整：', e.message);
-        return null;
-    }
-}
-
-window.onload = async function () {
-
-    let data = await _checkAndRefreshIfNeeded();
-
-    if (!data) {
+        console.warn('[Cobblemon] JSON 載入失敗，嘗試無快取版本：', e.message);
+        /* 版本號帶快取失敗時，再試一次（不帶時間戳） */
         try {
-            const res = await fetch('cobblemon_data.json');
-            if (res.ok) data = await res.json();
-        } catch (e) {
-            console.error('[Cobblemon] JSON 載入失敗：', e);
+            data = await _fetchLargeJson('cobblemon_data.json');
+        } catch (e2) {
+            console.error('[Cobblemon] JSON 載入完全失敗：', e2);
         }
     }
 
-    // Fallback to inline embedded data if fetch failed
+    /* Fallback：內嵌資料 */
     if (!data && window.__COBBLEMON_DATA__) {
         data = window.__COBBLEMON_DATA__;
-        console.log('[Cobblemon] Using inline embedded data as fallback');
+        console.log('[Cobblemon] 使用內嵌備用資料');
     }
 
     if (data) {
@@ -1830,7 +1840,6 @@ window.onload = async function () {
 
         if (Array.isArray(data.ads) && data.ads.length > 0) {
             window.ADS_DATA = data.ads;
-            // 同步寫入 localStorage，讓後續操作保持一致
             try { localStorage.setItem('cobblemon_ads', JSON.stringify(window.ADS_DATA)); } catch(e) {}
         }
 
