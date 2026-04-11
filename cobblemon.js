@@ -605,9 +605,32 @@ function closeStratModal() {
     _activeStrat = null;
 }
 
-// 攻略卡片圖示選擇器(還要增加!!!!!!!!!!)
-const _allStratIcons = ['📖','⚔️','💰','🛒','🥚','📊','🌿','✨','🏆','🗺️','💎','⚡',
-    '🔥','❄️','💧','🌊','⚡','🌟','🎯','🛡️','🗡️','🧪','🧬','🌐','🎮','🏅','🎁','🌸','🐉'];
+// 攻略卡片圖示選擇器
+const _allStratIcons = [
+    // 基本 & 遊戲
+    '📖','⚔️','💰','🛒','🥚','📊','🌿','✨','🏆','🗺️','💎','⚡','🔥','❄️','💧','🌊','🌟','🎯','🛡️','🗡️',
+    '🧪','🧬','🌐','🎮','🏅','🎁','🌸','🐉','🎲','🃏','🎴','🏹','🪃','💬','📦','🧭','🏠','🔒','🏡','🔧',
+    // 動物
+    '🦁','🐯','🐻','🦊','🐺','🦅','🦋','🐝','🐢','🦄','🐬','🦈','🦉','🦌','🐘','🦒','🐧','🦜','🐸','🐙',
+    '🦑','🐊','🦓','🦏','🦛','🐪','🦘','🦝','🦔','🐇','🐓','🦃','🦚','🐉',
+    // 自然 / 植物
+    '🌈','☀️','🌙','⭐','🌎','🌋','🏔️','🏖️','🌺','🌻','🌹','🍀','🍁','🌵','🌴','🌲','🌾','🍄','🌷','🌼',
+    '💐','🪨','🪵','🌕','⛅','🌧️','⛈️','🌪️','🏝️','🗻','🌄','🌅','🌠',
+    // 食物
+    '🍎','🍊','🍋','🍇','🍓','🫐','🍕','🍔','🍜','🍣','🍱','🍰','☕','🍺','🧋','🍭','🍩','🍦','🥗','🥩',
+    '🌮','🥐','🍳','🧀','🌭','🧁','🎂','🍷','🫖',
+    // 物品 / 道具
+    '🔑','💡','🔮','🧩','📚','📝','📋','📌','🗂️','🧰','💊','🩺','📡','📷','🎒','👑','💍','🪬','🪄','🎩',
+    '🧲','🔭','🔬','⚗️','🗝️','📜','🪣','🪞','🏷️',
+    // 建築 / 地點
+    '🏛️','🏯','🏰','⛩️','🕌','🗽','🗼','🎠','🎡','🎢','🏟️','🏗️','🌉','⛪','🛕','🏪','🏫','🏨','🏦',
+    // 活動 / 運動
+    '⚽','🏀','🏈','⚾','🎾','🏸','🥊','🎳','🥋','🏊','🚴','🧗','🤸','🏋️','⛷️','🏂','🤺','🤾',
+    // 科技 / 交通
+    '💻','📱','🖥️','⌨️','🚀','✈️','🚂','🚢','🏎️','🛸','🤖','🚁','🛻','🚒','🚑','🚓','⛵','🪂',
+    // 音樂 / 藝術
+    '🎪','🎭','🎨','🎵','🎶','🎸','🎺','🎻','🥁','🎬','🎥','🎤','🎧','🪗','🎷','🪘','🎙️',
+];
 
 function _openStratIconPicker(iconEl, stratId) {
     if (!document.body.classList.contains('editing-active')) return;
@@ -876,6 +899,18 @@ function _buildModalEditBar() {
     return `<div class="edit-ui" contenteditable="false"
         style="position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:4px;background:#0f172a;padding:8px 12px;border-radius:10px;margin-bottom:14px;flex-wrap:wrap;box-shadow:0 4px 14px rgba(0,0,0,0.3);">
         <span style="font-size:11px;font-weight:700;color:#00AEEF;margin-right:4px;">✏️ 攻略編輯</span>
+        <select class="rb-select" style="max-width:72px;height:24px;" title="字體大小"
+            onmousedown="event.stopPropagation();"
+            onchange="applyFormat('fontSize',this.value)">
+            <option value="1">10px</option>
+            <option value="2">13px</option>
+            <option value="3" selected>16px</option>
+            <option value="4">18px</option>
+            <option value="5">24px</option>
+            <option value="6">32px</option>
+            <option value="7">48px</option>
+        </select>
+        <span class="rb-sep"></span>
         <button class="rb" onmousedown="event.preventDefault();applyFormat('bold')"><b>B</b></button>
         <button class="rb" onmousedown="event.preventDefault();applyFormat('italic')"><i>I</i></button>
         <button class="rb" onmousedown="event.preventDefault();applyFormat('underline')"><u>U</u></button>
