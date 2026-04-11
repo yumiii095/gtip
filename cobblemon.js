@@ -1817,6 +1817,12 @@ window.onload = async function () {
         }
     }
 
+    // Fallback to inline embedded data if fetch failed
+    if (!data && window.__COBBLEMON_DATA__) {
+        data = window.__COBBLEMON_DATA__;
+        console.log('[Cobblemon] Using inline embedded data as fallback');
+    }
+
     if (data) {
         COMMANDS_DATA          = data.commands      || [];
         ALL_DATA               = data.search_index  || [];
