@@ -2124,52 +2124,245 @@
 
     <!-- 屬性克制表分頁 -->
     <div id="typechart-page" class="page-content hidden">
-        <div class="edit-ignore" contenteditable="false" style="background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #ede9fe 100%); border-bottom: 2px solid #f9a8d4; padding: 3rem 0;">
-            <div class="container mx-auto px-4">
-                <h2 class="text-3xl font-bold" style="color: #831843;">屬性克制表</h2>
-                <p class="mt-2 text-sm" style="color: #be185d;">查詢各屬性之間的攻守關係</p>
+        <div class="edit-ignore" contenteditable="false" style="background: linear-gradient(135deg, #003366 0%, #005599 60%, #00AEEF 100%); border-bottom: 2px solid #0077cc; padding: 20px 24px 18px;">
+            <div style="max-width:900px; margin:0 auto; display:flex; align-items:center; gap:14px;">
+                <span style="font-size:30px; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));">⚔️</span>
+                <div>
+                    <h2 style="color:white; font-size:1.35rem; font-weight:900; letter-spacing:0.02em; text-shadow:0 1px 4px rgba(0,0,0,0.3); margin:0;">屬性克制查詢</h2>
+                    <p style="color:rgba(255,255,255,0.75); font-size:0.78rem; margin:2px 0 0 0;">選擇 1 或 2 種屬性，立即查詢傷害倍率</p>
+                </div>
+                <span style="margin-left:auto; background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.3); color:white; font-size:0.7rem; font-weight:700; padding:3px 10px; border-radius:999px;">18種屬性</span>
             </div>
         </div>
-        <main class="container mx-auto py-8 px-4">
-            <!-- Legend -->
-            <div class="flex flex-wrap gap-3 mb-6 justify-center">
-                <div class="flex items-center gap-2 bg-white rounded-xl px-4 py-2 shadow-sm border border-gray-100">
-                    <span class="inline-block w-8 h-8 rounded-lg text-center font-bold text-white text-sm flex items-center justify-center" style="background:#dc2626; line-height:2rem;">2×</span>
-                    <span class="text-sm font-bold text-gray-700">效果絕佳（2倍傷害）</span>
+
+        <main style="max-width:900px; margin:0 auto; padding:20px 16px 40px;">
+            <!-- Mode tabs -->
+            <div id="tc-mode-tabs" style="display:flex; gap:8px; margin-bottom:18px;">
+                <button id="tc-tab-defense" onclick="tcSetMode('defense')" style="flex:1; padding:10px 0; border-radius:10px; border:2px solid #003366; background:linear-gradient(135deg,#003366,#0055aa); color:white; font-size:0.82rem; font-weight:700; cursor:pointer; font-family:inherit;">🛡️ 防禦方 — 我要承受什麼</button>
+                <button id="tc-tab-offense" onclick="tcSetMode('offense')" style="flex:1; padding:10px 0; border-radius:10px; border:2px solid #e2e8f0; background:#f8fafc; color:#64748b; font-size:0.82rem; font-weight:700; cursor:pointer; font-family:inherit;">⚔️ 攻擊方 — 我能打什麼</button>
+            </div>
+
+            <!-- Picker card -->
+            <div style="background:white; border-radius:14px; border:1px solid #e2e8f0; box-shadow:0 4px 24px rgba(0,51,102,0.10); overflow:hidden; margin-bottom:18px;">
+                <div style="padding:14px 20px; background:linear-gradient(90deg,#f8fafc,#f1f5f9); border-bottom:1px solid #e2e8f0; display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:18px;">🎯</span>
+                    <span id="tc-card-title" style="font-weight:800; font-size:0.95rem; color:#003366;">選擇防禦方屬性（最多 2 種）</span>
+                    <span style="margin-left:auto; font-size:0.72rem; color:#64748b;">已選 2 種後點任意按鈕即重置</span>
                 </div>
-                <div class="flex items-center gap-2 bg-white rounded-xl px-4 py-2 shadow-sm border border-gray-100">
-                    <span class="inline-block w-8 h-8 rounded-lg text-center font-bold text-white text-sm flex items-center justify-center" style="background:#2563eb; line-height:2rem;">½</span>
-                    <span class="text-sm font-bold text-gray-700">效果不理想（0.5倍）</span>
-                </div>
-                <div class="flex items-center gap-2 bg-white rounded-xl px-4 py-2 shadow-sm border border-gray-100">
-                    <span class="inline-block w-8 h-8 rounded-lg text-center font-bold text-white text-sm flex items-center justify-center" style="background:#374151; line-height:2rem;">0</span>
-                    <span class="text-sm font-bold text-gray-700">完全無效（0倍）</span>
-                </div>
-                <div class="flex items-center gap-2 bg-white rounded-xl px-4 py-2 shadow-sm border border-gray-100">
-                    <span class="inline-block w-8 h-8 rounded-lg text-center font-bold text-gray-400 text-sm flex items-center justify-center border" style="line-height:2rem;">—</span>
-                    <span class="text-sm font-bold text-gray-700">普通效果（1倍）</span>
+                <div style="padding:18px 20px;">
+                    <!-- Selection bar -->
+                    <div style="display:flex; align-items:center; gap:10px; padding:13px 18px; background:linear-gradient(90deg,#f8fafc,#f0f7ff); border-radius:10px; margin-bottom:16px; border:1px solid #e2e8f0; min-height:56px;">
+                        <span style="font-size:0.72rem; font-weight:700; color:#64748b; white-space:nowrap;">已選屬性：</span>
+                        <div id="tc-chips" style="display:flex; gap:7px; align-items:center; flex-wrap:wrap; flex:1;">
+                            <span style="font-size:0.78rem; color:#94a3b8; font-style:italic;">點選下方屬性按鈕開始查詢</span>
+                        </div>
+                        <button onclick="tcReset()" style="display:flex; align-items:center; gap:6px; padding:6px 14px; border-radius:8px; border:1.5px solid #e2e8f0; background:white; font-size:0.75rem; font-weight:700; color:#64748b; cursor:pointer; font-family:inherit;" onmouseover="this.style.borderColor='#ef4444';this.style.color='#ef4444';this.style.background='#fef2f2'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b';this.style.background='white'">
+                            ↺ 重置
+                        </button>
+                    </div>
+                    <!-- Type grid -->
+                    <div id="tc-grid" style="display:grid; grid-template-columns:repeat(6,1fr); gap:7px;"></div>
                 </div>
             </div>
 
-            <!-- Type chart table wrapper -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto">
-                <div style="min-width: 900px;">
-                    <table id="type-chart-table" style="width:100%; border-collapse:collapse; font-size:11px;">
-                        <thead>
-                            <tr>
-                                <th style="padding:8px 4px; text-align:left; font-size:10px; color:#6b7280; font-weight:700; border-bottom:2px solid #f3f4f6; background:#f9fafb; border-radius:12px 0 0 0; min-width:70px; white-space:nowrap; padding-left:12px;">攻擊方 ↓<br>防禦方 →</th>
-                                <!-- Headers filled by JS -->
-                            </tr>
-                        </thead>
-                        <tbody id="type-chart-body">
-                        </tbody>
-                    </table>
+            <!-- Results card -->
+            <div style="background:white; border-radius:14px; border:1px solid #e2e8f0; box-shadow:0 4px 24px rgba(0,51,102,0.10); overflow:hidden;">
+                <div style="padding:14px 20px; background:linear-gradient(90deg,#f8fafc,#f1f5f9); border-bottom:1px solid #e2e8f0; display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:18px;">📊</span>
+                    <span id="tc-result-title" style="font-weight:800; font-size:0.95rem; color:#003366;">各屬性攻擊此配置的傷害倍率</span>
+                </div>
+                <div id="tc-results" style="padding:18px 20px;">
+                    <div style="text-align:center; padding:36px 0 28px; color:#64748b;">
+                        <div style="font-size:3rem; margin-bottom:10px;">🔍</div>
+                        <p style="font-size:0.85rem; font-weight:500;">請先選擇屬性</p>
+                        <div style="font-size:0.75rem; margin-top:5px; color:#94a3b8;">選擇 1 或 2 種屬性後，結果將自動顯示</div>
+                    </div>
                 </div>
             </div>
-
-            <!-- Individual type cards -->
-            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4" id="type-detail-cards"></div>
         </main>
+
+        <style>
+        .tc-btn { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; padding:8px 4px 7px; border-radius:11px; border:2.5px solid transparent; cursor:pointer; transition:transform 0.13s, box-shadow 0.13s, opacity 0.13s; box-shadow:0 2px 6px rgba(0,0,0,0.12),inset 0 1px 0 rgba(255,255,255,0.25); user-select:none; -webkit-tap-highlight-color:transparent; font-family:inherit; }
+        .tc-btn:hover { transform:translateY(-2px) scale(1.04); box-shadow:0 5px 16px rgba(0,0,0,0.20),inset 0 1px 0 rgba(255,255,255,0.25); }
+        .tc-btn:active { transform:scale(0.96); }
+        .tc-btn.sel1 { border-color:#fff; box-shadow:0 0 0 3px #003366,0 4px 14px rgba(0,0,0,0.25); transform:scale(1.07); }
+        .tc-btn.sel2 { border-color:#fff; box-shadow:0 0 0 3px #00AEEF,0 4px 14px rgba(0,0,0,0.25); transform:scale(1.07); }
+        .tc-btn.dim { opacity:0.42; transform:scale(0.97); }
+        .tc-chip { display:inline-flex; align-items:center; gap:5px; padding:5px 12px 5px 8px; border-radius:999px; font-size:0.78rem; font-weight:800; color:white; text-shadow:0 1px 3px rgba(0,0,0,0.35); box-shadow:0 2px 8px rgba(0,0,0,0.15); animation:tcChipIn 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+        @keyframes tcChipIn { from{transform:scale(0.5);opacity:0} to{transform:scale(1);opacity:1} }
+        .tc-tag { display:inline-flex; align-items:center; gap:5px; padding:4px 11px 4px 8px; border-radius:999px; font-size:0.75rem; font-weight:700; color:white; text-shadow:0 1px 3px rgba(0,0,0,0.35); box-shadow:0 2px 7px rgba(0,0,0,0.14); }
+        .tc-results-wrap { animation:tcFadeUp 0.28s ease; }
+        @keyframes tcFadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+        @media(max-width:480px){ #tc-grid{grid-template-columns:repeat(3,1fr)!important;} }
+        </style>
+
+        <script>
+        (function(){
+        const TC_TYPES = {
+            Normal:   { zh:'一般', color:'#9FA19F', emoji:'⭕' },
+            Fire:     { zh:'火',   color:'#E62829', emoji:'🔥' },
+            Water:    { zh:'水',   color:'#2980EF', emoji:'💧' },
+            Electric: { zh:'電',   color:'#FAC000', emoji:'⚡' },
+            Grass:    { zh:'草',   color:'#3FA129', emoji:'🌿' },
+            Ice:      { zh:'冰',   color:'#3DCEF3', emoji:'❄️' },
+            Fighting: { zh:'格鬥', color:'#FF8000', emoji:'🥊' },
+            Poison:   { zh:'毒',   color:'#9141CB', emoji:'☠️' },
+            Ground:   { zh:'地面', color:'#915121', emoji:'🏔️' },
+            Flying:   { zh:'飛行', color:'#82BAF0', emoji:'🦅' },
+            Psychic:  { zh:'超能', color:'#EF4179', emoji:'🔮' },
+            Bug:      { zh:'蟲',   color:'#92A119', emoji:'🐛' },
+            Rock:     { zh:'岩石', color:'#AFA981', emoji:'🪨' },
+            Ghost:    { zh:'幽靈', color:'#704170', emoji:'👻' },
+            Dragon:   { zh:'龍',   color:'#5060E1', emoji:'🐉' },
+            Dark:     { zh:'惡',   color:'#624D4E', emoji:'🌑' },
+            Steel:    { zh:'鋼',   color:'#60A1B8', emoji:'⚙️' },
+            Fairy:    { zh:'妖精', color:'#EF70EF', emoji:'🌸' },
+        };
+        const TC_ATK = {
+            Normal:   {Rock:0.5,Ghost:0,Steel:0.5},
+            Fire:     {Fire:0.5,Water:0.5,Grass:2,Ice:2,Bug:2,Rock:0.5,Dragon:0.5,Steel:2},
+            Water:    {Fire:2,Water:0.5,Grass:0.5,Ground:2,Rock:2,Dragon:0.5},
+            Electric: {Water:2,Electric:0.5,Grass:0.5,Ground:0,Flying:2,Dragon:0.5},
+            Grass:    {Fire:0.5,Water:2,Grass:0.5,Poison:0.5,Ground:2,Flying:0.5,Bug:0.5,Rock:2,Dragon:0.5,Steel:0.5},
+            Ice:      {Fire:0.5,Water:0.5,Grass:2,Ice:0.5,Ground:2,Flying:2,Dragon:2,Steel:0.5},
+            Fighting: {Normal:2,Ice:2,Poison:0.5,Flying:0.5,Psychic:0.5,Bug:0.5,Rock:2,Ghost:0,Dark:2,Steel:2,Fairy:0.5},
+            Poison:   {Grass:2,Poison:0.5,Ground:0.5,Rock:0.5,Ghost:0.5,Steel:0,Fairy:2},
+            Ground:   {Fire:2,Electric:2,Grass:0.5,Poison:2,Flying:0,Bug:0.5,Rock:2,Steel:2},
+            Flying:   {Electric:0.5,Grass:2,Fighting:2,Bug:2,Rock:0.5,Steel:0.5},
+            Psychic:  {Fighting:2,Poison:2,Psychic:0.5,Dark:0,Steel:0.5},
+            Bug:      {Fire:0.5,Grass:2,Fighting:0.5,Poison:0.5,Flying:0.5,Psychic:2,Ghost:0.5,Dark:2,Steel:0.5,Fairy:0.5},
+            Rock:     {Fire:2,Ice:2,Fighting:0.5,Ground:0.5,Flying:2,Bug:2,Steel:0.5},
+            Ghost:    {Normal:0,Psychic:2,Ghost:2,Dark:0.5},
+            Dragon:   {Dragon:2,Steel:0.5,Fairy:0},
+            Dark:     {Fighting:0.5,Psychic:2,Ghost:2,Dark:0.5,Fairy:0.5},
+            Steel:    {Fire:0.5,Water:0.5,Electric:0.5,Ice:2,Rock:2,Steel:0.5,Fairy:2},
+            Fairy:    {Fire:0.5,Fighting:2,Poison:0.5,Dragon:2,Dark:2,Steel:0.5},
+        };
+        const TC_KEYS = Object.keys(TC_TYPES);
+        let tcMode = 'defense', tcSel = [];
+
+        function tcBuildGrid(){
+            const g = document.getElementById('tc-grid');
+            if(!g) return;
+            g.innerHTML = '';
+            TC_KEYS.forEach(t => {
+                const info = TC_TYPES[t];
+                const btn = document.createElement('button');
+                btn.className = 'tc-btn';
+                btn.id = 'tcb-' + t;
+                btn.style.backgroundColor = info.color;
+                btn.innerHTML = '<span style="font-size:1.35rem;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2))">' + info.emoji + '</span><span style="font-size:0.62rem;font-weight:800;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.4);letter-spacing:0.03em;white-space:nowrap">' + info.zh + '</span>';
+                btn.onclick = function(){ tcClick(t); };
+                g.appendChild(btn);
+            });
+        }
+
+        window.tcSetMode = function(m){
+            tcMode = m;
+            const dBtn = document.getElementById('tc-tab-defense');
+            const oBtn = document.getElementById('tc-tab-offense');
+            if(m === 'defense'){
+                dBtn.style.cssText = 'flex:1;padding:10px 0;border-radius:10px;border:2px solid #003366;background:linear-gradient(135deg,#003366,#0055aa);color:white;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;';
+                oBtn.style.cssText = 'flex:1;padding:10px 0;border-radius:10px;border:2px solid #e2e8f0;background:#f8fafc;color:#64748b;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;';
+                document.getElementById('tc-card-title').textContent = '選擇防禦方屬性（最多 2 種）';
+                document.getElementById('tc-result-title').textContent = '各屬性攻擊此配置的傷害倍率';
+            } else {
+                oBtn.style.cssText = 'flex:1;padding:10px 0;border-radius:10px;border:2px solid #003366;background:linear-gradient(135deg,#003366,#0055aa);color:white;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;';
+                dBtn.style.cssText = 'flex:1;padding:10px 0;border-radius:10px;border:2px solid #e2e8f0;background:#f8fafc;color:#64748b;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;';
+                document.getElementById('tc-card-title').textContent = '選擇攻擊方屬性（最多 2 種）';
+                document.getElementById('tc-result-title').textContent = '此屬性組合攻擊各防禦屬性的效果';
+            }
+            tcReset(false);
+        };
+
+        function tcClick(t){
+            if(tcSel.length === 2){ tcSel = [t]; }
+            else if(tcSel.includes(t)){ tcSel = tcSel.filter(x=>x!==t); }
+            else { tcSel.push(t); }
+            tcUpdateUI();
+        }
+
+        window.tcReset = function(doUpdate){
+            tcSel = [];
+            if(doUpdate !== false) tcUpdateUI();
+        };
+
+        function tcUpdateUI(){
+            TC_KEYS.forEach(t => {
+                const b = document.getElementById('tcb-' + t);
+                if(!b) return;
+                b.classList.remove('sel1','sel2','dim');
+                if(tcSel[0]===t) b.classList.add('sel1');
+                else if(tcSel[1]===t) b.classList.add('sel2');
+                else if(tcSel.length>0) b.classList.add('dim');
+            });
+            const chips = document.getElementById('tc-chips');
+            if(tcSel.length === 0){
+                chips.innerHTML = '<span style="font-size:0.78rem;color:#94a3b8;font-style:italic">點選下方屬性按鈕開始查詢</span>';
+            } else {
+                chips.innerHTML = tcSel.map(t => {
+                    const info = TC_TYPES[t];
+                    return '<span class="tc-chip" style="background:'+info.color+'">'+info.emoji+' <span>'+info.zh+'</span></span>';
+                }).join('');
+            }
+            tcRenderResults();
+        }
+
+        function tcGetEff(atk, def){ return (TC_ATK[atk]&&TC_ATK[atk][def]!==undefined)?TC_ATK[atk][def]:1; }
+
+        function tcRenderResults(){
+            const el = document.getElementById('tc-results');
+            if(tcSel.length === 0){
+                el.innerHTML = '<div style="text-align:center;padding:36px 0 28px;color:#64748b"><div style="font-size:3rem;margin-bottom:10px">🔍</div><p style="font-size:0.85rem;font-weight:500">請先選擇屬性</p><div style="font-size:0.75rem;margin-top:5px;color:#94a3b8">選擇 1 或 2 種屬性後，結果將自動顯示</div></div>';
+                return;
+            }
+            const results = {};
+            if(tcMode === 'defense'){
+                TC_KEYS.forEach(atk => {
+                    let m = 1;
+                    tcSel.forEach(def => { m *= tcGetEff(atk, def); });
+                    results[atk] = m;
+                });
+            } else {
+                TC_KEYS.forEach(def => {
+                    let best = 1;
+                    tcSel.forEach(atk => { best = Math.max(best, tcGetEff(atk, def)); });
+                    results[def] = best;
+                });
+            }
+            const multCfg = [
+                {v:4,   label:'4×',  desc:'超超效果！', bg:'#7c0000'},
+                {v:2,   label:'2×',  desc:'效果絕佳',   bg:'#dc2626'},
+                {v:1,   label:'1×',  desc:'普通效果',   bg:'#64748b'},
+                {v:0.5, label:'½×',  desc:'效果不太好', bg:'#2563eb'},
+                {v:0.25,label:'¼×',  desc:'效果非常差', bg:'#1e40af'},
+                {v:0,   label:'0×',  desc:'完全無效',   bg:'#111827'},
+            ];
+            const groups = {};
+            Object.entries(results).forEach(([t,m])=>{ if(!groups[m])groups[m]=[]; groups[m].push(t); });
+            let html = '<div class="tc-results-wrap">';
+            multCfg.forEach(cfg => {
+                const types = groups[cfg.v];
+                if(!types||!types.length) return;
+                html += '<div style="margin-bottom:14px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:26px;border-radius:7px;font-size:0.8rem;font-weight:900;background:'+cfg.bg+';color:white">'+cfg.label+'</span><span style="font-size:0.78rem;font-weight:700;color:#64748b">'+cfg.desc+'</span></div><div style="display:flex;flex-wrap:wrap;gap:6px">';
+                types.forEach(t => {
+                    const info = TC_TYPES[t];
+                    html += '<span class="tc-tag" style="background:'+info.color+'">'+info.emoji+' '+info.zh+'</span>';
+                });
+                html += '</div></div>';
+            });
+            html += '</div>';
+            el.innerHTML = html;
+        }
+
+        // Init when DOM is ready
+        if(document.readyState === 'loading'){
+            document.addEventListener('DOMContentLoaded', tcBuildGrid);
+        } else {
+            tcBuildGrid();
+        }
+        })();
+        </script>
     </div>
 
     <!-- 贊助伺服器分頁 -->
