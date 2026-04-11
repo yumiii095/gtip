@@ -1252,16 +1252,43 @@ function _escHtml(s) {
 function _openAdDetail(idx) {
     const ad = window.ADS_DATA[idx];
     if (!ad) return;
-    openAdDetailModal(ad);
+    openAdDetailModal(ad, idx);
 }
 
-function openAdDetailModal(ad) {
+function openAdDetailModal(ad, idx) {
     const modal = document.getElementById('ad-detail-modal');
     if (!modal) return;
-    document.getElementById('ad-detail-icon').textContent = ad.icon || '🌟';
-    document.getElementById('ad-detail-title').textContent = ad.title || '';
+    document.getElementById('ad-detail-icon').textContent    = ad.icon || '🌟';
+    document.getElementById('ad-detail-title').textContent   = ad.title || '';
     document.getElementById('ad-detail-subtitle').textContent = ad.subtitle || '';
     document.getElementById('ad-detail-content').textContent = ad.content || '（無詳細內容）';
+
+    // 動作列：連結按鈕 + 編輯按鈕（編輯模式）
+    const actionsEl = document.getElementById('ad-detail-actions');
+    if (actionsEl) {
+        actionsEl.innerHTML = '';
+        // 跳轉連結按鈕
+        if (ad.link) {
+            const linkBtn = document.createElement('a');
+            linkBtn.href = ad.link;
+            linkBtn.target = '_blank';
+            linkBtn.rel = 'noopener noreferrer';
+            linkBtn.textContent = '🔗 立即前往 →';
+            linkBtn.style.cssText = 'display:inline-block;padding:10px 24px;background:#f59e0b;color:white;font-weight:700;border-radius:8px;text-decoration:none;font-size:14px;transition:background 0.2s;';
+            linkBtn.onmouseenter = () => { linkBtn.style.background = '#d97706'; };
+            linkBtn.onmouseleave = () => { linkBtn.style.background = '#f59e0b'; };
+            actionsEl.appendChild(linkBtn);
+        }
+        // 編輯按鈕（僅編輯模式）
+        if (document.body.classList.contains('editing-active') && typeof idx === 'number') {
+            const editBtn = document.createElement('button');
+            editBtn.textContent = '✏️ 編輯廣告';
+            editBtn.style.cssText = 'padding:10px 20px;background:#2563eb;color:white;font-weight:700;border:none;border-radius:8px;cursor:pointer;font-size:14px;';
+            editBtn.onclick = () => { closeAdDetailModal(); openAdFormModal(idx); };
+            actionsEl.appendChild(editBtn);
+        }
+    }
+
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 }
@@ -1278,35 +1305,56 @@ function addAdCard() {
     openAdFormModal();
 }
 
-function openAdFormModal() {
+// 記錄目前是「新增」還是「編輯第幾筆」
+let _adEditIndex = -1;
+
+function openAdFormModal(editIdx) {
     const modal = document.getElementById('ad-form-modal');
     if (!modal) return;
-    // Clear form
-    document.getElementById('ad-form-title').value = '';
-    document.getElementById('ad-form-subtitle').value = '';
-    document.getElementById('ad-form-icon').value = '🌟';
-    document.getElementById('ad-form-content').value = '';
+    _adEditIndex = (typeof editIdx === 'number') ? editIdx : -1;
+    const isEdit = _adEditIndex >= 0;
+    const ad = isEdit ? window.ADS_DATA[_adEditIndex] : null;
+
+    // 標題
+    const titleEl = document.getElementById('ad-form-modal-title');
+    if (titleEl) titleEl.textContent = isEdit ? '✏️ 編輯廣告' : '🌟 新增廣告';
+
+    // 提交按鈕文字
+    const submitBtn = document.getElementById('ad-form-submit-btn');
+    if (submitBtn) submitBtn.textContent = isEdit ? '儲存修改' : '新增廣告';
+
+    // 填入欄位
+    document.getElementById('ad-form-title').value    = (ad && ad.title)    || '';
+    document.getElementById('ad-form-subtitle').value = (ad && ad.subtitle) || '';
+    document.getElementById('ad-form-icon').value     = (ad && ad.icon)     || '🌟';
+    document.getElementById('ad-form-link').value     = (ad && ad.link)     || '';
+    document.getElementById('ad-form-content').value  = (ad && ad.content)  || '';
     modal.style.display = 'flex';
 }
 
 function closeAdFormModal() {
     const modal = document.getElementById('ad-form-modal');
     if (modal) modal.style.display = 'none';
+    _adEditIndex = -1;
 }
 
 function submitAdForm() {
     const title = document.getElementById('ad-form-title').value.trim();
     if (!title) { alert('請填寫廣告標題！'); return; }
     const subtitle = document.getElementById('ad-form-subtitle').value.trim();
-    const icon = document.getElementById('ad-form-icon').value.trim() || '🌟';
+    const icon    = document.getElementById('ad-form-icon').value.trim() || '🌟';
+    const link    = document.getElementById('ad-form-link').value.trim();
     const content = document.getElementById('ad-form-content').value.trim();
 
-    const ad = {
-        id: 'ad-' + Date.now(),
-        title, subtitle, icon, content,
-    };
+    if (_adEditIndex >= 0) {
+        // 編輯模式：更新現有廣告
+        const existing = window.ADS_DATA[_adEditIndex];
+        window.ADS_DATA[_adEditIndex] = Object.assign({}, existing, { title, subtitle, icon, link, content });
+    } else {
+        // 新增模式
+        window.ADS_DATA.push({ id: 'ad-' + Date.now(), title, subtitle, icon, link, content });
+    }
 
-    window.ADS_DATA.push(ad);
     _saveAds();
     renderAdSidebar();
     renderSponsorGrid();

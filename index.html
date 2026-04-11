@@ -650,7 +650,7 @@
     <div id="ad-form-modal" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;background:rgba(0,0,0,0.55);" onclick="if(event.target===this)closeAdFormModal()">
         <div style="background:white;border-radius:16px;padding:32px;max-width:500px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);position:relative;">
             <button onclick="closeAdFormModal()" style="position:absolute;top:12px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:#6b7280;">✕</button>
-            <h3 style="font-size:20px;font-weight:700;color:#92400e;margin-bottom:20px;">🌟 新增廣告</h3>
+            <h3 id="ad-form-modal-title" style="font-size:20px;font-weight:700;color:#92400e;margin-bottom:20px;">🌟 新增廣告</h3>
             <div style="display:flex;flex-direction:column;gap:14px;">
                 <div>
                     <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">廣告標題 *</label>
@@ -665,13 +665,17 @@
                     <input id="ad-form-icon" type="text" placeholder="🌟" maxlength="4" style="width:80px;border:1.5px solid #d1d5db;border-radius:8px;padding:8px 12px;font-size:18px;text-align:center;outline:none;">
                 </div>
                 <div>
+                    <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">跳轉連結（選填，點廣告可前往）</label>
+                    <input id="ad-form-link" type="url" placeholder="https://..." style="width:100%;border:1.5px solid #d1d5db;border-radius:8px;padding:8px 12px;font-size:14px;outline:none;box-sizing:border-box;">
+                </div>
+                <div>
                     <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">詳細內容（點進去才看到）</label>
                     <textarea id="ad-form-content" rows="5" placeholder="廣告詳細介紹..." style="width:100%;border:1.5px solid #d1d5db;border-radius:8px;padding:8px 12px;font-size:14px;outline:none;resize:vertical;box-sizing:border-box;"></textarea>
                 </div>
             </div>
             <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
                 <button onclick="closeAdFormModal()" style="padding:8px 20px;border:1.5px solid #d1d5db;border-radius:8px;background:white;cursor:pointer;font-weight:600;color:#6b7280;">取消</button>
-                <button onclick="submitAdForm()" style="padding:8px 24px;background:#f59e0b;border:none;border-radius:8px;color:white;font-weight:700;cursor:pointer;font-size:14px;">新增廣告</button>
+                <button id="ad-form-submit-btn" onclick="submitAdForm()" style="padding:8px 24px;background:#f59e0b;border:none;border-radius:8px;color:white;font-weight:700;cursor:pointer;font-size:14px;">新增廣告</button>
             </div>
         </div>
     </div>
@@ -685,6 +689,7 @@
             <p id="ad-detail-subtitle" style="color:#b45309;font-size:14px;margin-bottom:20px;"></p>
             <hr style="border:none;border-top:1.5px solid #fde68a;margin-bottom:20px;">
             <div id="ad-detail-content" style="color:#374151;line-height:1.8;font-size:15px;white-space:pre-wrap;"></div>
+            <div id="ad-detail-actions" style="display:flex;gap:10px;margin-top:24px;flex-wrap:wrap;"></div>
         </div>
     </div>
 
