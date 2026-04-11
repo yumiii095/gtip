@@ -1594,6 +1594,7 @@ function executeFinalSave() {
         serverCommands : serverCmds,
         search_index   : ALL_DATA,
         strategies     : extractStrategiesFromDOM(),
+        ads            : window.ADS_DATA || [],
     };
     const jsonBlob = new Blob([JSON.stringify(jsonPayload, null, 2)], { type: 'application/json' });
     Object.assign(document.createElement('a'), {
@@ -1815,6 +1816,12 @@ window.onload = async function () {
         COMMANDS_DATA          = data.commands      || [];
         ALL_DATA               = data.search_index  || [];
         window.STRATEGIES_DATA = data.strategies    || [];
+
+        if (Array.isArray(data.ads) && data.ads.length > 0) {
+            window.ADS_DATA = data.ads;
+            // 同步寫入 localStorage，讓後續操作保持一致
+            try { localStorage.setItem('cobblemon_ads', JSON.stringify(window.ADS_DATA)); } catch(e) {}
+        }
 
         if (Array.isArray(data.serverCommands) && data.serverCommands.length > 0) {
             window.scData = data.serverCommands.map(s => Object.assign({}, s));
