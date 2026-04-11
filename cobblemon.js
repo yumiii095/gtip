@@ -1664,6 +1664,9 @@ function showPage(pageId) {
     document.getElementById('mobile-menu').classList.remove('open');
     // 切換到贊助/廣告相關頁時重新渲染（保持 editing 狀態同步）
     if (pageId === 'sponsor') { renderAdSidebar(); renderSponsorGrid(); }
+    // 廣告詳情頁隱藏 footer，其他頁面顯示
+    const footer = document.querySelector('footer');
+    if (footer) footer.style.display = (pageId === 'ad-detail') ? 'none' : '';
 }
 
 function toggleMobileMenu() {
