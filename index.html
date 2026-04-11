@@ -30,7 +30,7 @@
         .tm-blue-light { background-color: #00AEEF; }
         .section-title { border-bottom: 3px solid #003366; padding-bottom: 5px; margin-bottom: 20px; font-weight: bold; color: #003366; }
         .hidden { display: none; }
-        .btn-sq { border-radius: 0px; transition: all 0.1s; }
+        .btn-sq { border-radius: 8px; transition: all 0.1s; }
         .btn-sq:active { transform: scale(0.98); }
         .cmd-box { background-color: #f8fafc; border-left: 4px solid #00AEEF; padding: 10px; margin-bottom: 10px; font-family: monospace; transition: all 0.3s; position: relative; display: flex; align-items: center; flex-wrap: wrap; }
         .copy-btn { margin-left: auto; background: none; border: 1px solid #cbd5e0; border-radius: 4px; padding: 2px 8px; font-size: 11px; cursor: pointer; color: #64748b; transition: all 0.2s; white-space: nowrap; font-family: sans-serif; }
@@ -957,13 +957,11 @@
             </div>
             <nav class="hidden md:block" contenteditable="false">
                 <ul class="flex space-x-1 font-bold">
-                    <li><button onclick="showPage('home')" class="px-3 py-2 hover:bg-blue-50 text-blue-900 btn-sq" contenteditable="false">首頁</button></li>
-                    <li><button onclick="showPage('newbie')" class="px-3 py-2 hover:bg-blue-50 text-red-600 btn-sq" contenteditable="false">快捷鍵</button></li>
-                    <li><button onclick="showPage('commands')" class="px-3 py-2 hover:bg-blue-50 text-blue-900 btn-sq" contenteditable="false">指令集</button></li>
-                    <li><button onclick="showPage('tutorial')" class="px-3 py-2 hover:bg-blue-50 text-green-700 btn-sq" contenteditable="false">入門教學</button></li>
-                    <li><button onclick="showPage('faq')" class="px-3 py-2 hover:bg-blue-50 text-orange-600 btn-sq" contenteditable="false">常見問題</button></li>
-                    <li><button onclick="showPage('strategy')" class="px-3 py-2 hover:bg-blue-50 text-purple-700 btn-sq" contenteditable="false">攻略區</button></li>
-                    <li><button onclick="showPage('sponsor')" class="px-3 py-2 hover:bg-yellow-50 text-yellow-600 btn-sq font-bold" contenteditable="false">🌟 贊助伺服器</button></li>
+                    <li><button onclick="showPage('home')" class="px-3 py-2 hover:bg-blue-50 text-blue-900 rounded-lg transition-colors" contenteditable="false">首頁</button></li>
+                    <li><button onclick="showPage('commands')" class="px-3 py-2 hover:bg-blue-50 text-blue-900 rounded-lg transition-colors" contenteditable="false">指令集</button></li>
+                    <li><button onclick="showPage('typechart')" class="px-3 py-2 hover:bg-pink-50 text-pink-700 rounded-lg transition-colors" contenteditable="false">屬性克制表</button></li>
+                    <li><button onclick="showPage('strategy')" class="px-3 py-2 hover:bg-purple-50 text-purple-700 rounded-lg transition-colors" contenteditable="false">攻略區</button></li>
+                    <li><button onclick="showPage('sponsor')" class="px-3 py-2 hover:bg-yellow-50 text-yellow-600 rounded-lg font-bold transition-colors" contenteditable="false">🌟 贊助伺服器</button></li>
                 </ul>
             </nav>
             <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-blue-900 focus:outline-none" contenteditable="false">
@@ -972,13 +970,11 @@
         </div>
         <div id="mobile-menu" class="md:hidden bg-white border-t border-gray-100">
             <div class="flex flex-col p-4 space-y-2 font-bold">
-                <button onclick="showPage('home')" class="text-left py-2 border-b" contenteditable="false">🏠 首頁</button>
-                <button onclick="showPage('newbie')" class="text-left py-2 border-b text-red-600" contenteditable="false">🚩 快捷鍵</button>
-                <button onclick="showPage('commands')" class="text-left py-2 border-b text-blue-900" contenteditable="false">📋 指令集</button>
-                <button onclick="showPage('tutorial')" class="text-left py-2 border-b text-green-700" contenteditable="false">🔰 入門教學</button>
-                <button onclick="showPage('faq')" class="text-left py-2 border-b text-orange-600" contenteditable="false">❓ 常見問題</button>
-                <button onclick="showPage('strategy')" class="text-left py-2 border-b text-purple-700" contenteditable="false">⚔️ 攻略區</button>
-                <button onclick="showPage('sponsor')" class="text-left py-2 text-yellow-600 font-bold" contenteditable="false">🌟 贊助伺服器</button>
+                <button onclick="showPage('home')" class="text-left py-2 border-b rounded-lg px-2 hover:bg-gray-50" contenteditable="false">🏠 首頁</button>
+                <button onclick="showPage('commands')" class="text-left py-2 border-b text-blue-900 rounded-lg px-2 hover:bg-blue-50" contenteditable="false">📋 指令集</button>
+                <button onclick="showPage('typechart')" class="text-left py-2 border-b text-pink-700 rounded-lg px-2 hover:bg-pink-50" contenteditable="false"> 屬性克制表</button>
+                <button onclick="showPage('strategy')" class="text-left py-2 border-b text-purple-700 rounded-lg px-2 hover:bg-purple-50" contenteditable="false">⚔️ 攻略區</button>
+                <button onclick="showPage('sponsor')" class="text-left py-2 text-yellow-600 font-bold rounded-lg px-2 hover:bg-yellow-50" contenteditable="false">🌟 贊助伺服器</button>
             </div>
         </div>
     </header>
@@ -992,9 +988,9 @@
             <div class="container mx-auto px-4" style="position:relative;z-index:60;">
                 <h2 class="text-2xl md:text-4xl font-bold mb-6">今天想找什麼？</h2>
                 <div class="w-full max-w-2xl mx-auto relative">
-                    <div class="flex bg-white shadow-lg overflow-hidden text-gray-800">
+                    <div class="flex bg-white shadow-lg overflow-hidden text-gray-800" style="border-radius:12px;">
                         <input type="text" id="homeSearchInput" oninput="handleGlobalSearch(this, 'homeSuggestions')" onkeydown="if(event.key==='Enter')executeHomeSearch()" placeholder="搜尋關鍵字..." class="flex-1 min-w-0 p-3 md:p-4 outline-none text-sm md:text-base" style="font-size:16px;" contenteditable="false">
-                        <button class="tm-blue-dark flex-shrink-0 px-4 md:px-10 py-3 md:py-4 font-bold text-white btn-sq text-sm md:text-base whitespace-nowrap" onclick="executeHomeSearch()" contenteditable="false">搜尋</button>
+                        <button class="tm-blue-dark flex-shrink-0 px-4 md:px-10 py-3 md:py-4 font-bold text-white text-sm md:text-base whitespace-nowrap" style="border-radius:0 12px 12px 0;" onclick="executeHomeSearch()" contenteditable="false">搜尋</button>
                     </div>
                 </div>
             </div>
@@ -1023,10 +1019,10 @@
             <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
                 <div class="md:col-span-3 edit-ignore" contenteditable="false">
                     <div class="section-title">快速導航</div>
-                    <div class="flex flex-col border bg-white shadow-sm border-gray-300">
-                        <button onclick="showPage('tutorial')" class="p-4 border-b text-left hover:bg-green-50 font-bold text-green-700" contenteditable="false">▶ 入門教學指南</button>
-                        <button onclick="showPage('faq')" class="p-4 border-b text-left hover:bg-orange-50 font-bold text-orange-600" contenteditable="false">▶ 常見問題解答</button>
-                        <button onclick="showPage('strategy')" class="p-4 border-b text-left hover:bg-purple-50 font-bold text-purple-700" contenteditable="false">▶ 專業攻略專區</button>
+                    <div class="flex flex-col border bg-white shadow-sm border-gray-200 rounded-2xl overflow-hidden">
+                        <button onclick="showPage('newbie')" class="p-4 border-b text-left hover:bg-red-50 font-bold text-red-600 transition-colors" contenteditable="false">🚩 鍵盤快捷鍵</button>
+                        <button onclick="showPage('tutorial')" class="p-4 border-b text-left hover:bg-green-50 font-bold text-green-700 transition-colors" contenteditable="false">▶ 入門教學指南</button>
+                        <button onclick="showPage('faq')" class="p-4 text-left hover:bg-orange-50 font-bold text-orange-600 transition-colors" contenteditable="false">▶ 常見問題解答</button>
                     </div>
                 </div>
                 <div class="md:col-span-9">
@@ -2046,7 +2042,7 @@
             <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
             <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775813043867')" style="cursor:pointer;">📖<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
             <div class="strat-card-title">BP 點數系統說明</div>
-            <div class="strat-card-preview">BP 點數系統說明📌 BP 獲得方式1️⃣ 挑戰道館 擊敗道館館主 ➡ 可獲得 250 BP 點數 2️⃣ 參加排位賽 ✔ 對戰場數 ✔ 排名結算 ➡ 皆可獲得 BP 點數獎勵🛒 BP 使用方式�</div>
+            <div class="strat-card-preview">BP 點數系統說明📌 BP 獲得方式1️⃣ 挑戰道館 擊敗道館館主 ➡ 可獲得 250 BP 點數 2️⃣ 參加排位賽 ✔ 對戰場數 ✔ 排名結算 ➡ 皆可獲得 BP 點數獎勵🛒 BP 使用方式 </div>
             <span class="strat-card-arrow">›</span></div><div id="strat-new-1775812694686" class="strat-card">
             <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
             <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775812694686')" style="cursor:pointer;">🗡️<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
@@ -2123,6 +2119,56 @@
             <div class="strat-card-title">小智帽獲取方式</div>
             <div class="strat-card-preview">🧢 小智帽獲取方式 本攻略資料來自玩家社群分享，本站進行整理與修改。 原作者：♚伊比利小豬♚ ／ 來源連結 若原作者不希望本站收錄，請聯絡我們，將立即移除。 1️⃣ 小智甲賀忍蛙 啟動條件：好感度 </div>
             <span class="strat-card-arrow">›</span></div></div>
+        </main>
+    </div>
+
+    <!-- 屬性克制表分頁 -->
+    <div id="typechart-page" class="page-content hidden">
+        <div class="edit-ignore" contenteditable="false" style="background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #ede9fe 100%); border-bottom: 2px solid #f9a8d4; padding: 3rem 0;">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold" style="color: #831843;">屬性克制表</h2>
+                <p class="mt-2 text-sm" style="color: #be185d;">查詢各屬性之間的攻守關係</p>
+            </div>
+        </div>
+        <main class="container mx-auto py-8 px-4">
+            <!-- Legend -->
+            <div class="flex flex-wrap gap-3 mb-6 justify-center">
+                <div class="flex items-center gap-2 bg-white rounded-xl px-4 py-2 shadow-sm border border-gray-100">
+                    <span class="inline-block w-8 h-8 rounded-lg text-center font-bold text-white text-sm flex items-center justify-center" style="background:#dc2626; line-height:2rem;">2×</span>
+                    <span class="text-sm font-bold text-gray-700">效果絕佳（2倍傷害）</span>
+                </div>
+                <div class="flex items-center gap-2 bg-white rounded-xl px-4 py-2 shadow-sm border border-gray-100">
+                    <span class="inline-block w-8 h-8 rounded-lg text-center font-bold text-white text-sm flex items-center justify-center" style="background:#2563eb; line-height:2rem;">½</span>
+                    <span class="text-sm font-bold text-gray-700">效果不理想（0.5倍）</span>
+                </div>
+                <div class="flex items-center gap-2 bg-white rounded-xl px-4 py-2 shadow-sm border border-gray-100">
+                    <span class="inline-block w-8 h-8 rounded-lg text-center font-bold text-white text-sm flex items-center justify-center" style="background:#374151; line-height:2rem;">0</span>
+                    <span class="text-sm font-bold text-gray-700">完全無效（0倍）</span>
+                </div>
+                <div class="flex items-center gap-2 bg-white rounded-xl px-4 py-2 shadow-sm border border-gray-100">
+                    <span class="inline-block w-8 h-8 rounded-lg text-center font-bold text-gray-400 text-sm flex items-center justify-center border" style="line-height:2rem;">—</span>
+                    <span class="text-sm font-bold text-gray-700">普通效果（1倍）</span>
+                </div>
+            </div>
+
+            <!-- Type chart table wrapper -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto">
+                <div style="min-width: 900px;">
+                    <table id="type-chart-table" style="width:100%; border-collapse:collapse; font-size:11px;">
+                        <thead>
+                            <tr>
+                                <th style="padding:8px 4px; text-align:left; font-size:10px; color:#6b7280; font-weight:700; border-bottom:2px solid #f3f4f6; background:#f9fafb; border-radius:12px 0 0 0; min-width:70px; white-space:nowrap; padding-left:12px;">攻擊方 ↓<br>防禦方 →</th>
+                                <!-- Headers filled by JS -->
+                            </tr>
+                        </thead>
+                        <tbody id="type-chart-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Individual type cards -->
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4" id="type-detail-cards"></div>
         </main>
     </div>
 
@@ -2516,4 +2562,158 @@
 
     <script src="cobblemon.js" defer=""></script>
 
+    <script>
+    // ── Global UI: Rounded search bar overrides ──────────────────────
+    document.addEventListener('DOMContentLoaded', function() {
+        // Make search bar rounded
+        const heroSearch = document.querySelector('#homeSearchInput');
+        if (heroSearch) {
+            heroSearch.closest('.flex').style.borderRadius = '12px';
+            heroSearch.closest('.flex').style.overflow = 'hidden';
+        }
+        // Make card/section elements more rounded
+        document.querySelectorAll('.cmd-box').forEach(el => {
+            el.style.borderRadius = '8px';
+        });
+        document.querySelectorAll('#commands-page .sc-section').forEach(el => {
+            el.style.borderRadius = '14px';
+        });
+
+        // Build type chart when page is shown
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('[onclick*="typechart"]')) {
+                setTimeout(buildTypeChart, 100);
+            }
+        });
+    });
+
+    // ── 屬性克制表 ─────────────────────────────────────────────────────
+    const TYPES_ZH = {
+        Normal:   { zh: '一般', color: '#A8A878', emoji: '⬜' },
+        Fire:     { zh: '火',   color: '#F08030', emoji: '🔥' },
+        Water:    { zh: '水',   color: '#6890F0', emoji: '💧' },
+        Electric: { zh: '電',   color: '#F8D030', emoji: '⚡' },
+        Grass:    { zh: '草',   color: '#78C850', emoji: '🌿' },
+        Ice:      { zh: '冰',   color: '#98D8D8', emoji: '❄️' },
+        Fighting: { zh: '格鬥', color: '#C03028', emoji: '🥊' },
+        Poison:   { zh: '毒',   color: '#A040A0', emoji: '☠️' },
+        Ground:   { zh: '地面', color: '#E0C068', emoji: '🏔️' },
+        Flying:   { zh: '飛行', color: '#A890F0', emoji: '🦅' },
+        Psychic:  { zh: '超能', color: '#F85888', emoji: '🔮' },
+        Bug:      { zh: '蟲',   color: '#A8B820', emoji: '🐛' },
+        Rock:     { zh: '岩石', color: '#B8A038', emoji: '🪨' },
+        Ghost:    { zh: '幽靈', color: '#705898', emoji: '👻' },
+        Dragon:   { zh: '龍',   color: '#7038F8', emoji: '🐉' },
+        Dark:     { zh: '惡',   color: '#705848', emoji: '🌑' },
+        Steel:    { zh: '鋼',   color: '#B8B8D0', emoji: '⚙️' },
+        Fairy:    { zh: '妖精', color: '#EE99AC', emoji: '🌸' },
+    };
+
+    // Offense chart: attacking_type -> {defending_type: multiplier}
+    // 2 = super effective, 0.5 = not very effective, 0 = immune
+    const TYPE_CHART = {
+        Normal:   { Rock:0.5, Ghost:0, Steel:0.5 },
+        Fire:     { Fire:0.5, Water:0.5, Grass:2, Ice:2, Bug:2, Rock:0.5, Dragon:0.5, Steel:2 },
+        Water:    { Fire:2, Water:0.5, Grass:0.5, Ground:2, Rock:2, Dragon:0.5 },
+        Electric: { Water:2, Electric:0.5, Grass:0.5, Ground:0, Flying:2, Dragon:0.5 },
+        Grass:    { Fire:0.5, Water:2, Grass:0.5, Poison:0.5, Ground:2, Flying:0.5, Bug:0.5, Rock:2, Dragon:0.5, Steel:0.5 },
+        Ice:      { Fire:0.5, Water:0.5, Grass:2, Ice:0.5, Ground:2, Flying:2, Dragon:2, Steel:0.5 },
+        Fighting: { Normal:2, Ice:2, Poison:0.5, Flying:0.5, Psychic:0.5, Bug:0.5, Rock:2, Ghost:0, Dark:2, Steel:2, Fairy:0.5 },
+        Poison:   { Grass:2, Poison:0.5, Ground:0.5, Rock:0.5, Ghost:0.5, Steel:0, Fairy:2 },
+        Ground:   { Fire:2, Electric:2, Grass:0.5, Poison:2, Flying:0, Bug:0.5, Rock:2, Steel:2 },
+        Flying:   { Electric:0.5, Grass:2, Fighting:2, Bug:2, Rock:0.5, Steel:0.5 },
+        Psychic:  { Fighting:2, Poison:2, Psychic:0.5, Dark:0, Steel:0.5 },
+        Bug:      { Fire:0.5, Grass:2, Fighting:0.5, Poison:0.5, Flying:0.5, Psychic:2, Ghost:0.5, Dark:2, Steel:0.5, Fairy:0.5 },
+        Rock:     { Fire:2, Ice:2, Fighting:0.5, Ground:0.5, Flying:2, Bug:2, Steel:0.5 },
+        Ghost:    { Normal:0, Psychic:2, Ghost:2, Dark:0.5 },
+        Dragon:   { Dragon:2, Steel:0.5, Fairy:0 },
+        Dark:     { Fighting:0.5, Psychic:2, Ghost:2, Dark:0.5, Fairy:0.5 },
+        Steel:    { Fire:0.5, Water:0.5, Electric:0.5, Ice:2, Rock:2, Steel:0.5, Fairy:2 },
+        Fairy:    { Fire:0.5, Fighting:2, Poison:0.5, Dragon:2, Dark:2, Steel:0.5 },
+    };
+
+    function getEff(atk, def) {
+        return (TYPE_CHART[atk] && TYPE_CHART[atk][def] !== undefined) ? TYPE_CHART[atk][def] : 1;
+    }
+
+    let _typeChartBuilt = false;
+    function buildTypeChart() {
+        if (_typeChartBuilt) return;
+        _typeChartBuilt = true;
+
+        const types = Object.keys(TYPES_ZH);
+        const table = document.getElementById('type-chart-table');
+        const tbody = document.getElementById('type-chart-body');
+        if (!table || !tbody) return;
+
+        // Build header
+        const thead = table.querySelector('thead tr');
+        types.forEach(t => {
+            const th = document.createElement('th');
+            const info = TYPES_ZH[t];
+            th.style.cssText = `padding:5px 2px; min-width:38px; text-align:center; font-size:9px; color:white; background:${info.color}; font-weight:700; border-bottom:2px solid #f3f4f6; white-space:nowrap; writing-mode:vertical-rl; text-orientation:mixed; height:60px; vertical-align:bottom;`;
+            th.textContent = info.zh;
+            thead.appendChild(th);
+        });
+
+        // Build rows
+        types.forEach((atk, ai) => {
+            const tr = document.createElement('tr');
+            tr.style.background = ai % 2 === 0 ? '#fff' : '#f9fafb';
+
+            // Row label
+            const tdLabel = document.createElement('td');
+            const info = TYPES_ZH[atk];
+            tdLabel.style.cssText = `padding:4px 8px; font-size:10px; font-weight:700; white-space:nowrap; border-right:2px solid #f3f4f6; color:white; background:${info.color}; border-radius:6px 0 0 6px;`;
+            tdLabel.textContent = `${info.emoji} ${info.zh}`;
+            tr.appendChild(tdLabel);
+
+            types.forEach(def => {
+                const eff = getEff(atk, def);
+                const td = document.createElement('td');
+                td.style.cssText = `padding:2px; text-align:center; font-size:10px; font-weight:700;`;
+
+                if (eff === 2) {
+                    td.innerHTML = '<span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:#dc2626;color:white;font-size:9px;">2×</span>';
+                } else if (eff === 0) {
+                    td.innerHTML = '<span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:#374151;color:white;font-size:9px;">0</span>';
+                } else if (eff === 0.5) {
+                    td.innerHTML = '<span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:#2563eb;color:white;font-size:9px;">½</span>';
+                } else {
+                    td.innerHTML = '<span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:transparent;color:#9ca3af;font-size:9px;">—</span>';
+                }
+                tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+        });
+
+        // Build detail cards
+        const cardsEl = document.getElementById('type-detail-cards');
+        if (!cardsEl) return;
+        types.forEach(t => {
+            const info = TYPES_ZH[t];
+            const strong = [], weak = [], immune = [];
+            types.forEach(def => {
+                const e = getEff(t, def);
+                if (e === 2) strong.push(def);
+                else if (e === 0.5) weak.push(def);
+                else if (e === 0) immune.push(def);
+            });
+
+            const card = document.createElement('div');
+            card.style.cssText = `background:white; border-radius:16px; padding:16px; border:2px solid ${info.color}30; box-shadow:0 2px 8px rgba(0,0,0,0.06);`;
+            card.innerHTML = `
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                    <span style="background:${info.color};color:white;padding:4px 12px;border-radius:99px;font-size:12px;font-weight:700;">${info.emoji} ${info.zh}屬性</span>
+                </div>
+                ${strong.length ? `<div style="margin-bottom:6px;"><span style="font-size:11px;color:#dc2626;font-weight:700;">效果絕佳 (×2)：</span><div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;">${strong.map(x=>`<span style="background:${TYPES_ZH[x].color};color:white;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:600;">${TYPES_ZH[x].zh}</span>`).join('')}</div></div>` : ''}
+                ${weak.length ? `<div style="margin-bottom:6px;"><span style="font-size:11px;color:#2563eb;font-weight:700;">效果不理想 (×½)：</span><div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;">${weak.map(x=>`<span style="background:${TYPES_ZH[x].color};color:white;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:600;">${TYPES_ZH[x].zh}</span>`).join('')}</div></div>` : ''}
+                ${immune.length ? `<div><span style="font-size:11px;color:#374151;font-weight:700;">完全無效 (×0)：</span><div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;">${immune.map(x=>`<span style="background:${TYPES_ZH[x].color};color:white;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:600;">${TYPES_ZH[x].zh}</span>`).join('')}</div></div>` : ''}
+                ${!strong.length && !weak.length && !immune.length ? `<p style="font-size:12px;color:#9ca3af;">對所有屬性普通效果</p>` : ''}
+            `;
+            cardsEl.appendChild(card);
+        });
+    }
+    </script>
 </body></html>
+
