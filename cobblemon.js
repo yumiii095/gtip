@@ -1001,7 +1001,7 @@ function _applyHL(boxes, query) {
 
 
 /* ════════════════════════════════════════════════════
-   8. 可拖曳/可縮放圖片 圖片通能
+   8. 可拖曳/可縮放圖片
 ════════════════════════════════════════════════════ */
 
 function _createDraggableImage(src, name) {
@@ -1025,13 +1025,13 @@ function _createDraggableImage(src, name) {
     imgToolbar.className = 'img-toolbar';
     imgToolbar.setAttribute('contenteditable', 'false');
     imgToolbar.innerHTML = `
-        <button class="rb" style="font-size:10px;padding:2px 5px;" onmousedown="event.preventDefault();setImgAlign(this,'left')"   title="靠左對齊">◀</button>
+        <button class="rb" style="font-size:10px;padding:2px 5px;" onmousedown="event.preventDefault();setImgAlign(this,'left')"   title="靠左">◀</button>
         <button class="rb" style="font-size:10px;padding:2px 5px;" onmousedown="event.preventDefault();setImgAlign(this,'center')" title="置中">■</button>
-        <button class="rb" style="font-size:10px;padding:2px 5px;" onmousedown="event.preventDefault();setImgAlign(this,'right')"  title="靠右對齊">▶</button>
+        <button class="rb" style="font-size:10px;padding:2px 5px;" onmousedown="event.preventDefault();setImgAlign(this,'right')"  title="靠右">▶</button>
         <span class="rb-sep"></span>
-        <button class="rb" style="font-size:10px;padding:2px 5px;" onmousedown="event.preventDefault();setImgWrap(this,'left')"   title="文繞圖（圖靠左）">⬡◀</button>
-        <button class="rb" style="font-size:10px;padding:2px 5px;" onmousedown="event.preventDefault();setImgWrap(this,'right')"  title="文繞圖（圖靠右）">▶⬡</button>
-        <button class="rb" style="font-size:10px;padding:2px 5px;" onmousedown="event.preventDefault();setImgWrap(this,'none')"   title="取消文繞圖">⊗</button>
+        <button class="rb" style="font-size:10px;padding:2px 5px;" onmousedown="event.preventDefault();setImgWrap(this,'left')"   title="文繞圖（圖靠左）">⬚◀</button>
+        <button class="rb" style="font-size:10px;padding:2px 5px;" onmousedown="event.preventDefault();setImgWrap(this,'right')"  title="文繞圖（圖靠右）">▶⬚</button>
+        <button class="rb" style="font-size:10px;padding:2px 5px;" onmousedown="event.preventDefault();setImgWrap(this,'none')"   title="取消文繞圖">✕繞</button>
         <span class="rb-sep"></span>
         <button class="rb" style="font-size:10px;padding:2px 5px;" onmousedown="event.preventDefault();setImgWidth(this,'25%')"  title="25%">¼</button>
         <button class="rb" style="font-size:10px;padding:2px 5px;" onmousedown="event.preventDefault();setImgWidth(this,'50%')"  title="50%">½</button>
@@ -1126,15 +1126,13 @@ function setImgWidth(btn, w) {
 
 function setImgWrap(btn, side) {
     const wrapper = btn.closest('.drag-img');
-    // Clear existing alignment/float styles
     wrapper.classList.remove('img-float-left', 'img-float-right', 'img-center');
     if (side === 'left') {
-        wrapper.style.cssText = 'float:left;margin:4px 16px 8px 0;display:inline-block;';
+        wrapper.style.cssText = 'float:left;display:inline-block;margin:4px 14px 8px 0;max-width:50%;';
     } else if (side === 'right') {
-        wrapper.style.cssText = 'float:right;margin:4px 0 8px 16px;display:inline-block;';
+        wrapper.style.cssText = 'float:right;display:inline-block;margin:4px 0 8px 14px;max-width:50%;';
     } else {
-        // Cancel wrap: revert to block center
-        wrapper.style.cssText = 'display:block;text-align:center;margin:8px auto;max-width:100%;float:none;clear:both;';
+        wrapper.style.cssText = 'display:block;float:none;clear:both;text-align:center;margin:8px auto;max-width:100%;';
     }
 }
 

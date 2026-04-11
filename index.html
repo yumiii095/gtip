@@ -311,6 +311,8 @@
         .drag-img.img-center { display: block; margin: 8px auto; text-align: center; }
         .drag-img img { display: block; max-width: 100%; border-radius: 6px; }
         .drag-img img.selected-img { outline: 2px solid #00AEEF; outline-offset: 2px; }
+        /* 文繞圖清除浮動 */
+        [contenteditable]:after { content: ''; display: table; clear: both; }
         .img-resize-handle {
             display: none; position: absolute; right: -5px; bottom: -5px;
             width: 12px; height: 12px; background: #00AEEF;
@@ -602,7 +604,9 @@
             <button class="strat-modal-close" onclick="closeStratModal()" contenteditable="false">✕</button>
             <div id="strat-modal-body"><div class="edit-ui" contenteditable="false" style="position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:4px;background:#0f172a;padding:8px 12px;border-radius:10px;margin-bottom:14px;flex-wrap:wrap;box-shadow:0 4px 14px rgba(0,0,0,0.3);">
         <span style="font-size:11px;font-weight:700;color:#00AEEF;margin-right:4px;">✏️ 攻略編輯</span>
-        <select class="rb-select" style="max-width:70px;height:24px;" onmousedown="event.stopPropagation();" onchange="applyFormat('fontSize',this.value)" title="字體大小" contenteditable="false">
+        <select class="rb-select" style="max-width:72px;height:24px;" title="字體大小" contenteditable="false"
+            onmousedown="event.stopPropagation();"
+            onchange="applyFormat('fontSize',this.value)">
             <option value="1">10px</option>
             <option value="2">13px</option>
             <option value="3" selected>16px</option>
@@ -1897,7 +1901,7 @@
             <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
             <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775813043867')" style="cursor:pointer;">📖<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;">✏️</span></div>
             <div class="strat-card-title">BP 點數系統說明</div>
-            <div class="strat-card-preview">BP 點數系統說明📌 BP 獲得方式1️⃣ 挑戰道館 擊敗道館館主 ➡ 可獲得 250 BP 點數 2️⃣ 參加排位賽 ✔ 對戰場數 ✔ 排名結算 ➡ 皆可獲得 BP 點數獎勵🛒 BP 使用方式 </div>
+            <div class="strat-card-preview">BP 點數系統說明📌 BP 獲得方式1️⃣ 挑戰道館 擊敗道館館主 ➡ 可獲得 250 BP 點數 2️⃣ 參加排位賽 ✔ 對戰場數 ✔ 排名結算 ➡ 皆可獲得 BP 點數獎勵🛒 BP 使用方式�</div>
             <span class="strat-card-arrow">›</span></div><div id="strat-new-1775812694686" class="strat-card">
             <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
             <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775812694686')" style="cursor:pointer;">🗡️<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;">✏️</span></div>
@@ -1984,7 +1988,7 @@
         <p class="font-bold text-xl text-blue-400">Cobblemon 方可夢樂園</p>
         <p class="text-gray-500 text-sm mt-3 px-6 leading-relaxed">本站由玩家自發性維護，<br>非官方（伺服器管理團隊）直接運營。</p>
         <p class="text-gray-600 text-xs mt-4" id="busuanzi-footer">
-       📄 累計瀏覽：<span id="busuanzi_value_site_pv" class="text-gray-400">0</span> 次
+            📄 累計瀏覽：<span id="busuanzi_value_site_pv" class="text-gray-400">--</span> 次
         </p>
     </footer>
     <script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
@@ -2199,17 +2203,32 @@
         // BUG2 FIX: 暴露 scRender 供 cobblemon.js 的 window.onload 更新資料後呼叫
         window.scRender = scRender;
 
-    // 指令集章節圖示選擇器
-        const _scAllIcons = ['💬','📦','🧭','🏠','💰','🎁','🎮','🔒','🏡','🔧','⚔️','📖',
-            '🌿','✨','🏆','🗺️','💎','⚡','🔥','❄️','💧','🌊','🌟','🎯','🛡️','🗡️','🧪','🧬','🌐','🏅','🌸','🐉',
-            '🎪','🎭','🎨','🎵','🎶','🎸','🎺','🎻','🥁','🎲','🃏','🎳','⚽','🏀','🏈','⚾','🎾','🏸','🥊',
-            '🚀','✈️','🚂','🚢','🏎️','🛒','🧲','⚗️','🔬','🔭','🛒','💻','📱','🖥️','⌨️','🖨️','📡','📷',
-            '🌈','☀️','🌙','⭐','🌎','🌋','🏔️','🏖️','🌺','🌻','🌹','🍀','🍁','🌵','🌴','🌲','🎋','🎄',
-            '🦁','🐯','🐻','🦊','🐺','🦅','🦋','🐝','🐢','🦄','🐬','🦈','🦉','🦌','🐘','🦒','🐧','🦜',
-            '🍎','🍊','🍋','🍇','🍓','🍕','🍔','🍜','🍣','🍰','☕','🍺','💊','💉','🩺','🩹','🧰','🔑',
-            '📚','📝','📋','📊','📈','📉','🗃️','🗂️','📌','📍','🗺️','🧩','🔮','💡','🔔','🔊','📢','📣',
-            '🏛️','🏯','🏰','⛩️','🕌','🕍','⛪','🗽','🗼','🎠','🎡','🎢','🎪','🎬','🎥','📽️','🎞️'];
-
+        // 指令集章節圖示選擇器
+        const _scAllIcons = [
+            // 基本 & 遊戲
+            '💬','📦','🧭','🏠','💰','🎁','🎮','🔒','🏡','🔧','⚔️','📖','🌿','✨','🏆','🗺️','💎','⚡','🔥','❄️',
+            '💧','🌊','🌟','🎯','🛡️','🗡️','🧪','🧬','🌐','🏅','🌸','🐉','🎲','🃏','🎴','🎰','🕹️','🧩','🏹','🪃',
+            // 動物
+            '🦁','🐯','🐻','🦊','🐺','🦅','🦋','🐝','🐢','🦄','🐬','🦈','🦉','🦌','🐘','🦒','🐧','🦜','🐸','🐙',
+            '🦑','🦞','🦀','🐊','🦓','🦏','🦛','🐪','🦘','🦝','🦨','🦦','🦥','🐿️','🦔','🐇','🐁','🐓','🦃','🦚',
+            // 自然 / 植物
+            '🌈','☀️','🌙','⭐','🌎','🌋','🏔️','🏖️','🌺','🌻','🌹','🍀','🍁','🌵','🌴','🌲','🎋','🌾','🍄','🌷',
+            '🌼','💐','🪨','🪵','🌏','🌍','🌕','🌤️','⛅','🌧️','⛈️','🌪️','🌬️','🌊','🏝️','🗻','🌄','🌅','🌠',
+            // 食物
+            '🍎','🍊','🍋','🍇','🍓','🫐','🍕','🍔','🍜','🍣','🍱','🍰','☕','🍺','🧋','🍭','🍩','🍦','🥗','🥩',
+            '🌮','🥐','🧇','🥞','🍳','🥚','🧀','🥓','🌭','🥨','🧁','🎂','🍮','🍯','🥤','🧃','🍷','🥂','🫖',
+            // 物品 / 道具
+            '🔑','💡','🔮','🧩','📚','📝','📋','📊','📈','📌','🗂️','🧰','💊','🩺','🛒','📡','📷','🎒','👑','💍',
+            '🪬','🧿','🪄','🎩','🧲','🔭','🔬','⚗️','🧫','🪤','🗝️','🔐','🪪','📜','🗞️','📰','🏷️','🪣','🧴','🪞',
+            // 建築 / 地點
+            '🏛️','🏯','🏰','⛩️','🕌','🗽','🗼','🎠','🎡','🎢','🏟️','🏗️','🌉','⛪','🕍','🛕','🏪','🏫','🏨','🏦',
+            // 活動 / 運動
+            '⚽','🏀','🏈','⚾','🎾','🏸','🥊','🎲','🎳','🥋','🏊','🚴','🧗','🤸','🤺','🏋️','⛷️','🏂','🤼','🤾',
+            // 科技 / 交通
+            '💻','📱','🖥️','⌨️','🚀','✈️','🚂','🚢','🏎️','🛸','🤖','🛺','🚁','🛻','🚒','🚑','🚓','⛵','🛩️','🪂',
+            // 音樂 / 藝術
+            '🎪','🎭','🎨','🎵','🎶','🎸','🎺','🎻','🥁','🎬','🎥','🎤','🎧','🪗','🎷','🪘','🎙️','🎚️','🎛️',
+        ];
 
         window._openScIconPicker = function(iconEl, si) {
             if (!document.body.classList.contains('editing-active')) return;
