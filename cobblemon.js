@@ -2,7 +2,7 @@
  * Cobblemon 方可夢樂園 — 攻略站
  * cobblemon.js  ·  主要互動邏輯
  *
- * 模組結構：
+ * 結構：
  *   1. State          — 全域狀態與資料
  *   2. Utils          — 通用工具函式
  *   3. SearchEngine   — 搜尋評分核心
@@ -15,12 +15,13 @@
  *  10. UI Helpers     — 頁面切換、深色模式等
  *  11. Events         — 全域事件監聽
  *  12. Init           — 頁面載入初始化
+ *  攻略區攻略卡片需要整理，圖片需要文繞圖功能 ，移除累計訪客
  */
 
 'use strict';
 
 /* ════════════════════════════════════════════════════
-   1. STATE — 全域狀態與資料
+   1. STATE-全域狀態&資料
 ════════════════════════════════════════════════════ */
 
 let COMMANDS_DATA  = [];
@@ -43,7 +44,7 @@ const PAGE_LABEL = {
 
 
 /* ════════════════════════════════════════════════════
-   2. UTILS — 通用工具函式
+   2. UTILS-通用工具函式
 ════════════════════════════════════════════════════ */
 
 function escapeHtml(str) {
@@ -86,7 +87,7 @@ function highlightTerms(text, terms) {
 
 
 /* ════════════════════════════════════════════════════
-   3. SEARCH ENGINE — 搜尋評分核心
+   3. SEARCH ENGINE-搜尋評分核心
 ════════════════════════════════════════════════════ */
 
 function searchScore(query, item) {
@@ -169,7 +170,7 @@ function rankResults(query, limit = 8) {
 
 
 /* ════════════════════════════════════════════════════
-   4. SEARCH UI — 搜尋建議 / 執行搜尋
+   4. SEARCH UI-搜尋建議/執行搜尋 [優化]
 ════════════════════════════════════════════════════ */
 
 function _positionSuggestionBox(input, box) {
@@ -355,7 +356,7 @@ function _highlightAndScrollToCommand(targetId) {
 
 
 /* ════════════════════════════════════════════════════
-   5. COMMANDS — 指令集初始化與操作
+   5. COMMANDS-指令集初始化與操作
 ════════════════════════════════════════════════════ */
 
 function initCommands() {
@@ -471,7 +472,7 @@ function addNewSection(containerId, type) {
 
 
 /* ════════════════════════════════════════════════════
-   6. STRATEGIES — 攻略卡片與 Modal
+   6. 攻略區攻略卡片
 ════════════════════════════════════════════════════ */
 
 function _stratPreview(html) {
@@ -604,7 +605,7 @@ function closeStratModal() {
     _activeStrat = null;
 }
 
-// 攻略卡片圖示選擇器
+// 攻略卡片圖示選擇器(還要增加!!!!!!!!!!)
 const _allStratIcons = ['📖','⚔️','💰','🛒','🥚','📊','🌿','✨','🏆','🗺️','💎','⚡',
     '🔥','❄️','💧','🌊','⚡','🌟','🎯','🛡️','🗡️','🧪','🧬','🌐','🎮','🏅','🎁','🌸','🐉'];
 
@@ -681,10 +682,10 @@ function insertStrategyImage(input) {
 
 
 /* ════════════════════════════════════════════════════
-   7. EDIT MODE — 編輯模式、格式工具列
+   7. 編輯模式、格式工具列
 ════════════════════════════════════════════════════ */
 
-// ── [修改3] 手機點頁腳5次開啟編輯模式 ─────────────────────────────
+// ── 手機點頁腳5次開啟編輯模式 ─────────────────────────────
 let _footerTapCount = 0;
 let _footerTapTimer = null;
 
@@ -704,7 +705,7 @@ function _initFooterTapSecret() {
         if (_footerTapCount >= 5) {
             _footerTapCount = 0;
             toggleEditMode(true);
-            // 給手機一點視覺回饋
+            // 給手機一點視覺回饋 牛逼東東
             _showToast('✏️ 編輯模式已開啟');
         } else {
             // 2秒內沒繼續點就重置計數
@@ -1000,7 +1001,7 @@ function _applyHL(boxes, query) {
 
 
 /* ════════════════════════════════════════════════════
-   8. IMAGE EDITOR — 可拖曳 / 可縮放圖片
+   8. 可拖曳/可縮放圖片 圖片通能
 ════════════════════════════════════════════════════ */
 
 function _createDraggableImage(src, name) {
@@ -1329,7 +1330,7 @@ function addNewsCard() {
 
 
 /* ════════════════════════════════════════════════════
-   10. UI HELPERS — 頁面切換、深色模式等
+   10. UI HELPERS — 頁面切換、深色模式等 (深色模式有大問題，圖示)
 ════════════════════════════════════════════════════ */
 
 function toggleDarkMode() {
@@ -1378,13 +1379,13 @@ document.addEventListener('paste', function(e) {
     div.querySelectorAll('[style]').forEach(el => {
         el.style.removeProperty('background-color');
         el.style.removeProperty('background');
-        // 如果是 emoji（只含 emoji 字元），也移除 color
+        // 如果是 emoji（只含 emoji ），也移除 color
         const txt = el.textContent || '';
         if (/^\p{Emoji}/u.test(txt)) el.style.removeProperty('color');
-        // 若 style 清空了，移除 style 屬性
+        // if style 清空了，移除 style 屬性
         if (!el.getAttribute('style').trim()) el.removeAttribute('style');
     });
-    // 移除空的 span 包裹（把內容提升）
+    // 移除空的span包裹（把內容提升）
     div.querySelectorAll('span:not([class]):not([id])').forEach(span => {
         if (!span.getAttribute('style')) {
             span.replaceWith(...span.childNodes);
@@ -1442,7 +1443,7 @@ window.addEventListener('scroll', () => {
 
 
 /* ════════════════════════════════════════════════════
-   12. INIT — 頁面載入初始化
+   12. 頁面載入初始化
 ════════════════════════════════════════════════════ */
 
 async function _checkAndRefreshIfNeeded() {
