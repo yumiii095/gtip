@@ -1238,633 +1238,7 @@
                 </div>
                 <!-- sections rendered by JS -->
                 <div class="sc-sections" id="scSections">
-                <div class="sc-section" data-id="social">
-                    <div class="sc-sec-header" onclick="scToggle('social')">
-                        <span class="sc-sec-icon">💬</span>
-                        <span class="sc-sec-title">私聊 / 社交系統</span>
-                        <span class="sc-sec-count">9 指令</span>
-                        
-                        <span class="sc-chevron">▼</span>
-                    </div>
-                    <div class="sc-sec-body">
-                        
-                            <div class="sc-cmd-group">
-                                <div class="sc-cmd-group-label">私聊玩家</div>
-                                
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/message [玩家名]</span>
-                                               <span class="sc-cmd-desc">私聊玩家（同 /msg /talk /tell）</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/message [玩家名]',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/msg [玩家名]</span>
-                                               <span class="sc-cmd-desc">私聊玩家（/message 別名）</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/msg [玩家名]',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/talk [玩家名]</span>
-                                               <span class="sc-cmd-desc">私聊玩家（/message 別名）</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/talk [玩家名]',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/tell [玩家名]</span>
-                                               <span class="sc-cmd-desc">私聊玩家（/message 別名）</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/tell [玩家名]',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/m [玩家名] [訊息]</span>
-                                               <span class="sc-cmd-desc">快速單次私聊（後面加訊息）</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/m [玩家名] [訊息]',this)" title="複製指令">📋</button>
-                                    </div>
-                                
-                                
-                            </div>
-                        
-                            <div class="sc-cmd-group">
-                                <div class="sc-cmd-group-label">私聊模式說明</div>
-                                
-                                
-                                <div class="sc-note">👉 後面加訊息 = 單次私聊　👉 不加訊息 = 進入持續私聊模式<br>退出私聊：輸入 /message、/msg、/talk、/tell 或 /global（不帶參數）</div>
-                            </div>
-                        
-                            <div class="sc-cmd-group">
-                                <div class="sc-cmd-group-label">其他社交功能</div>
-                                
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/r [訊息]</span>
-                                               <span class="sc-cmd-desc">快速回覆上一個私聊訊息</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/r [訊息]',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/ignore [ID] [t|f]</span>
-                                               <span class="sc-cmd-desc">屏蔽（t）/ 解除屏蔽（f）玩家</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/ignore [ID] [t|f]',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/ignorelist</span>
-                                               <span class="sc-cmd-desc">查看目前屏蔽名單</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/ignorelist',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">@[玩家ID]</span>
-                                               <span class="sc-cmd-desc">在聊天中標記（Mention）玩家</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('@[玩家ID]',this)" title="複製指令">📋</button>
-                                    </div>
-                                
-                                
-                            </div>
-                        
-                    </div>
                 </div>
-                <div class="sc-section" data-id="display">
-                    <div class="sc-sec-header" onclick="scToggle('display')">
-                        <span class="sc-sec-icon">📦</span>
-                        <span class="sc-sec-title">展示系統</span>
-                        <span class="sc-sec-count">3 指令</span>
-                        
-                        <span class="sc-chevron">▼</span>
-                    </div>
-                    <div class="sc-sec-body">
-                        
-                            <div class="sc-cmd-group">
-                                <div class="sc-cmd-group-label">聊天框輸入關鍵字</div>
-                                
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">[i]</span>
-                                               <span class="sc-cmd-desc">展示手上目前持有的物品</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('[i]',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">[inv]</span>
-                                               <span class="sc-cmd-desc">展示目前背包完整內容</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('[inv]',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">[ender]</span>
-                                               <span class="sc-cmd-desc">展示末影箱內容</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('[ender]',this)" title="複製指令">📋</button>
-                                    </div>
-                                
-                                
-                            </div>
-                        
-                            <div class="sc-cmd-group">
-                                <div class="sc-cmd-group-label">寶可夢展示方式</div>
-                                
-                                
-                                <div class="sc-note">🎮 按 C 開啟寶可夢列表 → 點選想展示的寶可夢 → 按右鍵 即可展示給聊天中的所有玩家</div>
-                            </div>
-                        
-                    </div>
-                </div>
-                <div class="sc-section" data-id="teleport">
-                    <div class="sc-sec-header" onclick="scToggle('teleport')">
-                        <span class="sc-sec-icon">🧭</span>
-                        <span class="sc-sec-title">傳送 / 移動功能</span>
-                        <span class="sc-sec-count">6 指令</span>
-                        
-                        <span class="sc-chevron">▼</span>
-                    </div>
-                    <div class="sc-sec-body">
-                        
-                            <div class="sc-cmd-group">
-                                <div class="sc-cmd-group-label">玩家之間傳送</div>
-                                
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/tpa [玩家]</span>
-                                               <span class="sc-cmd-desc">申請傳送到指定玩家的位置</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/tpa [玩家]',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/tpahere [玩家]</span>
-                                               <span class="sc-cmd-desc">申請將指定玩家傳送到你身邊</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/tpahere [玩家]',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/back</span>
-                                               <span class="sc-cmd-desc">返回上一個地點（死亡或傳送前的位置）</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/back',this)" title="複製指令">📋</button>
-                                    </div>
-                                
-                                
-                            </div>
-                        
-                            <div class="sc-cmd-group">
-                                <div class="sc-cmd-group-label">地點傳送</div>
-                                
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/spawn</span>
-                                               <span class="sc-cmd-desc">傳送回主城出生點</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/spawn',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/dp</span>
-                                               <span class="sc-cmd-desc">開啟地標選單</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/dp',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/warps</span>
-                                               <span class="sc-cmd-desc">查看所有公共傳送點列表</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/warps',this)" title="複製指令">📋</button>
-                                    </div>
-                                
-                                
-                            </div>
-                        
-                    </div>
-                </div>
-                <div class="sc-section" data-id="home">
-                    <div class="sc-sec-header" onclick="scToggle('home')">
-                        <span class="sc-sec-icon">🏠</span>
-                        <span class="sc-sec-title">HOME 家園系統</span>
-                        <span class="sc-sec-count">5 指令</span>
-                        
-                        <span class="sc-chevron">▼</span>
-                    </div>
-                    <div class="sc-sec-body">
-                        
-                            <div class="sc-cmd-group">
-                                <div class="sc-cmd-group-label">家的設定與管理</div>
-                                
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/sethome [名稱]</span>
-                                               <span class="sc-cmd-desc">在目前站立位置設定家（可設多個）</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/sethome [名稱]',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/home [名稱]</span>
-                                               <span class="sc-cmd-desc">傳送回指定名稱的家</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/home [名稱]',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/delhome [名稱]</span>
-                                               <span class="sc-cmd-desc">刪除指定名稱的家</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/delhome [名稱]',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/homelist</span>
-                                               <span class="sc-cmd-desc">查看所有已設定的家及其位置</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/homelist',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/homes</span>
-                                               <span class="sc-cmd-desc">查看所有已設定的家及其位置</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/homes',this)" title="複製指令">📋</button>
-                                    </div>
-                                
-                                
-                            </div>
-                        
-                    </div>
-                </div>
-                <div class="sc-section" data-id="economy">
-                    <div class="sc-sec-header" onclick="scToggle('economy')">
-                        <span class="sc-sec-icon">💰</span>
-                        <span class="sc-sec-title">經濟系統</span>
-                        <span class="sc-sec-count">6 指令</span>
-                        
-                        <span class="sc-chevron">▼</span>
-                    </div>
-                    <div class="sc-sec-body">
-                        
-                            <div class="sc-cmd-group">
-                                <div class="sc-cmd-group-label">查詢金錢</div>
-                                
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/balance [玩家]</span>
-                                               <span class="sc-cmd-desc">查詢自己或他人的餘額</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/balance [玩家]',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/bal [玩家]</span>
-                                               <span class="sc-cmd-desc">查詢餘額（/balance 別名）</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/bal [玩家]',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/money [玩家]</span>
-                                               <span class="sc-cmd-desc">查詢餘額（/balance 別名）</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/money [玩家]',this)" title="複製指令">📋</button>
-                                    </div>
-                                
-                                
-                            </div>
-                        
-                            <div class="sc-cmd-group">
-                                <div class="sc-cmd-group-label">排行榜與詳細資訊</div>
-                                
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/baltop</span>
-                                               <span class="sc-cmd-desc">查看伺服器金錢排行榜</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/baltop',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/balancetop</span>
-                                               <span class="sc-cmd-desc">查看伺服器金錢排行榜（同 /baltop）</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/balancetop',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/ne me</span>
-                                               <span class="sc-cmd-desc">查看個人詳細經濟資訊</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/ne me',this)" title="複製指令">📋</button>
-                                    </div>
-                                
-                                
-                            </div>
-                        
-                    </div>
-                </div>
-                <div class="sc-section" data-id="quest">
-                    <div class="sc-sec-header" onclick="scToggle('quest')">
-                        <span class="sc-sec-icon">🎁</span>
-                        <span class="sc-sec-title">任務 / 獎勵</span>
-                        <span class="sc-sec-count">6 指令</span>
-                        
-                        <span class="sc-chevron">▼</span>
-                    </div>
-                    <div class="sc-sec-body">
-                        
-                            <div class="sc-cmd-group">
-                                <div class="sc-cmd-group-label">每日 / 定期獎勵</div>
-                                
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/days</span>
-                                               <span class="sc-cmd-desc">每日任務（每天重置，記得領）</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/days',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/vote</span>
-                                               <span class="sc-cmd-desc">投票支持伺服器以獲得獎勵</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/vote',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/onlinereward</span>
-                                               <span class="sc-cmd-desc">在線時間累積獎勵</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/onlinereward',this)" title="複製指令">📋</button>
-                                    </div>
-                                
-                                
-                            </div>
-                        
-                            <div class="sc-cmd-group">
-                                <div class="sc-cmd-group-label">進度 / 系統</div>
-                                
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/pex</span>
-                                               <span class="sc-cmd-desc">圖鑑系統（查看收集進度）</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/pex',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/stattrak</span>
-                                               <span class="sc-cmd-desc">閃光保底進度查詢</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/stattrak',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/ob open</span>
-                                               <span class="sc-cmd-desc">冰果任務開啟</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/ob open',this)" title="複製指令">📋</button>
-                                    </div>
-                                
-                                
-                            </div>
-                        
-                    </div>
-                </div>
-                <div class="sc-section" data-id="player">
-                    <div class="sc-sec-header" onclick="scToggle('player')">
-                        <span class="sc-sec-icon">🎮</span>
-                        <span class="sc-sec-title">玩家功能</span>
-                        <span class="sc-sec-count">8 指令</span>
-                        
-                        <span class="sc-chevron">▼</span>
-                    </div>
-                    <div class="sc-sec-body">
-                        
-                            <div class="sc-cmd-group">
-                                <div class="sc-cmd-group-label">狀態切換</div>
-                                
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/pvp</span>
-                                               <span class="sc-cmd-desc">切換開啟 / 關閉 PVP 模式</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/pvp',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/afk</span>
-                                               <span class="sc-cmd-desc">切換掛機狀態（讓其他玩家知道你離開）</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/afk',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/suicide</span>
-                                               <span class="sc-cmd-desc">自殺脫困（卡在地形或卡住時使用）</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/suicide',this)" title="複製指令">📋</button>
-                                    </div>
-                                
-                                
-                            </div>
-                        
-                            <div class="sc-cmd-group">
-                                <div class="sc-cmd-group-label">實用工具</div>
-                                
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/playerinv</span>
-                                               <span class="sc-cmd-desc">開啟隨身倉庫</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/playerinv',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/wiki [英文名]</span>
-                                               <span class="sc-cmd-desc">查詢寶可夢詳細資料（請輸入英文名稱）</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/wiki [英文名]',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/cos</span>
-                                               <span class="sc-cmd-desc">開啟時裝系統</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/cos',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/discord</span>
-                                               <span class="sc-cmd-desc">取得 Discord 社群連結</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/discord',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/banlist</span>
-                                               <span class="sc-cmd-desc">查看伺服器禁用物品清單</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/banlist',this)" title="複製指令">📋</button>
-                                    </div>
-                                
-                                
-                            </div>
-                        
-                    </div>
-                </div>
-                <div class="sc-section" data-id="lock">
-                    <div class="sc-sec-header" onclick="scToggle('lock')">
-                        <span class="sc-sec-icon">🔒</span>
-                        <span class="sc-sec-title">鎖箱 / 權限</span>
-                        <span class="sc-sec-count">1 指令</span>
-                        
-                        <span class="sc-chevron">▼</span>
-                    </div>
-                    <div class="sc-sec-body">
-                        
-                            <div class="sc-cmd-group">
-                                <div class="sc-cmd-group-label">鎖箱指令</div>
-                                
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/lock [3/4] [玩家名]</span>
-                                               <span class="sc-cmd-desc">對著鎖箱牌子輸入，設定第 3 或 4 行可開啟的玩家</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/lock [3/4] [玩家名]',this)" title="複製指令">📋</button>
-                                    </div>
-                                
-                                
-                            </div>
-                        
-                            <div class="sc-cmd-group">
-                                <div class="sc-cmd-group-label">使用說明</div>
-                                
-                                
-                                <div class="sc-note">👉 站在箱子旁邊的告示牌前輸入指令<br>👉 數字 3 或 4 代表要寫入告示牌的第幾行<br>👉 填入玩家名後，該玩家即可開啟此箱子</div>
-                            </div>
-                        
-                    </div>
-                </div>
-                <div class="sc-section" data-id="land">
-                    <div class="sc-sec-header" onclick="scToggle('land')">
-                        <span class="sc-sec-icon">🏡</span>
-                        <span class="sc-sec-title">領地系統（Residence）</span>
-                        <span class="sc-sec-count">9 指令</span>
-                        
-                        <span class="sc-chevron">▼</span>
-                    </div>
-                    <div class="sc-sec-body">
-                        
-                            <div class="sc-cmd-group">
-                                <div class="sc-cmd-group-label">操作說明</div>
-                                
-                                
-                                <div class="sc-note">🛠 工具：木鋤頭<br>🖱 左鍵點擊 = 選擇第 1 個角落　右鍵點擊 = 選擇第 2 個角落<br>選好兩個對角後，再輸入 /res create 建立領地</div>
-                            </div>
-                        
-                            <div class="sc-cmd-group">
-                                <div class="sc-cmd-group-label">領地管理</div>
-                                
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/res create [名稱]</span>
-                                               <span class="sc-cmd-desc">建立領地（需先用木鋤頭框選範圍）</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/res create [名稱]',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/res remove [名稱]</span>
-                                               <span class="sc-cmd-desc">刪除指定領地</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/res remove [名稱]',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/res tp [名稱]</span>
-                                               <span class="sc-cmd-desc">傳送到指定領地</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/res tp [名稱]',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/res tpset</span>
-                                               <span class="sc-cmd-desc">設定領地的傳送落點（站在想傳送到的位置輸入）</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/res tpset',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/res expand [格數]</span>
-                                               <span class="sc-cmd-desc">向你目前面對的方向擴張領地範圍</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/res expand [格數]',this)" title="複製指令">📋</button>
-                                    </div>
-                                
-                                
-                            </div>
-                        
-                            <div class="sc-cmd-group">
-                                <div class="sc-cmd-group-label">領地權限設定</div>
-                                
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/res padd [玩家]</span>
-                                               <span class="sc-cmd-desc">給予指定玩家此領地的全部權限</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/res padd [玩家]',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/res pset [玩家]</span>
-                                               <span class="sc-cmd-desc">單獨設定指定玩家的特定權限項目</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/res pset [玩家]',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/res pdel [玩家]</span>
-                                               <span class="sc-cmd-desc">移除指定玩家此領地的全部權限</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/res pdel [玩家]',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/res set</span>
-                                               <span class="sc-cmd-desc">設定領地特定權限項目</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/res set',this)" title="複製指令">📋</button>
-                                    </div>
-                                
-                                
-                            </div>
-                        
-                    </div>
-                </div>
-                <div class="sc-section" data-id="special">
-                    <div class="sc-sec-header" onclick="scToggle('special')">
-                        <span class="sc-sec-icon">🔧</span>
-                        <span class="sc-sec-title">特殊 / 除錯功能</span>
-                        <span class="sc-sec-count">1 指令</span>
-                        
-                        <span class="sc-chevron">▼</span>
-                    </div>
-                    <div class="sc-sec-body">
-                        
-                            <div class="sc-cmd-group">
-                                <div class="sc-cmd-group-label">除錯指令</div>
-                                
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/megafix</span>
-                                               <span class="sc-cmd-desc">解除 Mega 進化卡住的異常狀態</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/megafix',this)" title="複製指令">📋</button>
-                                    </div>
-                                
-                                
-                            </div>
-                        
-                    </div>
-                </div>
-                <div class="sc-section" data-id="sec-1774697795410">
-                    <div class="sc-sec-header" onclick="scToggle('sec-1774697795410')">
-                        <span class="sc-sec-icon">🛡️</span>
-                        <span class="sc-sec-title">雕塑版權保護系統</span>
-                        <span class="sc-sec-count">6 指令</span>
-                        
-                        <span class="sc-chevron">▼</span>
-                    </div>
-                    <div class="sc-sec-body">
-                        
-                            <div class="sc-cmd-group">
-                                <div class="sc-cmd-group-label">指令列表</div>
-                                
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/cb claim</span>
-                                               <span class="sc-cmd-desc">認領你正在看的雕塑方塊</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/cb claim',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/cb claimhand</span>
-                                               <span class="sc-cmd-desc">認領手中的雕塑方塊</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/cb claimhand',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/cb setcopyable true/false</span>
-                                               <span class="sc-cmd-desc">設定作品是否允許他人(所有人)編輯或複製 預設不允許</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/cb setcopyable true/false',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/cb trust [玩家]</span>
-                                               <span class="sc-cmd-desc">授權其他玩家編輯你的所有版權聲明作品</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/cb trust [玩家]',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/cb untrust [玩家]</span>
-                                               <span class="sc-cmd-desc">撤銷授權</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/cb untrust [玩家]',this)" title="複製指令">📋</button>
-                                    </div>
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/cb trustlist</span>
-                                               <span class="sc-cmd-desc">檢視你的授權列表</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/cb trustlist',this)" title="複製指令">📋</button>
-                                    </div>
-                                
-                                
-                            </div>
-                        
-                    </div>
-                </div>
-                <div class="sc-section" data-id="sec-1774974099450">
-                    <div class="sc-sec-header" onclick="scToggle('sec-1774974099450')">
-                        <span class="sc-sec-icon">💧</span>
-                        <span class="sc-sec-title">釣魚系統</span>
-                        <span class="sc-sec-count">1 指令</span>
-                        
-                        <span class="sc-chevron">▼</span>
-                    </div>
-                    <div class="sc-sec-body">
-                        
-                            <div class="sc-cmd-group">
-                                <div class="sc-cmd-group-label">指令列表</div>
-                                
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/lfish catalog</span>
-                                               <span class="sc-cmd-desc">查看釣魚目錄介面</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/lfish catalog',this)" title="複製指令">📋</button>
-                                    </div>
-                                
-                                
-                            </div>
-                        
-                    </div>
-                </div>
-                <div class="sc-section" data-id="sec-1775811704528">
-                    <div class="sc-sec-header" onclick="scToggle('sec-1775811704528')">
-                        <span class="sc-sec-icon">🌐</span>
-                        <span class="sc-sec-title">好友系統</span>
-                        <span class="sc-sec-count">1 指令</span>
-                        
-                        <span class="sc-chevron">▼</span>
-                    </div>
-                    <div class="sc-sec-body">
-                        
-                            <div class="sc-cmd-group">
-                                <div class="sc-cmd-group-label">指令列表</div>
-                                
-                                    <div class="sc-cmd-row">
-                                        <span class="sc-cmd">/friend</span>
-                                               <span class="sc-cmd-desc">新增好友 / 管理權限 / 隱私設置</span>
-                                               <button class="sc-copy-btn" onclick="scCopyCmd('/friend',this)" title="複製指令">📋</button>
-                                    </div>
-                                
-                                
-                            </div>
-                        
-                    </div>
-                </div></div>
             </div>
 
             <!-- 感謝詞與版權宣告 -->
@@ -1958,217 +1332,91 @@
         </div>
         <main class="container mx-auto py-12 px-4">
             <!-- 卡片列表 -->
-            <div id="strategy-container" class="max-w-5xl mx-auto strat-grid"><div id="strat-new-1775833721629" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775833721629')" style="cursor:pointer;">🏅<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">禮包內容</div>
-            <div class="strat-card-preview">禮包內容百變怪禮包稱號 [無限可能體+百變怪圖] 稱號buff 速度2 抗火5 ◀ ■ ▶ ¼ ½ 全 ✕3V百變怪x1單體個體值隨機器 [可單獨改精靈一個個體 1-31] 有機率搞出6v百變怪機會紅</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-new-1775826506003" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775826506003')" style="cursor:pointer;">📖<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">投票教學</div>
-            <div class="strat-card-preview">投票教學在主城 輸入/vote ◀ ■ ▶ ¼ ½ 全 ✕ ◀ ■ ▶ ¼ ½ 全 ✕點擊後到底下輸入自己ID 在按底下真人驗證就投票成功了~打開商店教學/vote 點擊返回gui點擊投票商店可以兌換</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-new-1775826500757" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775826500757')" style="cursor:pointer;">🛒<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">造型鑰匙獲得方式</div>
-            <div class="strat-card-preview">造型鑰匙獲得方式1.部分活動獎勵中可獲得鑰匙2. 參加寶可夢排位賽可獲得鑰匙3. 伺服器 Discord 群福袋獎勵4. 前往票物商城購買抽獎箱鑰匙5. 累積儲值可獲得鑰匙獎勵6.每日簽到至月底可獲得</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-new-1775818369810" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775818369810')" style="cursor:pointer;">✨<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">LOL精靈獲得/進化條件</div>
-            <div class="strat-card-preview">LOL精靈獲得/進化條件寶可夢資訊說明🌍 出生地紅樹林沼澤🔄 進化方式（共有兩種）1️⃣ 進化為「菲艾」條件：裝備 力量頭帶2️⃣ 進化為「吉茵珂絲」條件：裝備 毒針📌 裝備對應道具後，符合進化</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-new-1775818306667" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775818306667')" style="cursor:pointer;">💰<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">特殊進化玩法</div>
-            <div class="strat-card-preview">特殊進化玩法🐢 土台龜造型變化使用「樹林龜 + 任意樹苗」🌱 不同樹苗 → 不同造型土台龜！💰 玉隨賽富豪進化條件準備以下材料：索財靈999 金幣256 遠古遺骸 或 64 獄隨錠🔥 即可進化</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-new-1775818121177" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775818121177')" style="cursor:pointer;">📖<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">材質包安裝教學</div>
-            <div class="strat-card-preview">材質包安裝教學1️⃣ 進入遊戲後，按下 ESC2️⃣ 點選 「選項」3️⃣ 進入 「材質包」4️⃣ 點擊 「打開文件資料夾」5️⃣ 將材質包檔案拖曳或移動進該資料夾6️⃣ 回到遊戲畫面💡 記得將材質</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-new-1775817804852" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775817804852')" style="cursor:pointer;">🛡️<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">雕塑版權保護系統上線</div>
-            <div class="strat-card-preview">🛡️ 雕塑版權保護系統上線為了保護大家的雕塑作品，伺服器新增了版權保護功能。📌 基礎命令/cb claim — 認領你正在看的雕塑方塊/cb claimhand — 認領手中的雕塑方塊🔒 權限管</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-new-1775817374716" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775817374716')" style="cursor:pointer;">🎮<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">雕刻教學</div>
-            <div class="strat-card-preview">雕刻教學首先打開設定把打開工具菜單改成習慣按鍵 建議改成接下來 我們需要鑿子 這模組最重要物品 ◀ ■ ▶ ¼ ½ 全 ✕ ◀ ■ ▶ ¼ ½ 全 ✕拿著物品 按住 工具菜單按鈕顯示六個選項 可以改造</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-new-1775817001492" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775817001492')" style="cursor:pointer;">📖<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">家具製作教學</div>
-            <div class="strat-card-preview">家具製作教學想製作Mrcrayfish的家具的話首先你需要三個物品1.這模組的工作檯 2.淺色 or 黑色 發電機 3.板手 接下來電線連接 手上拿著板手 對著你要著機器 連接接下來點集發電機把可以燃</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-new-1775816142371" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775816142371')" style="cursor:pointer;">📖<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">強化煤炭系統</div>
-            <div class="strat-card-preview">強化煤炭系統強化煤炭 可用於強化以下裝備類型： 🛡️ 護甲 ⚔️ 武器 🏹 弓箭 🔨 槌子 🔱 三叉戟 🪓 斧頭📈 強化效果一覽⚔️ 近戰武器劍 / 斧頭 / 三叉戟 / 重錘+1～+10</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-new-1775815140073" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775815140073')" style="cursor:pointer;">💧<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">釣魚系統</div>
-            <div class="strat-card-preview">釣魚系統📌 基本說明本伺服器有專屬的釣魚系統，需要使用特殊釣竿才能正常釣魚！🛒 如何獲得釣竿輸入指令/spawn前往主城到右後方區域找到釣竿販售點購買 ◀ ■ ▶ ¼ ½ 全 ✕👉 一共有 三種</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-new-1775814653933" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775814653933')" style="cursor:pointer;">✨<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">小碎鑽融合 &amp; 蒂安希</div>
-            <div class="strat-card-preview">小碎鑽融合 &amp; 蒂安希取得 〈蒂安希〉 是一項高成本、耗時間的挑戰，但最終回報是伺服器中最稀有、最昂貴的傳說寶可夢之一。你可以前往/warp carbinkFusion透過 融合〈小碎鑽〉 來嘗試獲得</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-new-1775814395843" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775814395843')" style="cursor:pointer;">🎁<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">PokéStop 補給站</div>
-            <div class="strat-card-preview">PokéStop 補給站到達主城後，找到下方圖片所示的補給站， 右鍵點擊即可獲得補給物品。⏱️ 補給站冷卻機制說明補給站被使用後會變成紫色進入 5 分鐘冷卻時間冷卻期間無法再次使用💡 補給站為共用機</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-new-1775813919073" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775813919073')" style="cursor:pointer;">🌟<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">哲爾尼亞斯碎片 獲得方式</div>
-            <div class="strat-card-preview">哲爾尼亞斯碎片 獲得方式🎰 於 扭蛋（祈星之星） 中 有機率抽到 哲爾尼亞斯碎片 ◀ ■ ▶ ¼ ½ 全 ✕ ◀ ■ ▶ ¼ ½ 全 ✕💡 先點擊票務兌換祈願之星才能扭蛋 ◀ ■ ▶ ¼ ½ 全 </div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-new-1775813615156" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775813615156')" style="cursor:pointer;">🎁<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">GS 球 系統說明</div>
-            <div class="strat-card-preview">GS 球 系統說明📥 獲得方式🎯 賓果獎勵 可獲得 GS 球 ×1🧪 使用方式手持 GS 球 右鍵點擊 開始召喚 ◀ ■ ▶ ¼ ½ 全 ✕🎲 召喚成功率：40% ❌ 召喚失敗：獲得 復魔金蘋</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-new-1775813347646" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775813347646')" style="cursor:pointer;">✨<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">純淨珠系統說明</div>
-            <div class="strat-card-preview">純淨珠系統說明💡 主城使用[祭壇傳送點 /warp jitan ] ◀ ■ ▶ ¼ ½ 全 ✕📥 獲得方式🎯 賓果獎勵 可獲得 純淨珠 ×1💡 賓果每周更新🧪 使用方式（直接召喚）🔥火焰鳥</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-new-1775813043867" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775813043867')" style="cursor:pointer;">📖<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">BP 點數系統說明</div>
-            <div class="strat-card-preview">BP 點數系統說明📌 BP 獲得方式1️⃣ 挑戰道館 擊敗道館館主 ➡ 可獲得 250 BP 點數 2️⃣ 參加排位賽 ✔ 對戰場數 ✔ 排名結算 ➡ 皆可獲得 BP 點數獎勵🛒 BP 使用方式 </div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-new-1775812694686" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775812694686')" style="cursor:pointer;">🗡️<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">寶可夢狩獵活動攻略</div>
-            <div class="strat-card-preview">寶可夢狩獵活動攻略📌 進入方法打開菜單 → 點擊左邊第二欄 → 往下滑 → 找到「寶可夢狩獵」並點擊進入。 ◀ ■ ▶ ¼ ½ 全 ✕ ◀ ■ ▶ ¼ ½ 全 ✕進入後，你可以看到各種寶可夢頭顱，每</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-new-1775812311107" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775812311107')" style="cursor:pointer;">🌟<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">賓果教學說明</div>
-            <div class="strat-card-preview">賓果教學說明📋 賓果玩法說明賓果盤上的 每一格 都有對應的任務或收集目標 ◀ ■ ▶ ¼ ½ 全 ✕達成條件後，即可解鎖該格進度👉 完成方式將指定的 寶可夢放入精靈背包點選賓果盤中 對應的寶可夢格</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-new-1775812150246" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775812150246')" style="cursor:pointer;">🧬<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">夢幻克隆系統教學</div>
-            <div class="strat-card-preview">夢幻克隆系統教學 所需條件 🧬 夢幻 ×1💰 金幣 ×5,000📍 克隆流程1️⃣ 前往主城/spawn2️⃣ 前往寶可夢中心，找到 科技克隆機3️⃣ 右鍵點擊科技克隆機 👉 選擇你自己的 夢</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-new-1775808319815" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775808319815')" style="cursor:pointer;">⚔️<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">抓寶可夢的技巧教學</div>
-            <div class="strat-card-preview">抓寶可夢的技巧教學1️⃣ 先把血量壓低（最重要）將寶可夢 打到紅血或黃血血量越低，捕捉成功率越高建議招式：催眠麻痺冰凍睡眠（成功率最高）2️⃣ 善用異常狀態📌 捕捉成功率加成（由高到低）：😴 睡眠</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-new-1775801215364" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775801215364')" style="cursor:pointer;">🧬<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">基格爾德使用教學（重組流程）</div>
-            <div class="strat-card-preview">基格爾德使用教學（重組流程）1️⃣ 放入材料將 基格爾德細胞 與 基格爾德核心細胞 ◀ ■ ▶ ¼ ½ 全 ✕放入 基格爾德立方體 ◀ ■ ▶ ¼ ½ 全 ✕2️⃣ 重組裝置將裝有材料的 基格爾德立方</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-new-1775798712804" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775798712804')" style="cursor:pointer;">🐉<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">基格爾德（Zygarde）獲得方式說明</div>
-            <div class="strat-card-preview">基格爾德（Zygarde）獲得方式說明📍 取得來源在 特定遺跡 中探索開啟遺跡內的 箱子有機率獲得以下材料： ◀ ■ ▶ ¼ ½ 全 ✕ ◀ ■ ▶ ¼ ½ 全 ✕ ◀ ■ ▶ ¼ ½ 全 ✕🟢 </div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-money" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-money')" style="cursor:pointer;">💰<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">賺錢小技巧</div>
-            <div class="strat-card-preview">💰 賺錢小技巧 1. 解冰果 按C開啟選單➡️ 左方點選最新資訊➡️ 打開冰果任務（或/ob open ） 2. 投票赚金幣 在主城輸入/vote 到網站後輸入ID驗證就可以拿投票積分 1點積分可以</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-chestshop" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-chestshop')" style="cursor:pointer;">💰<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">如何設置/經營箱子商店？</div>
-            <div class="strat-card-preview">📦 如何設置/經營箱子商店？ 📦 設置箱子商店 1️⃣ 放下一個 箱子或木桶2️⃣ 手持想要販售的物品3️⃣ 對著箱子 按左鍵4️⃣ 依照系統提示，在 指令輸入欄輸入價格數字💡 不用輸入斜線/5</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-breeding" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-breeding')" style="cursor:pointer;">🥚<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">牧場繁殖</div>
-            <div class="strat-card-preview">🐄 牧場繁殖 繁殖基本條件 進行寶可夢繁殖前，請先確認以下條件： 必須有一隻公寶可夢＋一隻母寶可夢 兩隻寶可夢需屬於 相同蛋群（蛋種） 蛋群查詢網站：神奇寶貝百科 將兩隻寶可夢放入 牧場（點開牧場介</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-stats" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-stats')" style="cursor:pointer;">🌿<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">個體值 (IVs) 與努力值 (EVs)</div>
-            <div class="strat-card-preview">📊 個體值 (IVs) 與努力值 (EVs) 個體值 (IVs) - 天生潛力 每項數值最高為 31，也就是俗稱的 "V"。6項全部31即為 6V。 如何查看？ 在隊伍選單中對寶可夢點擊 M 查看詳</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-mega" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-mega')" style="cursor:pointer;">✨<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">Mega 超級進化材料獲取方式</div>
-            <div class="strat-card-preview">⚡ Mega 超級進化材料獲取方式 本攻略資料來自玩家社群分享，本站進行整理與修改。 原作者：♚伊比利小豬♚ ／ 來源連結 若原作者不希望本站收錄，請聯絡我們，將立即移除。 1️⃣ 未加工超級進化石（</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-dmax" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-dmax')" style="cursor:pointer;">🏆<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">極巨化材料獲取方式</div>
-            <div class="strat-card-preview">🔴 極巨化材料獲取方式 本攻略資料來自玩家社群分享，本站進行整理與修改。 原作者：♚伊比利小豬♚ ／ 來源連結 若原作者不希望本站收錄，請聯絡我們，將立即移除。 1️⃣ 許願星（目前非常稀有） 幾乎</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-tera" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-tera')" style="cursor:pointer;">🗺️<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">太晶化材料獲取方式</div>
-            <div class="strat-card-preview">💎 太晶化材料獲取方式 本攻略資料來自玩家社群分享，本站進行整理與修改。 原作者：♚伊比利小豬♚ ／ 來源連結 若原作者不希望本站收錄，請聯絡我們，將立即移除。 1️⃣ 太晶碎片 與野生寶可夢對戰，</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-z" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-z')" style="cursor:pointer;">💎<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">Z 招式材料獲取方式</div>
-            <div class="strat-card-preview">⚡ Z 招式材料獲取方式 本攻略資料來自玩家社群分享，本站進行整理與修改。 原作者：♚伊比利小豬♚ ／ 來源連結 若原作者不希望本站收錄，請聯絡我們，將立即移除。 ⚠️ 目前伺服器是否存在尚未完全確認</div>
-            <span class="strat-card-arrow">›</span></div><div id="strat-ashcap" class="strat-card">
-            <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
-            <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-ashcap')" style="cursor:pointer;">⚡<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
-            <div class="strat-card-title">小智帽獲取方式</div>
-            <div class="strat-card-preview">🧢 小智帽獲取方式 本攻略資料來自玩家社群分享，本站進行整理與修改。 原作者：♚伊比利小豬♚ ／ 來源連結 若原作者不希望本站收錄，請聯絡我們，將立即移除。 1️⃣ 小智甲賀忍蛙 啟動條件：好感度 </div>
-            <span class="strat-card-arrow">›</span></div></div>
+            <div id="strategy-container" class="max-w-5xl mx-auto strat-grid"></div>
         </main>
     </div>
 
     <!-- 屬性克制表分頁 -->
     <div id="typechart-page" class="page-content hidden">
-        <div class="edit-ignore" contenteditable="false" style="background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #ede9fe 100%); border-bottom: 2px solid #f9a8d4; padding: 3rem 0;">
+        <div class="edit-ignore" contenteditable="false" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); border-bottom: 2px solid #e94560; padding: 2.5rem 0;">
             <div class="container mx-auto px-4">
-                <h2 class="text-3xl font-bold" style="color: #831843;">屬性克制表</h2>
-                <p class="mt-2 text-sm" style="color: #be185d;">查詢各屬性之間的攻守關係</p>
+                <h2 class="text-3xl font-bold" style="color:#fff;">⚡ 屬性克制表</h2>
+                <p class="mt-2 text-sm" style="color:#94a3b8;">選擇防禦方屬性，查看各攻擊屬性的效果倍率</p>
             </div>
         </div>
-        <main class="container mx-auto py-8 px-4">
-            <!-- Legend -->
-            <div class="flex flex-wrap gap-3 mb-6 justify-center">
-                <div class="flex items-center gap-2 bg-white rounded-xl px-4 py-2 shadow-sm border border-gray-100">
-                    <span class="inline-block w-8 h-8 rounded-lg text-center font-bold text-white text-sm flex items-center justify-center" style="background:#dc2626; line-height:2rem;">2×</span>
-                    <span class="text-sm font-bold text-gray-700">效果絕佳（2倍傷害）</span>
+        <main class="container mx-auto py-8 px-4" id="typechart-main">
+
+            <!-- Defender type selector -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="text-lg font-bold text-gray-700">🛡️ 防禦方屬性</span>
+                    <span class="text-sm text-gray-400">（可選 1~2 個）</span>
+                    <button id="tc-reset-btn" onclick="tcReset()" class="ml-auto text-xs px-3 py-1 rounded-full border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors" style="display:none;">↺ 重置</button>
                 </div>
-                <div class="flex items-center gap-2 bg-white rounded-xl px-4 py-2 shadow-sm border border-gray-100">
-                    <span class="inline-block w-8 h-8 rounded-lg text-center font-bold text-white text-sm flex items-center justify-center" style="background:#2563eb; line-height:2rem;">½</span>
-                    <span class="text-sm font-bold text-gray-700">效果不理想（0.5倍）</span>
-                </div>
-                <div class="flex items-center gap-2 bg-white rounded-xl px-4 py-2 shadow-sm border border-gray-100">
-                    <span class="inline-block w-8 h-8 rounded-lg text-center font-bold text-white text-sm flex items-center justify-center" style="background:#374151; line-height:2rem;">0</span>
-                    <span class="text-sm font-bold text-gray-700">完全無效（0倍）</span>
-                </div>
-                <div class="flex items-center gap-2 bg-white rounded-xl px-4 py-2 shadow-sm border border-gray-100">
-                    <span class="inline-block w-8 h-8 rounded-lg text-center font-bold text-gray-400 text-sm flex items-center justify-center border" style="line-height:2rem;">—</span>
-                    <span class="text-sm font-bold text-gray-700">普通效果（1倍）</span>
-                </div>
+                <div id="tc-type-selector" class="flex flex-wrap gap-2"></div>
             </div>
 
-            <!-- Type chart table wrapper -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto">
-                <div style="min-width: 900px;">
-                    <table id="type-chart-table" style="width:100%; border-collapse:collapse; font-size:11px;">
-                        <thead>
-                            <tr>
-                                <th style="padding:8px 4px; text-align:left; font-size:10px; color:#6b7280; font-weight:700; border-bottom:2px solid #f3f4f6; background:#f9fafb; border-radius:12px 0 0 0; min-width:70px; white-space:nowrap; padding-left:12px;">攻擊方 ↓<br>防禦方 →</th>
-                                <!-- Headers filled by JS -->
-                            </tr>
-                        </thead>
-                        <tbody id="type-chart-body">
-                        </tbody>
-                    </table>
+            <!-- Results panel -->
+            <div id="tc-results" class="hidden">
+                <!-- Selected display -->
+                <div class="flex items-center gap-3 mb-5">
+                    <span class="font-bold text-gray-600 text-sm">防禦屬性：</span>
+                    <div id="tc-selected-display" class="flex gap-2"></div>
                 </div>
-            </div>
 
-            <!-- Individual type cards -->
-            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4" id="type-detail-cards"></div>
+                <!-- Effectiveness groups -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div id="tc-4x" class="hidden tc-group rounded-2xl border-2 p-4" style="border-color:#7c1515; background:#fff5f5;">
+                        <div class="font-bold mb-3 flex items-center gap-2" style="color:#7c1515;">
+                            <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl text-white font-black text-sm" style="background:#dc2626;">4×</span>
+                            效果超強（4 倍傷害）
+                        </div>
+                        <div id="tc-4x-list" class="flex flex-wrap gap-2"></div>
+                    </div>
+                    <div id="tc-2x" class="hidden tc-group rounded-2xl border-2 p-4" style="border-color:#c2410c; background:#fff7ed;">
+                        <div class="font-bold mb-3 flex items-center gap-2" style="color:#c2410c;">
+                            <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl text-white font-black text-sm" style="background:#ea580c;">2×</span>
+                            效果絕佳（2 倍傷害）
+                        </div>
+                        <div id="tc-2x-list" class="flex flex-wrap gap-2"></div>
+                    </div>
+                    <div id="tc-1x" class="hidden tc-group rounded-2xl border-2 p-4" style="border-color:#d1d5db; background:#f9fafb;">
+                        <div class="font-bold mb-3 flex items-center gap-2" style="color:#6b7280;">
+                            <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl font-black text-sm border" style="border-color:#d1d5db; color:#6b7280; background:#fff;">1×</span>
+                            普通效果
+                        </div>
+                        <div id="tc-1x-list" class="flex flex-wrap gap-2"></div>
+                    </div>
+                    <div id="tc-half" class="hidden tc-group rounded-2xl border-2 p-4" style="border-color:#1d4ed8; background:#eff6ff;">
+                        <div class="font-bold mb-3 flex items-center gap-2" style="color:#1d4ed8;">
+                            <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl text-white font-black text-sm" style="background:#2563eb;">½×</span>
+                            效果不佳（½ 倍傷害）
+                        </div>
+                        <div id="tc-half-list" class="flex flex-wrap gap-2"></div>
+                    </div>
+                    <div id="tc-quarter" class="hidden tc-group rounded-2xl border-2 p-4" style="border-color:#5b21b6; background:#f5f3ff;">
+                        <div class="font-bold mb-3 flex items-center gap-2" style="color:#5b21b6;">
+                            <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl text-white font-black text-sm" style="background:#7c3aed;">¼×</span>
+                            效果極差（¼ 倍傷害）
+                        </div>
+                        <div id="tc-quarter-list" class="flex flex-wrap gap-2"></div>
+                    </div>
+                    <div id="tc-zero" class="hidden tc-group rounded-2xl border-2 p-4" style="border-color:#374151; background:#f1f5f9;">
+                        <div class="font-bold mb-3 flex items-center gap-2" style="color:#1f2937;">
+                            <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl text-white font-black text-sm" style="background:#374151;">0×</span>
+                            完全無效（免疫）
+                        </div>
+                        <div id="tc-zero-list" class="flex flex-wrap gap-2"></div>
+                    </div>
+                </div>
+
+                <!-- Hint when nothing selected -->
+            </div>
+            <div id="tc-hint" class="text-center py-16 text-gray-400">
+                <div class="text-5xl mb-4">👆</div>
+                <p class="text-lg font-bold">請點選上方的防禦屬性</p>
+                <p class="text-sm mt-2">最多可選 2 種（雙屬性）</p>
+            </div>
         </main>
     </div>
 
@@ -2563,55 +1811,33 @@
     <script src="cobblemon.js" defer=""></script>
 
     <script>
-    // ── Global UI: Rounded search bar overrides ──────────────────────
-    document.addEventListener('DOMContentLoaded', function() {
-        // Make search bar rounded
-        const heroSearch = document.querySelector('#homeSearchInput');
-        if (heroSearch) {
-            heroSearch.closest('.flex').style.borderRadius = '12px';
-            heroSearch.closest('.flex').style.overflow = 'hidden';
-        }
-        // Make card/section elements more rounded
-        document.querySelectorAll('.cmd-box').forEach(el => {
-            el.style.borderRadius = '8px';
-        });
-        document.querySelectorAll('#commands-page .sc-section').forEach(el => {
-            el.style.borderRadius = '14px';
-        });
+    // ═══════════════════════════════════════════════════════════════
+    // 屬性克制表互動工具  (inspired by linuswontcrytonight.github.io)
+    // ═══════════════════════════════════════════════════════════════
 
-        // Build type chart when page is shown
-        document.addEventListener('click', function(e) {
-            if (e.target.closest('[onclick*="typechart"]')) {
-                setTimeout(buildTypeChart, 100);
-            }
-        });
-    });
-
-    // ── 屬性克制表 ─────────────────────────────────────────────────────
-    const TYPES_ZH = {
-        Normal:   { zh: '一般', color: '#A8A878', emoji: '⬜' },
-        Fire:     { zh: '火',   color: '#F08030', emoji: '🔥' },
-        Water:    { zh: '水',   color: '#6890F0', emoji: '💧' },
-        Electric: { zh: '電',   color: '#F8D030', emoji: '⚡' },
-        Grass:    { zh: '草',   color: '#78C850', emoji: '🌿' },
-        Ice:      { zh: '冰',   color: '#98D8D8', emoji: '❄️' },
-        Fighting: { zh: '格鬥', color: '#C03028', emoji: '🥊' },
-        Poison:   { zh: '毒',   color: '#A040A0', emoji: '☠️' },
-        Ground:   { zh: '地面', color: '#E0C068', emoji: '🏔️' },
-        Flying:   { zh: '飛行', color: '#A890F0', emoji: '🦅' },
-        Psychic:  { zh: '超能', color: '#F85888', emoji: '🔮' },
-        Bug:      { zh: '蟲',   color: '#A8B820', emoji: '🐛' },
-        Rock:     { zh: '岩石', color: '#B8A038', emoji: '🪨' },
-        Ghost:    { zh: '幽靈', color: '#705898', emoji: '👻' },
-        Dragon:   { zh: '龍',   color: '#7038F8', emoji: '🐉' },
-        Dark:     { zh: '惡',   color: '#705848', emoji: '🌑' },
-        Steel:    { zh: '鋼',   color: '#B8B8D0', emoji: '⚙️' },
-        Fairy:    { zh: '妖精', color: '#EE99AC', emoji: '🌸' },
+    const TC_TYPES = {
+        Normal:   { zh:'一般', en:'Normal',   color:'#9FA19F', bg:'#9FA19F22', imgColor:'#9FA19F' },
+        Fire:     { zh:'火',   en:'Fire',     color:'#E62829', bg:'#E6282922', imgColor:'#E62829' },
+        Water:    { zh:'水',   en:'Water',    color:'#2980EF', bg:'#2980EF22', imgColor:'#2980EF' },
+        Electric: { zh:'電',   en:'Electric', color:'#FAC000', bg:'#FAC00022', imgColor:'#FAC000' },
+        Grass:    { zh:'草',   en:'Grass',    color:'#3FA129', bg:'#3FA12922', imgColor:'#3FA129' },
+        Ice:      { zh:'冰',   en:'Ice',      color:'#3DCEF3', bg:'#3DCEF322', imgColor:'#3DCEF3' },
+        Fighting: { zh:'格鬥', en:'Fighting', color:'#FF8000', bg:'#FF800022', imgColor:'#FF8000' },
+        Poison:   { zh:'毒',   en:'Poison',   color:'#9141CB', bg:'#9141CB22', imgColor:'#9141CB' },
+        Ground:   { zh:'地面', en:'Ground',   color:'#915121', bg:'#91512122', imgColor:'#915121' },
+        Flying:   { zh:'飛行', en:'Flying',   color:'#81B9EF', bg:'#81B9EF22', imgColor:'#81B9EF' },
+        Psychic:  { zh:'超能', en:'Psychic',  color:'#EF4179', bg:'#EF417922', imgColor:'#EF4179' },
+        Bug:      { zh:'蟲',   en:'Bug',      color:'#91A119', bg:'#91A11922', imgColor:'#91A119' },
+        Rock:     { zh:'岩石', en:'Rock',     color:'#AFA981', bg:'#AFA98122', imgColor:'#AFA981' },
+        Ghost:    { zh:'幽靈', en:'Ghost',    color:'#704170', bg:'#70417022', imgColor:'#704170' },
+        Dragon:   { zh:'龍',   en:'Dragon',   color:'#5060E1', bg:'#5060E122', imgColor:'#5060E1' },
+        Dark:     { zh:'惡',   en:'Dark',     color:'#624D4E', bg:'#624D4E22', imgColor:'#624D4E' },
+        Steel:    { zh:'鋼',   en:'Steel',    color:'#60A1B8', bg:'#60A1B822', imgColor:'#60A1B8' },
+        Fairy:    { zh:'妖精', en:'Fairy',    color:'#EF70EF', bg:'#EF70EF22', imgColor:'#EF70EF' },
     };
 
-    // Offense chart: attacking_type -> {defending_type: multiplier}
-    // 2 = super effective, 0.5 = not very effective, 0 = immune
-    const TYPE_CHART = {
+    // Offensive effectiveness: attacker -> { defender: multiplier }
+    const TC_OFFENSE = {
         Normal:   { Rock:0.5, Ghost:0, Steel:0.5 },
         Fire:     { Fire:0.5, Water:0.5, Grass:2, Ice:2, Bug:2, Rock:0.5, Dragon:0.5, Steel:2 },
         Water:    { Fire:2, Water:0.5, Grass:0.5, Ground:2, Rock:2, Dragon:0.5 },
@@ -2632,88 +1858,156 @@
         Fairy:    { Fire:0.5, Fighting:2, Poison:0.5, Dragon:2, Dark:2, Steel:0.5 },
     };
 
-    function getEff(atk, def) {
-        return (TYPE_CHART[atk] && TYPE_CHART[atk][def] !== undefined) ? TYPE_CHART[atk][def] : 1;
+    // Given a list of defender types, compute effectiveness of each attacker
+    function tcCalcDefense(defTypes) {
+        const result = {};
+        for (const atk of Object.keys(TC_TYPES)) {
+            let mult = 1;
+            for (const def of defTypes) {
+                const row = TC_OFFENSE[atk] || {};
+                mult *= (row[def] !== undefined ? row[def] : 1);
+            }
+            result[atk] = mult;
+        }
+        return result;
     }
 
-    let _typeChartBuilt = false;
-    function buildTypeChart() {
-        if (_typeChartBuilt) return;
-        _typeChartBuilt = true;
+    function tcTypePill(type, size = 'md') {
+        const t = TC_TYPES[type];
+        const pad = size === 'sm' ? '2px 10px' : '4px 14px';
+        const fs  = size === 'sm' ? '11px' : '13px';
+        return `<span style="background:${t.color};color:#fff;padding:${pad};border-radius:999px;font-size:${fs};font-weight:700;white-space:nowrap;">${t.zh}</span>`;
+    }
 
-        const types = Object.keys(TYPES_ZH);
-        const table = document.getElementById('type-chart-table');
-        const tbody = document.getElementById('type-chart-body');
-        if (!table || !tbody) return;
+    let _tcSelected = [];
 
-        // Build header
-        const thead = table.querySelector('thead tr');
-        types.forEach(t => {
-            const th = document.createElement('th');
-            const info = TYPES_ZH[t];
-            th.style.cssText = `padding:5px 2px; min-width:38px; text-align:center; font-size:9px; color:white; background:${info.color}; font-weight:700; border-bottom:2px solid #f3f4f6; white-space:nowrap; writing-mode:vertical-rl; text-orientation:mixed; height:60px; vertical-align:bottom;`;
-            th.textContent = info.zh;
-            thead.appendChild(th);
-        });
+    function tcInit() {
+        const sel = document.getElementById('tc-type-selector');
+        if (!sel || sel.dataset.built) return;
+        sel.dataset.built = '1';
 
-        // Build rows
-        types.forEach((atk, ai) => {
-            const tr = document.createElement('tr');
-            tr.style.background = ai % 2 === 0 ? '#fff' : '#f9fafb';
-
-            // Row label
-            const tdLabel = document.createElement('td');
-            const info = TYPES_ZH[atk];
-            tdLabel.style.cssText = `padding:4px 8px; font-size:10px; font-weight:700; white-space:nowrap; border-right:2px solid #f3f4f6; color:white; background:${info.color}; border-radius:6px 0 0 6px;`;
-            tdLabel.textContent = `${info.emoji} ${info.zh}`;
-            tr.appendChild(tdLabel);
-
-            types.forEach(def => {
-                const eff = getEff(atk, def);
-                const td = document.createElement('td');
-                td.style.cssText = `padding:2px; text-align:center; font-size:10px; font-weight:700;`;
-
-                if (eff === 2) {
-                    td.innerHTML = '<span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:#dc2626;color:white;font-size:9px;">2×</span>';
-                } else if (eff === 0) {
-                    td.innerHTML = '<span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:#374151;color:white;font-size:9px;">0</span>';
-                } else if (eff === 0.5) {
-                    td.innerHTML = '<span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:#2563eb;color:white;font-size:9px;">½</span>';
-                } else {
-                    td.innerHTML = '<span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:transparent;color:#9ca3af;font-size:9px;">—</span>';
-                }
-                tr.appendChild(td);
-            });
-            tbody.appendChild(tr);
-        });
-
-        // Build detail cards
-        const cardsEl = document.getElementById('type-detail-cards');
-        if (!cardsEl) return;
-        types.forEach(t => {
-            const info = TYPES_ZH[t];
-            const strong = [], weak = [], immune = [];
-            types.forEach(def => {
-                const e = getEff(t, def);
-                if (e === 2) strong.push(def);
-                else if (e === 0.5) weak.push(def);
-                else if (e === 0) immune.push(def);
-            });
-
-            const card = document.createElement('div');
-            card.style.cssText = `background:white; border-radius:16px; padding:16px; border:2px solid ${info.color}30; box-shadow:0 2px 8px rgba(0,0,0,0.06);`;
-            card.innerHTML = `
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-                    <span style="background:${info.color};color:white;padding:4px 12px;border-radius:99px;font-size:12px;font-weight:700;">${info.emoji} ${info.zh}屬性</span>
-                </div>
-                ${strong.length ? `<div style="margin-bottom:6px;"><span style="font-size:11px;color:#dc2626;font-weight:700;">效果絕佳 (×2)：</span><div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;">${strong.map(x=>`<span style="background:${TYPES_ZH[x].color};color:white;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:600;">${TYPES_ZH[x].zh}</span>`).join('')}</div></div>` : ''}
-                ${weak.length ? `<div style="margin-bottom:6px;"><span style="font-size:11px;color:#2563eb;font-weight:700;">效果不理想 (×½)：</span><div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;">${weak.map(x=>`<span style="background:${TYPES_ZH[x].color};color:white;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:600;">${TYPES_ZH[x].zh}</span>`).join('')}</div></div>` : ''}
-                ${immune.length ? `<div><span style="font-size:11px;color:#374151;font-weight:700;">完全無效 (×0)：</span><div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;">${immune.map(x=>`<span style="background:${TYPES_ZH[x].color};color:white;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:600;">${TYPES_ZH[x].zh}</span>`).join('')}</div></div>` : ''}
-                ${!strong.length && !weak.length && !immune.length ? `<p style="font-size:12px;color:#9ca3af;">對所有屬性普通效果</p>` : ''}
+        for (const [key, t] of Object.entries(TC_TYPES)) {
+            const btn = document.createElement('button');
+            btn.id = 'tc-btn-' + key;
+            btn.style.cssText = `
+                padding:6px 14px; border-radius:999px; border:2px solid ${t.color};
+                background:transparent; color:${t.color}; font-size:13px; font-weight:700;
+                cursor:pointer; transition:all 0.15s; white-space:nowrap;
             `;
-            cardsEl.appendChild(card);
-        });
+            btn.textContent = t.zh;
+            btn.onclick = () => tcToggle(key);
+            sel.appendChild(btn);
+        }
     }
+
+    function tcToggle(type) {
+        const idx = _tcSelected.indexOf(type);
+        if (idx >= 0) {
+            _tcSelected.splice(idx, 1);
+        } else {
+            if (_tcSelected.length >= 2) return; // max 2 types
+            _tcSelected.push(type);
+        }
+        tcUpdateButtons();
+        tcShowResults();
+    }
+
+    function tcReset() {
+        _tcSelected = [];
+        tcUpdateButtons();
+        tcShowResults();
+    }
+
+    function tcUpdateButtons() {
+        for (const [key, t] of Object.entries(TC_TYPES)) {
+            const btn = document.getElementById('tc-btn-' + key);
+            if (!btn) continue;
+            const sel = _tcSelected.includes(key);
+            btn.style.background = sel ? t.color : 'transparent';
+            btn.style.color      = sel ? '#fff' : t.color;
+            btn.style.transform  = sel ? 'scale(1.08)' : 'scale(1)';
+            btn.style.boxShadow  = sel ? `0 4px 12px ${t.color}55` : 'none';
+        }
+        const resetBtn = document.getElementById('tc-reset-btn');
+        if (resetBtn) resetBtn.style.display = _tcSelected.length > 0 ? '' : 'none';
+    }
+
+    function tcShowResults() {
+        const hint    = document.getElementById('tc-hint');
+        const results = document.getElementById('tc-results');
+        if (!hint || !results) return;
+
+        if (_tcSelected.length === 0) {
+            hint.style.display    = '';
+            results.classList.add('hidden');
+            return;
+        }
+        hint.style.display = 'none';
+        results.classList.remove('hidden');
+
+        // Selected display
+        const selDisp = document.getElementById('tc-selected-display');
+        if (selDisp) {
+            selDisp.innerHTML = _tcSelected.map(t => tcTypePill(t, 'md')).join('');
+        }
+
+        // Compute effectiveness
+        const eff = tcCalcDefense(_tcSelected);
+
+        // Group attackers by multiplier
+        const groups = { '4': [], '2': [], '1': [], '0.5': [], '0.25': [], '0': [] };
+        for (const [atk, mult] of Object.entries(eff)) {
+            const key = mult === 4 ? '4' : mult === 2 ? '2' : mult === 1 ? '1' :
+                        mult === 0.5 ? '0.5' : mult === 0.25 ? '0.25' : '0';
+            groups[key].push(atk);
+        }
+
+        const groupDefs = [
+            { id:'tc-4x',      key:'4',    show: groups['4'].length > 0 },
+            { id:'tc-2x',      key:'2',    show: groups['2'].length > 0 },
+            { id:'tc-1x',      key:'1',    show: groups['1'].length > 0 },
+            { id:'tc-half',    key:'0.5',  show: groups['0.5'].length > 0 },
+            { id:'tc-quarter', key:'0.25', show: groups['0.25'].length > 0 },
+            { id:'tc-zero',    key:'0',    show: groups['0'].length > 0 },
+        ];
+
+        for (const g of groupDefs) {
+            const el   = document.getElementById(g.id);
+            const list = document.getElementById(g.id + '-list');
+            if (!el || !list) continue;
+            if (g.show) {
+                el.classList.remove('hidden');
+                list.innerHTML = groups[g.key].map(t => tcTypePill(t, 'sm')).join('');
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+    }
+
+    // Initialize when typechart page is shown
+    function _tcPageInit() {
+        tcInit();
+        tcUpdateButtons();
+        tcShowResults();
+    }
+
+    // Hook into showPage
+    document.addEventListener('DOMContentLoaded', function() {
+        // Patch showPage to init typechart on first visit
+        const _origShowPage = window.showPage;
+        window.showPage = function(pageId) {
+            _origShowPage && _origShowPage(pageId);
+            if (pageId === 'typechart') {
+                setTimeout(_tcPageInit, 50);
+            }
+        };
+
+        // Also init if typechart is already visible on load
+        if (!document.getElementById('typechart-page')?.classList.contains('hidden')) {
+            setTimeout(_tcPageInit, 100);
+        }
+    });
     </script>
 </body></html>
+
 
