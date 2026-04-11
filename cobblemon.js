@@ -1177,15 +1177,19 @@ function setImgWrap(btn, side) {
 
 
 /* ════════════════════════════════════════════════════
-   8b. ADS — 羊羔廣告管理
+   8b. ADS — 廣告管理（獨立頁面模式）
 ════════════════════════════════════════════════════ */
 
 window.ADS_DATA = window.ADS_DATA || [];
+let _activeAd = null;   // 目前正在檢視 / 編輯的廣告物件
+
+function _escHtml(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
 function _saveAds() {
-    try {
-        localStorage.setItem('cobblemon_ads', JSON.stringify(window.ADS_DATA));
-    } catch(e) {}
+    try { localStorage.setItem('cobblemon_ads', JSON.stringify(window.ADS_DATA)); } catch(e) {}
 }
 
 function _loadAds() {
@@ -1201,7 +1205,7 @@ function initAds() {
     renderSponsorGrid();
 }
 
-// 渲染首頁側欄廣告
+/* ── 首頁側欄廣告卡片 ── */
 function renderAdSidebar() {
     const container = document.getElementById('ad-container');
     if (!container) return;
@@ -1212,8 +1216,9 @@ function renderAdSidebar() {
         return;
     }
 
+    // 點擊 → 前往贊助頁並展開廣告詳情頁
     container.innerHTML = window.ADS_DATA.map((ad, i) => `
-        <div class="ad-card" onclick="_openAdDetail(${i})">
+        <div class="ad-card" onclick="openAdPage('${_escHtml(ad.id)}')">
             ${isEditing ? `<button class="edit-ui ad-card-delete" onmousedown="event.stopPropagation();event.preventDefault();deleteAd(${i})">✕</button>` : ''}
             <div class="ad-card-badge">廣告</div>
             <div class="ad-card-title">${_escHtml(ad.title)}</div>
@@ -1222,7 +1227,7 @@ function renderAdSidebar() {
     `).join('');
 }
 
-// 渲染贊助分頁廣告格
+/* ── 贊助頁廣告格 ── */
 function renderSponsorGrid() {
     const grid = document.getElementById('sponsor-ad-grid');
     if (!grid) return;
@@ -1234,7 +1239,7 @@ function renderSponsorGrid() {
     }
 
     grid.innerHTML = window.ADS_DATA.map((ad, i) => `
-        <div class="sponsor-slot" id="sponsor-slot-${i}" onclick="_openAdDetail(${i})">
+        <div class="sponsor-slot" id="sponsor-slot-${ad.id}" onclick="openAdPage('${_escHtml(ad.id)}')">
             ${isEditing ? `<button class="edit-ui ad-card-delete" style="position:absolute;top:8px;right:8px;" onmousedown="event.stopPropagation();event.preventDefault();deleteAd(${i})">✕</button>` : ''}
             <div class="text-3xl mb-3">${_escHtml(ad.icon || '🌟')}</div>
             <div class="font-bold text-amber-700 text-lg">${_escHtml(ad.title)}</div>
@@ -1243,92 +1248,157 @@ function renderSponsorGrid() {
     `).join('');
 }
 
-function _escHtml(s) {
-    if (!s) return '';
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+/* ── 廣告詳情獨立頁面 ── */
+function _buildAdEditBar(adId) {
+    return `<div class="edit-ui" contenteditable="false"
+        style="position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:4px;background:#0f172a;padding:8px 12px;border-radius:10px;margin-bottom:14px;flex-wrap:wrap;box-shadow:0 4px 14px rgba(0,0,0,0.3);">
+        <span style="font-size:11px;font-weight:700;color:#f59e0b;margin-right:4px;">✏️ 廣告內容編輯</span>
+        <select class="rb-select" style="max-width:72px;height:24px;" title="字體大小"
+            onmousedown="event.stopPropagation();"
+            onchange="applyFormat('fontSize',this.value)">
+            <option value="1">10px</option>
+            <option value="2">13px</option>
+            <option value="3" selected>16px</option>
+            <option value="4">18px</option>
+            <option value="5">24px</option>
+            <option value="6">32px</option>
+            <option value="7">48px</option>
+        </select>
+        <span class="rb-sep"></span>
+        <button class="rb" onmousedown="event.preventDefault();applyFormat('bold')"><b>B</b></button>
+        <button class="rb" onmousedown="event.preventDefault();applyFormat('italic')"><i>I</i></button>
+        <button class="rb" onmousedown="event.preventDefault();applyFormat('underline')"><u>U</u></button>
+        <button class="rb" onmousedown="event.preventDefault();applyFormat('strikeThrough')"><s>S</s></button>
+        <span class="rb-sep"></span>
+        <div class="rb-swatch" style="background:#e11d48;" onmousedown="event.preventDefault();applyFormat('foreColor','#e11d48')"></div>
+        <div class="rb-swatch" style="background:#f97316;" onmousedown="event.preventDefault();applyFormat('foreColor','#f97316')"></div>
+        <div class="rb-swatch" style="background:#eab308;" onmousedown="event.preventDefault();applyFormat('foreColor','#eab308')"></div>
+        <div class="rb-swatch" style="background:#16a34a;" onmousedown="event.preventDefault();applyFormat('foreColor','#16a34a')"></div>
+        <div class="rb-swatch" style="background:#2563eb;" onmousedown="event.preventDefault();applyFormat('foreColor','#2563eb')"></div>
+        <div class="rb-swatch" style="background:#9333ea;" onmousedown="event.preventDefault();applyFormat('foreColor','#9333ea')"></div>
+        <span class="rb-sep"></span>
+        <div class="rb-swatch" style="background:#fef08a;" onmousedown="event.preventDefault();applyFormat('hiliteColor','#fef08a')"></div>
+        <div class="rb-swatch" style="background:#bbf7d0;" onmousedown="event.preventDefault();applyFormat('hiliteColor','#bbf7d0')"></div>
+        <div class="rb-swatch" style="background:#bfdbfe;" onmousedown="event.preventDefault();applyFormat('hiliteColor','#bfdbfe')"></div>
+        <span class="rb-sep"></span>
+        <button class="rb" onmousedown="event.preventDefault();applyFormat('justifyLeft')" title="靠左">
+            <svg viewBox="0 0 16 16" fill="currentColor" width="14"><rect x="1" y="2" width="14" height="2"/><rect x="1" y="7" width="9" height="2"/><rect x="1" y="12" width="12" height="2"/></svg>
+        </button>
+        <button class="rb" onmousedown="event.preventDefault();applyFormat('justifyCenter')" title="置中">
+            <svg viewBox="0 0 16 16" fill="currentColor" width="14"><rect x="1" y="2" width="14" height="2"/><rect x="3.5" y="7" width="9" height="2"/><rect x="2" y="12" width="12" height="2"/></svg>
+        </button>
+        <button class="rb" onmousedown="event.preventDefault();applyFormat('insertUnorderedList')" title="清單">≡</button>
+        <button class="rb" onmousedown="event.preventDefault();insertLink()" title="連結">🔗</button>
+        <span class="rb-sep"></span>
+        <label class="rb" style="cursor:pointer;" title="插入圖片">
+            🖼 <input type="file" accept="image/*" style="display:none" onchange="insertEditableImage(this)" contenteditable="false">
+        </label>
+        <button class="rb" onmousedown="event.preventDefault();insertTip()"    title="小提醒">💡</button>
+        <button class="rb" onmousedown="event.preventDefault();insertNotice()" title="注意">⚠️</button>
+        <button class="rb" onmousedown="event.preventDefault();insertHRule()"  style="font-size:11px;" title="分隔線">─</button>
+        <span class="rb-sep"></span>
+        <button class="rb" onmousedown="event.preventDefault();document.execCommand('undo')" title="復原">↩</button>
+        <button class="rb" onmousedown="event.preventDefault();document.execCommand('redo')" title="重做">↪</button>
+        <button onclick="saveAdPageEdits('${adId}')"
+            style="background:#f59e0b;color:white;border:none;padding:5px 14px;border-radius:6px;font-weight:700;cursor:pointer;margin-left:auto;font-size:12px;"
+            contenteditable="false">💾 儲存</button>
+    </div>`;
 }
 
-// 點廣告：彈出詳情彈窗（仿攻略彈窗）
-function _openAdDetail(idx) {
-    const ad = window.ADS_DATA[idx];
+// 開啟廣告詳情獨立頁面（首頁卡片 / 贊助格均呼叫此處）
+function openAdPage(adId) {
+    const ad = window.ADS_DATA.find(a => a.id === adId);
     if (!ad) return;
-    openAdDetailModal(ad, idx);
-}
+    _activeAd = ad;
 
-function openAdDetailModal(ad, idx) {
-    const modal = document.getElementById('ad-detail-modal');
-    if (!modal) return;
-    document.getElementById('ad-detail-icon').textContent    = ad.icon || '🌟';
-    document.getElementById('ad-detail-title').textContent   = ad.title || '';
-    document.getElementById('ad-detail-subtitle').textContent = ad.subtitle || '';
-    document.getElementById('ad-detail-content').textContent = ad.content || '（無詳細內容）';
+    const isEditing = document.body.classList.contains('editing-active');
 
-    // 動作列：連結按鈕 + 編輯按鈕（編輯模式）
-    const actionsEl = document.getElementById('ad-detail-actions');
+    // 切換到 ad-detail 頁
+    showPage('ad-detail');
+
+    const page    = document.getElementById('ad-detail-page');
+    const body    = document.getElementById('ad-detail-body');
+    const iconEl  = document.getElementById('ad-detail-page-icon');
+    const titleEl = document.getElementById('ad-detail-page-title');
+    const subEl   = document.getElementById('ad-detail-page-subtitle');
+
+    if (iconEl)  iconEl.textContent  = ad.icon  || '🌟';
+    if (titleEl) titleEl.textContent = ad.title  || '';
+    if (subEl)   subEl.textContent   = ad.subtitle || '';
+
+    // 編輯模式：「編輯基本資訊」按鈕
+    const actionsEl = document.getElementById('ad-detail-edit-actions');
     if (actionsEl) {
-        actionsEl.innerHTML = '';
-        // 跳轉連結按鈕
-        if (ad.link) {
-            const linkBtn = document.createElement('a');
-            linkBtn.href = ad.link;
-            linkBtn.target = '_blank';
-            linkBtn.rel = 'noopener noreferrer';
-            linkBtn.textContent = '🔗 立即前往 →';
-            linkBtn.style.cssText = 'display:inline-block;padding:10px 24px;background:#f59e0b;color:white;font-weight:700;border-radius:8px;text-decoration:none;font-size:14px;transition:background 0.2s;';
-            linkBtn.onmouseenter = () => { linkBtn.style.background = '#d97706'; };
-            linkBtn.onmouseleave = () => { linkBtn.style.background = '#f59e0b'; };
-            actionsEl.appendChild(linkBtn);
-        }
-        // 編輯按鈕（僅編輯模式）
-        if (document.body.classList.contains('editing-active') && typeof idx === 'number') {
-            const editBtn = document.createElement('button');
-            editBtn.textContent = '✏️ 編輯廣告';
-            editBtn.style.cssText = 'padding:10px 20px;background:#2563eb;color:white;font-weight:700;border:none;border-radius:8px;cursor:pointer;font-size:14px;';
-            editBtn.onclick = () => { closeAdDetailModal(); openAdFormModal(idx); };
-            actionsEl.appendChild(editBtn);
+        if (isEditing) {
+            actionsEl.innerHTML = `<button onclick="editAdInfo('${_escHtml(adId)}')"
+                style="background:rgba(0,0,0,0.18);border:none;border-radius:8px;padding:6px 14px;color:white;font-weight:700;font-size:13px;cursor:pointer;">✏️ 編輯資訊</button>`;
+        } else {
+            actionsEl.innerHTML = '';
         }
     }
 
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
+    // 廣告正文（支援 HTML 富文字）
+    const html = ad.html || (ad.content ? `<p>${_escHtml(ad.content)}</p>` : '<p>（尚無內容）</p>');
+    body.innerHTML = (isEditing ? _buildAdEditBar(adId) : '') + html;
+
+    if (isEditing) {
+        body.setAttribute('contenteditable', 'true');
+        body.querySelectorAll('button,input,.edit-ui').forEach(el => el.setAttribute('contenteditable','false'));
+        setTimeout(_setupImgDropTargets, 50);
+    } else {
+        body.removeAttribute('contenteditable');
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function closeAdDetailModal() {
-    const modal = document.getElementById('ad-detail-modal');
-    if (modal) modal.style.display = 'none';
-    document.body.style.overflow = '';
+// 儲存廣告頁面編輯
+function saveAdPageEdits(adId) {
+    const ad   = window.ADS_DATA.find(a => a.id === adId);
+    if (!ad) return;
+    const body  = document.getElementById('ad-detail-body');
+    const clone = body.cloneNode(true);
+    clone.querySelectorAll('.edit-ui').forEach(el => el.remove());
+    clone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+    clone.querySelectorAll('.mt-4.bg-yellow-50,.notice-block').forEach(el => el.style.removeProperty('position'));
+
+    ad.html = clone.innerHTML.trim();
+    _saveAds();
+
+    const btn = document.querySelector(`[onclick="saveAdPageEdits('${adId}')"]`);
+    if (btn) { btn.textContent = '✅ 已儲存'; setTimeout(() => { if (btn) btn.textContent = '💾 儲存'; }, 1500); }
 }
 
-// 新增廣告（管理員）
+// 返回贊助頁
+function closeAdPage() {
+    _activeAd = null;
+    showPage('sponsor');
+}
+
+/* ── 新增廣告 ── */
 function addAdCard() {
     if (!document.body.classList.contains('editing-active')) return;
-    openAdFormModal();
+    _adEditIndex = -1;
+    _openAdFormModal();
 }
 
-// 記錄目前是「新增」還是「編輯第幾筆」
 let _adEditIndex = -1;
 
-function openAdFormModal(editIdx) {
+function _openAdFormModal(editIdx) {
     const modal = document.getElementById('ad-form-modal');
     if (!modal) return;
     _adEditIndex = (typeof editIdx === 'number') ? editIdx : -1;
     const isEdit = _adEditIndex >= 0;
     const ad = isEdit ? window.ADS_DATA[_adEditIndex] : null;
 
-    // 標題
     const titleEl = document.getElementById('ad-form-modal-title');
-    if (titleEl) titleEl.textContent = isEdit ? '✏️ 編輯廣告' : '🌟 新增廣告';
-
-    // 提交按鈕文字
+    if (titleEl) titleEl.textContent = isEdit ? '✏️ 編輯廣告資訊' : '🌟 新增廣告';
     const submitBtn = document.getElementById('ad-form-submit-btn');
     if (submitBtn) submitBtn.textContent = isEdit ? '儲存修改' : '新增廣告';
 
-    // 填入欄位
     document.getElementById('ad-form-title').value    = (ad && ad.title)    || '';
     document.getElementById('ad-form-subtitle').value = (ad && ad.subtitle) || '';
     document.getElementById('ad-form-icon').value     = (ad && ad.icon)     || '🌟';
-    document.getElementById('ad-form-link').value     = (ad && ad.link)     || '';
-    document.getElementById('ad-form-content').value  = (ad && ad.content)  || '';
     modal.style.display = 'flex';
 }
 
@@ -1342,17 +1412,13 @@ function submitAdForm() {
     const title = document.getElementById('ad-form-title').value.trim();
     if (!title) { alert('請填寫廣告標題！'); return; }
     const subtitle = document.getElementById('ad-form-subtitle').value.trim();
-    const icon    = document.getElementById('ad-form-icon').value.trim() || '🌟';
-    const link    = document.getElementById('ad-form-link').value.trim();
-    const content = document.getElementById('ad-form-content').value.trim();
+    const icon     = document.getElementById('ad-form-icon').value.trim() || '🌟';
 
     if (_adEditIndex >= 0) {
-        // 編輯模式：更新現有廣告
         const existing = window.ADS_DATA[_adEditIndex];
-        window.ADS_DATA[_adEditIndex] = Object.assign({}, existing, { title, subtitle, icon, link, content });
+        window.ADS_DATA[_adEditIndex] = Object.assign({}, existing, { title, subtitle, icon });
     } else {
-        // 新增模式
-        window.ADS_DATA.push({ id: 'ad-' + Date.now(), title, subtitle, icon, link, content });
+        window.ADS_DATA.push({ id: 'ad-' + Date.now(), title, subtitle, icon, html: '' });
     }
 
     _saveAds();
@@ -1361,7 +1427,7 @@ function submitAdForm() {
     closeAdFormModal();
 }
 
-// 刪除廣告（管理員）
+/* ── 刪除廣告 ── */
 function deleteAd(idx) {
     if (!document.body.classList.contains('editing-active')) return;
     if (!confirm('確定要刪除此廣告？')) return;
@@ -1369,7 +1435,17 @@ function deleteAd(idx) {
     _saveAds();
     renderAdSidebar();
     renderSponsorGrid();
-    closeAdDetailModal();
+    // 若目前在廣告詳情頁，返回贊助頁
+    if (document.getElementById('ad-detail-page') && !document.getElementById('ad-detail-page').classList.contains('hidden')) {
+        closeAdPage();
+    }
+}
+
+/* ── 編輯模式下廣告詳情頁的「編輯基本資訊」按鈕 ── */
+function editAdInfo(adId) {
+    const idx = window.ADS_DATA.findIndex(a => a.id === adId);
+    if (idx < 0) return;
+    _openAdFormModal(idx);
 }
 
 /* ════════════════════════════════════════════════════
@@ -1581,9 +1657,12 @@ function toggleDarkMode() {
 
 function showPage(pageId) {
     document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
-    document.getElementById(pageId + '-page')?.classList.remove('hidden');
+    const targetPage = document.getElementById(pageId + '-page');
+    if (targetPage) targetPage.classList.remove('hidden');
     window.scrollTo(0, 0);
     document.getElementById('mobile-menu').classList.remove('open');
+    // 切換到贊助/廣告相關頁時重新渲染（保持 editing 狀態同步）
+    if (pageId === 'sponsor') { renderAdSidebar(); renderSponsorGrid(); }
 }
 
 function toggleMobileMenu() {
