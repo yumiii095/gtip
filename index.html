@@ -165,6 +165,21 @@
         .dark-mode .page-hero-tutorial { background: linear-gradient(135deg, #051408, #0a2814); border-color: #0f4020; }
         .dark-mode .page-hero-strategy { background: linear-gradient(135deg, #0d0320, #1a0840); border-color: #300a6a; }
         .dark-mode .page-hero h2       { color: #f3f4f6 !important; }
+        /* ── 深色模式：指令集、攻略區、贊助伺服器 typechart-style 卡片 ── */
+        .dark-mode #commands-page > main > .sc-wrap > div[style*="border-radius:16px"],
+        .dark-mode #strategy-page > main > div > div[style*="border-radius:16px"],
+        .dark-mode #sponsor-page > main > div > div[style*="border-radius:16px"],
+        .dark-mode #bugreport-page #br-form-card {
+            background: #1f2937 !important;
+            border-color: #374151 !important;
+        }
+        .dark-mode #commands-page > main > .sc-wrap > div > div[style*="gradient(90deg"],
+        .dark-mode #strategy-page > main > div > div > div[style*="gradient(90deg"],
+        .dark-mode #sponsor-page > main > div > div > div[style*="gradient(90deg"] {
+            background: linear-gradient(90deg, #1e2d40, #1a2533) !important;
+            border-bottom-color: #374151 !important;
+        }
+
 
         .mode-switch {
             position: relative; width: 56px; height: 28px;
@@ -941,6 +956,7 @@
     <div class="tm-blue-dark text-white text-xs py-2 px-4 edit-ignore" contenteditable="false">
         <div class="container mx-auto flex justify-end items-center space-x-4">
             <span>伺服器狀態：<span class="text-green-400">● 運行中</span></span>
+            <button onclick="showPage('bugreport')" class="hover:underline flex items-center gap-1 text-red-300 hover:text-red-200 transition-colors" contenteditable="false">🐛 問題回報</button>
             <button onclick="showPage('home')" class="hover:underline" contenteditable="false">回首頁</button>
             <div class="flex items-center space-x-2">
                 <div class="mode-switch" onclick="toggleDarkMode()">
@@ -974,7 +990,8 @@
                 <button onclick="showPage('commands')" class="text-left py-2 border-b text-blue-900 rounded-lg px-2 hover:bg-blue-50" contenteditable="false">📋 指令集</button>
                 <button onclick="showPage('typechart')" class="text-left py-2 border-b text-pink-700 rounded-lg px-2 hover:bg-pink-50" contenteditable="false"> 屬性克制表</button>
                 <button onclick="showPage('strategy')" class="text-left py-2 border-b text-purple-700 rounded-lg px-2 hover:bg-purple-50" contenteditable="false">⚔️ 攻略區</button>
-                <button onclick="showPage('sponsor')" class="text-left py-2 text-yellow-600 font-bold rounded-lg px-2 hover:bg-yellow-50" contenteditable="false">🌟 贊助伺服器</button>
+                <button onclick="showPage('sponsor')" class="text-left py-2 border-b text-yellow-600 font-bold rounded-lg px-2 hover:bg-yellow-50" contenteditable="false">🌟 贊助伺服器</button>
+                <button onclick="showPage('bugreport')" class="text-left py-2 text-red-500 font-bold rounded-lg px-2 hover:bg-red-50" contenteditable="false">🐛 問題回報</button>
             </div>
         </div>
     </header>
@@ -1020,7 +1037,7 @@
                 <div class="md:col-span-3 edit-ignore" contenteditable="false">
                     <div class="section-title">快速導航</div>
                     <div class="flex flex-col border bg-white shadow-sm border-gray-200 rounded-2xl overflow-hidden">
-                        <button onclick="showPage('newbie')" class="p-4 border-b text-left hover:bg-red-50 font-bold text-red-600 transition-colors" contenteditable="false">🚩 鍵盤快捷鍵</button>
+                        <button onclick="showPage('newbie')" class="p-4 border-b text-left hover:bg-red-50 font-bold text-red-600 transition-colors" contenteditable="false">▶ 鍵盤快捷鍵</button>
                         <button onclick="showPage('tutorial')" class="p-4 border-b text-left hover:bg-green-50 font-bold text-green-700 transition-colors" contenteditable="false">▶ 入門教學指南</button>
                         <button onclick="showPage('faq')" class="p-4 text-left hover:bg-orange-50 font-bold text-orange-600 transition-colors" contenteditable="false">▶ 常見問題解答</button>
                     </div>
@@ -1206,15 +1223,25 @@
     </div>
 
     <div id="commands-page" class="page-content hidden">
-        <div class="page-hero page-hero-commands edit-ignore" contenteditable="false">
-            <div class="container mx-auto px-4">
-                <h2 class="text-blue-900">⚔️ 伺服器指令集</h2>
-                <p class="text-blue-600 text-sm mt-1">點擊分類展開 · 搜尋指令或功能描述</p>
+        <div style="background:linear-gradient(135deg,#003366 0%,#005599 60%,#2563eb 100%);border-bottom:2px solid #1d4ed8;padding:20px 24px 18px;" class="edit-ignore" contenteditable="false">
+            <div style="max-width:900px;margin:0 auto;display:flex;align-items:center;gap:14px;">
+                <span style="font-size:30px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));">⚔️</span>
+                <div>
+                    <h2 style="color:white;font-size:1.35rem;font-weight:900;letter-spacing:0.02em;text-shadow:0 1px 4px rgba(0,0,0,0.3);margin:0;">伺服器指令集</h2>
+                    <p style="color:rgba(255,255,255,0.75);font-size:0.78rem;margin:2px 0 0 0;">點擊分類展開 · 搜尋指令或功能描述</p>
+                </div>
+                <span style="margin-left:auto;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.3);color:white;font-size:0.7rem;font-weight:700;padding:3px 10px;border-radius:999px;">快速搜尋</span>
             </div>
         </div>
         <main class="container mx-auto py-8 px-4">
             <div class="sc-wrap">
-                <!-- search -->
+                <!-- search+tabs card like typechart -->
+                <div style="background:white;border-radius:16px;border:1px solid #e2e8f0;box-shadow:0 4px 24px rgba(0,51,102,0.10);overflow:hidden;margin-bottom:20px;">
+                    <div style="padding:14px 20px;background:linear-gradient(90deg,#f8faff,#eff6ff);border-bottom:1px solid #dbeafe;display:flex;align-items:center;gap:10px;">
+                        <span style="font-size:16px;">🔍</span>
+                        <span style="font-weight:800;font-size:0.95rem;color:#003366;">搜尋 &amp; 篩選指令分類</span>
+                    </div>
+                    <div style="padding:16px 20px;">
                 <div class="sc-search-wrap">
                     <span class="sc-si">🔍</span>
                     <input type="text" id="scSearch" placeholder="搜尋指令或功能描述..." contenteditable="false">
@@ -1233,6 +1260,8 @@
                     <div class="sc-tab" data-cat="land">🏡 領地</div>
                     <div class="sc-tab" data-cat="special">🔧 特殊</div>
                 </div>
+                    </div><!-- /card-body -->
+                </div><!-- /search+tabs card -->
                 <!-- sections rendered by JS -->
                 <div class="sc-sections" id="scSections">
                 <div class="sc-section" data-id="social">
@@ -1941,15 +1970,27 @@
     </div>
 
     <div id="strategy-page" class="page-content hidden">
-        <div class="page-hero page-hero-strategy edit-ignore" contenteditable="false">
-            <div class="container mx-auto px-4 flex justify-between items-center">
-                <h2 style="color:#581c87">⚔️ 專業攻略區</h2>
-                <button class="edit-ui admin-btn" onclick="addNewSection('strategy-container', 'strategy')" contenteditable="false">[+] 新增攻略章節</button>
+        <div style="background:linear-gradient(135deg,#4c1d95 0%,#7c3aed 60%,#a855f7 100%);border-bottom:2px solid #6d28d9;padding:20px 24px 18px;" class="edit-ignore" contenteditable="false">
+            <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:14px;">
+                <span style="font-size:30px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));">⚔️</span>
+                <div>
+                    <h2 style="color:white;font-size:1.35rem;font-weight:900;letter-spacing:0.02em;text-shadow:0 1px 4px rgba(0,0,0,0.3);margin:0;">專業攻略區</h2>
+                    <p style="color:rgba(255,255,255,0.75);font-size:0.78rem;margin:2px 0 0 0;">點擊卡片查看詳細攻略內容</p>
+                </div>
+                <button class="edit-ui admin-btn" onclick="addNewSection('strategy-container', 'strategy')" contenteditable="false" style="margin-left:auto;">[+] 新增攻略章節</button>
             </div>
         </div>
-        <main class="container mx-auto py-12 px-4">
+        <main class="container mx-auto py-8 px-4">
+            <div style="max-width:1100px;margin:0 auto 0;">
+                <div style="background:white;border-radius:16px;border:1px solid #e9d5ff;box-shadow:0 4px 24px rgba(124,58,237,0.10);overflow:hidden;margin-bottom:24px;">
+                    <div style="padding:14px 20px;background:linear-gradient(90deg,#faf5ff,#f3e8ff);border-bottom:1px solid #e9d5ff;display:flex;align-items:center;gap:10px;">
+                        <span style="font-size:16px;">📖</span>
+                        <span style="font-weight:800;font-size:0.95rem;color:#4c1d95;">所有攻略</span>
+                        <span style="margin-left:auto;font-size:0.72rem;color:#7c3aed;">點擊卡片展開詳細內容</span>
+                    </div>
+                    <div style="padding:20px;">
             <!-- 卡片列表 -->
-            <div id="strategy-container" class="max-w-5xl mx-auto strat-grid"><div id="strat-new-1775826506003" class="strat-card">
+            <div id="strategy-container" class="strat-grid"><div id="strat-new-1775826506003" class="strat-card">
             <button class="edit-ui admin-btn admin-btn-delete" style="position:absolute;top:10px;right:10px;padding:4px 10px;font-size:12px" onclick="event.stopPropagation();this.closest('.strat-card').remove()" contenteditable="false">[x]</button>
             <div class="strat-card-icon" onclick="event.stopPropagation();_openStratIconPicker(this,'strat-new-1775826506003')" style="cursor:pointer;">📖<span class="edit-ui" style="position:absolute;top:6px;left:8px;font-size:10px;background:rgba(0,0,0,0.55);color:#fff;border-radius:4px;padding:1px 4px;pointer-events:none;" contenteditable="false">✏️</span></div>
             <div class="strat-card-title">投票教學</div>
@@ -2105,6 +2146,9 @@
             <div class="strat-card-title">小智帽獲取方式</div>
             <div class="strat-card-preview">🧢 小智帽獲取方式 本攻略資料來自玩家社群分享，本站進行整理與修改。 原作者：♚伊比利小豬♚ ／ 來源連結 若原作者不希望本站收錄，請聯絡我們，將立即移除。 1️⃣ 小智甲賀忍蛙 啟動條件：好感度 </div>
             <span class="strat-card-arrow">›</span></div></div>
+                    </div><!-- /card-body -->
+                </div><!-- /typechart-style-card -->
+            </div><!-- /max-width-container -->
         </main>
     </div>
 
@@ -2345,17 +2389,25 @@
 
     <!-- 贊助伺服器分頁 -->
     <div id="sponsor-page" class="page-content hidden">
-        <div class="bg-gradient-to-r from-yellow-400 to-amber-500 py-12 border-b border-yellow-300 edit-ignore" contenteditable="false">
-            <div class="container mx-auto px-4 flex justify-between items-center">
+        <div style="background:linear-gradient(135deg,#92400e 0%,#d97706 60%,#f59e0b 100%);border-bottom:2px solid #b45309;padding:20px 24px 18px;" class="edit-ignore" contenteditable="false">
+            <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:14px;">
+                <span style="font-size:30px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));">🌟</span>
                 <div>
-                    <h2 class="text-3xl font-bold text-white">🌟 贊助伺服器</h2>
-                    <p class="text-yellow-100 mt-1 text-sm">感謝每一位贊助者的支持！</p>
+                    <h2 style="color:white;font-size:1.35rem;font-weight:900;letter-spacing:0.02em;text-shadow:0 1px 4px rgba(0,0,0,0.3);margin:0;">贊助伺服器</h2>
+                    <p style="color:rgba(255,255,255,0.8);font-size:0.78rem;margin:2px 0 0 0;">感謝每一位贊助者的支持！</p>
                 </div>
-                <button class="edit-ui admin-btn" onclick="addAdCard()" contenteditable="false">[+] 新增廣告</button>
+                <button class="edit-ui admin-btn" onclick="addAdCard()" contenteditable="false" style="margin-left:auto;">[+] 新增廣告</button>
             </div>
         </div>
-        <main class="container mx-auto py-12 px-4">
-
+        <main class="container mx-auto py-8 px-4">
+            <div style="max-width:1100px;margin:0 auto;">
+                <div style="background:white;border-radius:16px;border:1px solid #fde68a;box-shadow:0 4px 24px rgba(217,119,6,0.12);overflow:hidden;margin-bottom:24px;">
+                    <div style="padding:14px 20px;background:linear-gradient(90deg,#fffbeb,#fef3c7);border-bottom:1px solid #fde68a;display:flex;align-items:center;gap:10px;">
+                        <span style="font-size:16px;">🏅</span>
+                        <span style="font-weight:800;font-size:0.95rem;color:#92400e;">贊助方案 &amp; 特典</span>
+                        <span style="margin-left:auto;font-size:0.72rem;color:#d97706;">點擊卡片查看詳細內容</span>
+                    </div>
+                    <div style="padding:20px;">
             <div id="sponsor-ad-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         <div class="sponsor-slot" id="sponsor-slot-ad-1775930516011" onclick="openAdPage('ad-1775930516011')">
             
@@ -2378,8 +2430,146 @@
             <div class="text-amber-600 text-sm mt-1">點擊查看禮包內容...</div>
         </div>
     </div>
+                    </div><!-- /card-body -->
+                </div><!-- /typechart-card -->
+            </div><!-- /max-width-container -->
             <!-- 廣告詳情面板：使用攻略彈窗樣式 -->
         </main>
+    </div>
+
+
+    <!-- 問題回報分頁 -->
+    <div id="bugreport-page" class="page-content hidden">
+        <div style="background:linear-gradient(135deg,#7f1d1d 0%,#dc2626 60%,#ef4444 100%);border-bottom:2px solid #b91c1c;padding:20px 24px 18px;" class="edit-ignore" contenteditable="false">
+            <div style="max-width:720px;margin:0 auto;display:flex;align-items:center;gap:14px;">
+                <span style="font-size:30px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));">🐛</span>
+                <div>
+                    <h2 style="color:white;font-size:1.35rem;font-weight:900;letter-spacing:0.02em;text-shadow:0 1px 4px rgba(0,0,0,0.3);margin:0;">問題回報</h2>
+                    <p style="color:rgba(255,255,255,0.8);font-size:0.78rem;margin:2px 0 0 0;">遇到 Bug 或錯誤資訊？請填寫下方表單，我們會盡快處理</p>
+                </div>
+            </div>
+        </div>
+        <main style="max-width:720px;margin:0 auto;padding:28px 16px 60px;">
+            <div id="br-success" style="display:none;background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:24px;text-align:center;margin-bottom:24px;">
+                <div style="font-size:2.5rem;margin-bottom:10px;">✅</div>
+                <p style="font-weight:800;color:#166534;font-size:1rem;margin:0 0 6px;">回報已送出！</p>
+                <p style="color:#15803d;font-size:0.85rem;margin:0;">感謝您的回報，我們會盡快確認並處理。</p>
+                <button onclick="resetBugForm()" style="margin-top:14px;padding:8px 22px;border-radius:8px;background:#16a34a;color:white;border:none;font-weight:700;cursor:pointer;font-size:0.85rem;">再填一次</button>
+            </div>
+            <div id="br-form-card" style="background:white;border-radius:16px;border:1px solid #e2e8f0;box-shadow:0 4px 24px rgba(0,0,0,0.09);overflow:hidden;">
+                <div style="padding:16px 22px;background:linear-gradient(90deg,#fff1f2,#ffe4e6);border-bottom:1px solid #fecdd3;display:flex;align-items:center;gap:10px;">
+                    <span style="font-size:16px;">📝</span>
+                    <span style="font-weight:800;font-size:0.95rem;color:#7f1d1d;">填寫問題詳情</span>
+                    <span style="margin-left:auto;font-size:0.72rem;color:#b91c1c;">* 為必填欄位</span>
+                </div>
+                <div style="padding:24px 26px;display:flex;flex-direction:column;gap:18px;">
+                    <div>
+                        <label style="display:block;font-weight:700;font-size:0.85rem;color:#374151;margin-bottom:8px;">問題類型 <span style="color:#dc2626;">*</span></label>
+                        <div style="display:flex;flex-wrap:wrap;gap:8px;" id="br-type-group">
+                            <button type="button" class="br-type-btn" onclick="selectBrType(this,\'網站錯誤\')" data-val="網站錯誤">🌐 網站錯誤</button>
+                            <button type="button" class="br-type-btn" onclick="selectBrType(this,\'內容錯誤\')" data-val="內容錯誤">📋 內容錯誤</button>
+                            <button type="button" class="br-type-btn" onclick="selectBrType(this,\'伺服器問題\')" data-val="伺服器問題">🖥️ 伺服器問題</button>
+                            <button type="button" class="br-type-btn" onclick="selectBrType(this,\'功能建議\')" data-val="功能建議">💡 功能建議</button>
+                            <button type="button" class="br-type-btn" onclick="selectBrType(this,\'其他\')" data-val="其他">❓ 其他</button>
+                        </div>
+                        <input type="hidden" id="br-type-val" value="">
+                    </div>
+                    <div>
+                        <label for="br-player-id" style="display:block;font-weight:700;font-size:0.85rem;color:#374151;margin-bottom:6px;">玩家 ID（選填）</label>
+                        <input type="text" id="br-player-id" placeholder="你的 Minecraft ID（方便我們聯繫）" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #e2e8f0;font-size:0.88rem;outline:none;font-family:inherit;box-sizing:border-box;transition:border 0.2s;" onfocus="this.style.borderColor=\'#dc2626\'" onblur="this.style.borderColor=\'#e2e8f0\'">
+                    </div>
+                    <div>
+                        <label for="br-title" style="display:block;font-weight:700;font-size:0.85rem;color:#374151;margin-bottom:6px;">問題標題 <span style="color:#dc2626;">*</span></label>
+                        <input type="text" id="br-title" placeholder="簡短描述你遇到的問題" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #e2e8f0;font-size:0.88rem;outline:none;font-family:inherit;box-sizing:border-box;transition:border 0.2s;" onfocus="this.style.borderColor=\'#dc2626\'" onblur="this.style.borderColor=\'#e2e8f0\'">
+                    </div>
+                    <div>
+                        <label for="br-desc" style="display:block;font-weight:700;font-size:0.85rem;color:#374151;margin-bottom:6px;">詳細描述 <span style="color:#dc2626;">*</span></label>
+                        <textarea id="br-desc" rows="5" placeholder="請詳細描述問題發生的情況、步驟，或建議的內容..." style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #e2e8f0;font-size:0.88rem;outline:none;font-family:inherit;box-sizing:border-box;resize:vertical;transition:border 0.2s;" onfocus="this.style.borderColor=\'#dc2626\'" onblur="this.style.borderColor=\'#e2e8f0\'"></textarea>
+                    </div>
+                    <div>
+                        <label style="display:block;font-weight:700;font-size:0.85rem;color:#374151;margin-bottom:8px;">嚴重程度</label>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;" id="br-severity-group">
+                            <button type="button" class="br-sev-btn" onclick="selectBrSev(this,\'輕微\')" data-val="輕微" style="border-color:#22c55e;color:#16a34a;">🟢 輕微</button>
+                            <button type="button" class="br-sev-btn br-sev-active" onclick="selectBrSev(this,\'一般\')" data-val="一般" style="border-color:#f59e0b;color:#d97706;background:#fffbeb;">🟡 一般</button>
+                            <button type="button" class="br-sev-btn" onclick="selectBrSev(this,\'嚴重\')" data-val="嚴重" style="border-color:#ef4444;color:#dc2626;">🔴 嚴重</button>
+                        </div>
+                        <input type="hidden" id="br-severity-val" value="一般">
+                    </div>
+                    <div id="br-error" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:0.82rem;color:#dc2626;font-weight:700;">
+                        ⚠️ <span id="br-error-msg">請填寫所有必填欄位</span>
+                    </div>
+                    <div style="display:flex;gap:10px;justify-content:flex-end;padding-top:4px;">
+                        <button type="button" onclick="showPage(\'home\')" style="padding:10px 20px;border-radius:10px;border:1.5px solid #e2e8f0;background:white;font-size:0.85rem;font-weight:700;color:#64748b;cursor:pointer;">取消</button>
+                        <button type="button" onclick="submitBugReport()" id="br-submit-btn" style="padding:10px 28px;border-radius:10px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:white;border:none;font-size:0.88rem;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(220,38,38,0.35);transition:transform 0.1s,box-shadow 0.1s;" onmouseover="this.style.transform=\'translateY(-1px)\';this.style.boxShadow=\'0 6px 18px rgba(220,38,38,0.45)\'" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'0 4px 12px rgba(220,38,38,0.35)\'">🚀 送出回報</button>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top:18px;text-align:center;">
+                <p style="font-size:0.75rem;color:#9ca3af;">回報資料將透過 Google 表單提交，請放心填寫。</p>
+            </div>
+        </main>
+        <style>
+        .br-type-btn { padding:7px 14px;border-radius:20px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#64748b;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s; }
+        .br-type-btn:hover { border-color:#dc2626;color:#dc2626;background:#fff1f2; }
+        .br-type-btn.br-type-active { background:#dc2626;border-color:#dc2626;color:white; }
+        .br-sev-btn { padding:7px 16px;border-radius:20px;border:1.5px solid #e2e8f0;background:#f8fafc;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s; }
+        .dark-mode #br-form-card { background:#1f2937;border-color:#374151; }
+        .dark-mode #br-form-card input, .dark-mode #br-form-card textarea { background:#283448!important;border-color:#374151!important;color:#f3f4f6!important; }
+        .dark-mode .br-type-btn { background:#283448;border-color:#374151;color:#9ca3af; }
+        .dark-mode .br-sev-btn { background:#283448;border-color:#374151; }
+        </style>
+        <script>
+        (function(){
+            window.selectBrType = function(btn, val) {
+                document.querySelectorAll('.br-type-btn').forEach(b => b.classList.remove('br-type-active'));
+                btn.classList.add('br-type-active');
+                document.getElementById('br-type-val').value = val;
+            };
+            window.selectBrSev = function(btn, val) {
+                document.querySelectorAll('.br-sev-btn').forEach(b => { b.classList.remove('br-sev-active'); b.style.background='#f8fafc'; });
+                btn.classList.add('br-sev-active');
+                document.getElementById('br-severity-val').value = val;
+            };
+            window.submitBugReport = function() {
+                const type     = document.getElementById('br-type-val').value;
+                const title    = document.getElementById('br-title').value.trim();
+                const desc     = document.getElementById('br-desc').value.trim();
+                const player   = document.getElementById('br-player-id').value.trim();
+                const severity = document.getElementById('br-severity-val').value;
+                const errEl    = document.getElementById('br-error');
+                const errMsg   = document.getElementById('br-error-msg');
+                if (!type)  { errMsg.textContent='請選擇問題類型'; errEl.style.display='block'; return; }
+                if (!title) { errMsg.textContent='請填寫問題標題'; errEl.style.display='block'; return; }
+                if (!desc)  { errMsg.textContent='請填寫詳細描述'; errEl.style.display='block'; return; }
+                errEl.style.display = 'none';
+                const FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLScFW3iEG6S0ACnWt9V-7_PNGqb_TZwjhvJeAjhOzp2-oRjKUg/formResponse';
+                const iframe = document.createElement('iframe');
+                iframe.style.display='none'; iframe.name='br-frame-'+Date.now();
+                document.body.appendChild(iframe);
+                const form = document.createElement('form');
+                form.method='POST'; form.action=FORM_ACTION; form.target=iframe.name; form.style.display='none';
+                // entry IDs - 請依實際 Google 表單欄位更新
+                const fields = { 'entry.388785920':type, 'entry.1755524944':title, 'entry.2035850451':desc, 'entry.738268889':player, 'entry.1483429702':severity };
+                Object.entries(fields).forEach(([n,v])=>{ const i=document.createElement('input'); i.type='hidden'; i.name=n; i.value=v; form.appendChild(i); });
+                document.body.appendChild(form);
+                form.submit();
+                setTimeout(()=>{ document.getElementById('br-form-card').style.display='none'; document.getElementById('br-success').style.display='block'; document.body.removeChild(form); setTimeout(()=>document.body.removeChild(iframe),3000); }, 600);
+            };
+            window.resetBugForm = function() {
+                document.getElementById('br-form-card').style.display='block';
+                document.getElementById('br-success').style.display='none';
+                document.getElementById('br-type-val').value='';
+                document.getElementById('br-title').value='';
+                document.getElementById('br-desc').value='';
+                document.getElementById('br-player-id').value='';
+                document.getElementById('br-severity-val').value='一般';
+                document.querySelectorAll('.br-type-btn').forEach(b=>b.classList.remove('br-type-active'));
+                document.querySelectorAll('.br-sev-btn').forEach(b=>{ b.classList.remove('br-sev-active'); b.style.background='#f8fafc'; });
+                const defSev=document.querySelector('.br-sev-btn[data-val="一般"]');
+                if(defSev){ defSev.classList.add('br-sev-active'); defSev.style.background='#fffbeb'; }
+            };
+        })();
+        </script>
     </div>
 
     <!-- 回到頂部懸浮按鈕 -->

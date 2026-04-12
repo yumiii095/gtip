@@ -1602,8 +1602,13 @@ function executeFinalSave() {
     }).click();
 
     setTimeout(() => {
+        // 確保匯出的 HTML 不帶 dark-mode，讓新檔案預設淺色模式
+        const _hadDark = document.body.classList.contains('dark-mode');
+        document.body.classList.remove('dark-mode');
+        const exportedHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+        if (_hadDark) document.body.classList.add('dark-mode');
         Object.assign(document.createElement('a'), {
-            href     : URL.createObjectURL(new Blob(['<!DOCTYPE html>\n' + document.documentElement.outerHTML], { type: 'text/html' })),
+            href     : URL.createObjectURL(new Blob([exportedHtml], { type: 'text/html' })),
             download : 'index.html',
         }).click();
     }, 300);
