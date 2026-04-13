@@ -2129,10 +2129,21 @@
             <div style="background:white; border-radius:14px; border:1px solid #e2e8f0; box-shadow:0 4px 24px rgba(0,51,102,0.10); overflow:hidden; margin-bottom:18px;">
                 <div style="padding:14px 20px; background:linear-gradient(90deg,#f8fafc,#f1f5f9); border-bottom:1px solid #e2e8f0; display:flex; align-items:center; gap:10px;">
                     <span style="font-size:18px;">🎯</span>
-                    <span id="tc-card-title" style="font-weight:800; font-size:0.95rem; color:#003366;">選擇防禦方屬性（最多 2 種）</span>
-                    <span style="margin-left:auto; font-size:0.72rem; color:#64748b;">選 2 種後再點即重置</span>
+                    <span id="tc-card-title" style="font-weight:800; font-size:0.95rem; color:#003366;">選擇攻擊方屬性（最多 2 種）</span>
+                    <span style="margin-left:auto; font-size:0.72rem; color:#64748b;">已選 2 種後點任意按鈕即重置</span>
                 </div>
-                <div id="tc-grid"></div>
+                <div style="padding:18px 20px;">
+                    <!-- Selection bar -->
+                    <div style="display:flex; align-items:center; gap:10px; padding:13px 18px; background:linear-gradient(90deg,#f8fafc,#f0f7ff); border-radius:10px; margin-bottom:16px; border:1px solid #e2e8f0; min-height:56px;">
+                        <span style="font-size:0.72rem; font-weight:700; color:#64748b; white-space:nowrap;">已選屬性：</span>
+                        <div id="tc-chips" style="display:flex; gap:7px; align-items:center; flex-wrap:wrap; flex:1;"><span style="font-size:0.78rem;color:#94a3b8;font-style:italic">點選下方屬性按鈕開始查詢</span></div>
+                        <button onclick="tcReset()" style="display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 8px; border: 1.5px solid rgb(226, 232, 240); background: white; font-size: 0.75rem; font-weight: 700; color: rgb(100, 116, 139); cursor: pointer; font-family: inherit;" onmouseover="this.style.borderColor='#ef4444';this.style.color='#ef4444';this.style.background='#fef2f2'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b';this.style.background='white'" contenteditable="false">
+                            ↺ 重置
+                        </button>
+                    </div>
+                    <!-- Type grid -->
+                    <div id="tc-grid" style="display:grid; grid-template-columns:repeat(6,1fr); gap:7px;"><button class="tc-btn dim" id="tcb-Normal" style="background-color: rgb(159, 161, 159);" contenteditable="false"><span style="font-size:1.35rem;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2))">⭕</span><span style="font-size:0.62rem;font-weight:800;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.4);letter-spacing:0.03em;white-space:nowrap">一般</span></button><button class="tc-btn dim" id="tcb-Fire" style="background-color: rgb(230, 40, 41);" contenteditable="false"><span style="font-size:1.35rem;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2))">🔥</span><span style="font-size:0.62rem;font-weight:800;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.4);letter-spacing:0.03em;white-space:nowrap">火</span></button><button class="tc-btn dim" id="tcb-Water" style="background-color: rgb(41, 128, 239);" contenteditable="false"><span style="font-size:1.35rem;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2))">💧</span><span style="font-size:0.62rem;font-weight:800;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.4);letter-spacing:0.03em;white-space:nowrap">水</span></button><button class="tc-btn dim" id="tcb-Electric" style="background-color: rgb(250, 192, 0);" contenteditable="false"><span style="font-size:1.35rem;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2))">⚡</span><span style="font-size:0.62rem;font-weight:800;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.4);letter-spacing:0.03em;white-space:nowrap">電</span></button><button class="tc-btn sel1" id="tcb-Grass" style="background-color: rgb(63, 161, 41);" contenteditable="false"><span style="font-size:1.35rem;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2))">🌿</span><span style="font-size:0.62rem;font-weight:800;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.4);letter-spacing:0.03em;white-space:nowrap">草</span></button><button class="tc-btn dim" id="tcb-Ice" style="background-color: rgb(61, 206, 243);" contenteditable="false"><span style="font-size:1.35rem;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2))">❄️</span><span style="font-size:0.62rem;font-weight:800;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.4);letter-spacing:0.03em;white-space:nowrap">冰</span></button><button class="tc-btn dim" id="tcb-Fighting" style="background-color: rgb(255, 128, 0);" contenteditable="false"><span style="font-size:1.35rem;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2))">🥊</span><span style="font-size:0.62rem;font-weight:800;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.4);letter-spacing:0.03em;white-space:nowrap">格鬥</span></button><button class="tc-btn dim" id="tcb-Poison" style="background-color: rgb(145, 65, 203);" contenteditable="false"><span style="font-size:1.35rem;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2))">☠️</span><span style="font-size:0.62rem;font-weight:800;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.4);letter-spacing:0.03em;white-space:nowrap">毒</span></button><button class="tc-btn dim" id="tcb-Ground" style="background-color: rgb(145, 81, 33);" contenteditable="false"><span style="font-size:1.35rem;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2))">🏔️</span><span style="font-size:0.62rem;font-weight:800;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.4);letter-spacing:0.03em;white-space:nowrap">地面</span></button><button class="tc-btn dim" id="tcb-Flying" style="background-color: rgb(130, 186, 240);" contenteditable="false"><span style="font-size:1.35rem;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2))">🦅</span><span style="font-size:0.62rem;font-weight:800;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.4);letter-spacing:0.03em;white-space:nowrap">飛行</span></button><button class="tc-btn dim" id="tcb-Psychic" style="background-color: rgb(239, 65, 121);" contenteditable="false"><span style="font-size:1.35rem;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2))">🔮</span><span style="font-size:0.62rem;font-weight:800;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.4);letter-spacing:0.03em;white-space:nowrap">超能</span></button><button class="tc-btn dim" id="tcb-Bug" style="background-color: rgb(146, 161, 25);" contenteditable="false"><span style="font-size:1.35rem;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2))">🐛</span><span style="font-size:0.62rem;font-weight:800;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.4);letter-spacing:0.03em;white-space:nowrap">蟲</span></button><button class="tc-btn dim" id="tcb-Rock" style="background-color: rgb(175, 169, 129);" contenteditable="false"><span style="font-size:1.35rem;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2))">🪨</span><span style="font-size:0.62rem;font-weight:800;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.4);letter-spacing:0.03em;white-space:nowrap">岩石</span></button><button class="tc-btn dim" id="tcb-Ghost" style="background-color: rgb(112, 65, 112);" contenteditable="false"><span style="font-size:1.35rem;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2))">👻</span><span style="font-size:0.62rem;font-weight:800;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.4);letter-spacing:0.03em;white-space:nowrap">幽靈</span></button><button class="tc-btn dim" id="tcb-Dragon" style="background-color: rgb(80, 96, 225);" contenteditable="false"><span style="font-size:1.35rem;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2))">🐉</span><span style="font-size:0.62rem;font-weight:800;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.4);letter-spacing:0.03em;white-space:nowrap">龍</span></button><button class="tc-btn dim" id="tcb-Dark" style="background-color: rgb(98, 77, 78);" contenteditable="false"><span style="font-size:1.35rem;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2))">🌑</span><span style="font-size:0.62rem;font-weight:800;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.4);letter-spacing:0.03em;white-space:nowrap">惡</span></button><button class="tc-btn dim" id="tcb-Steel" style="background-color: rgb(96, 161, 184);" contenteditable="false"><span style="font-size:1.35rem;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2))">⚙️</span><span style="font-size:0.62rem;font-weight:800;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.4);letter-spacing:0.03em;white-space:nowrap">鋼</span></button><button class="tc-btn dim" id="tcb-Fairy" style="background-color: rgb(239, 112, 239);" contenteditable="false"><span style="font-size:1.35rem;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2))">🌸</span><span style="font-size:0.62rem;font-weight:800;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.4);letter-spacing:0.03em;white-space:nowrap">妖精</span></button></div>
+                </div>
             </div>
 
             <!-- Results card -->
@@ -2146,92 +2157,41 @@
         </main>
 
         <style>
-        /* ── 屬性選擇清單 (list-item style) ── */
-        #tc-grid { list-style:none; margin:0; padding:0; }
-        .tc-btn {
-            width:100%; display:flex; flex-direction:row; align-items:center;
-            gap:0; padding:0; border:none; border-bottom:1px solid #f0f2f5;
-            background:white; cursor:pointer; font-family:inherit;
-            transition:background 0.12s; user-select:none;
-            -webkit-tap-highlight-color:transparent; position:relative;
-        }
-        .tc-btn:last-child { border-bottom:none; }
-        .tc-btn:hover { background:#f8faff; }
-        .tc-btn:active { background:#eef3ff; }
-        /* Badge 左側色塊 */
-        .tc-btn .tc-badge {
-            flex-shrink:0; width:72px; min-height:52px;
-            display:flex; align-items:center; justify-content:center;
-            padding:8px 10px;
-        }
-        .tc-btn .tc-badge img {
-            height:28px; width:auto; object-fit:contain;
-            filter:drop-shadow(0 1px 3px rgba(0,0,0,0.18));
-        }
-        /* 名稱文字 */
-        .tc-btn .tc-name {
-            flex:1; padding:14px 16px 14px 4px;
-            font-size:1rem; font-weight:700; color:#1e293b;
-            text-align:left; letter-spacing:0.02em;
-        }
-        /* 右側勾選指示 */
-        .tc-btn .tc-check {
-            flex-shrink:0; width:36px; height:52px;
-            display:flex; align-items:center; justify-content:center;
-            font-size:1.1rem; opacity:0; transition:opacity 0.15s;
-        }
-        /* 選取狀態：整列背景上色，文字白色 */
-        .tc-btn.sel1 { background:var(--tc-color); }
-        .tc-btn.sel1 .tc-name { color:white; text-shadow:0 1px 3px rgba(0,0,0,0.35); }
-        .tc-btn.sel1 .tc-check { opacity:1; color:white; }
-        .tc-btn.sel1 .tc-badge img { filter:drop-shadow(0 1px 3px rgba(0,0,0,0.3)) brightness(1.15); }
-        .tc-btn.sel2 { background:var(--tc-color); }
-        .tc-btn.sel2 .tc-name { color:white; text-shadow:0 1px 3px rgba(0,0,0,0.35); }
-        .tc-btn.sel2 .tc-check { opacity:1; color:white; }
-        .tc-btn.sel2 .tc-badge img { filter:drop-shadow(0 1px 3px rgba(0,0,0,0.3)) brightness(1.15); }
-        /* 淡出未選 */
-        .tc-btn.dim { opacity:0.38; }
-        /* 分隔：左邊色條 */
-        .tc-btn.sel1::before, .tc-btn.sel2::before {
-            content:''; position:absolute; left:0; top:0; bottom:0;
-            width:4px; background:rgba(255,255,255,0.5); border-radius:0 3px 3px 0;
-        }
-        /* 結果標籤 */
-        .tc-tag { display:inline-flex; align-items:center; gap:5px; padding:4px 11px 4px 6px; border-radius:999px; font-size:0.78rem; font-weight:700; color:white; text-shadow:0 1px 3px rgba(0,0,0,0.35); box-shadow:0 2px 7px rgba(0,0,0,0.14); }
-        .tc-tag img { height:16px; width:auto; filter:brightness(10); vertical-align:middle; }
+        .tc-btn { position:relative; display:flex; flex-direction:row; align-items:center; justify-content:center; gap:5px; padding:8px 6px 7px; border-radius:11px; border:2.5px solid transparent; cursor:pointer; transition:transform 0.13s, box-shadow 0.13s, opacity 0.13s; box-shadow:0 2px 6px rgba(0,0,0,0.12),inset 0 1px 0 rgba(255,255,255,0.25); user-select:none; -webkit-tap-highlight-color:transparent; font-family:inherit; }
+        .tc-btn:hover { transform:translateY(-2px) scale(1.04); box-shadow:0 5px 16px rgba(0,0,0,0.20),inset 0 1px 0 rgba(255,255,255,0.25); }
+        .tc-btn:active { transform:scale(0.96); }
+        .tc-btn.sel1 { border-color:#fff; box-shadow:0 0 0 3px #003366,0 4px 14px rgba(0,0,0,0.25); transform:scale(1.07); }
+        .tc-btn.sel2 { border-color:#fff; box-shadow:0 0 0 3px #00AEEF,0 4px 14px rgba(0,0,0,0.25); transform:scale(1.07); }
+        .tc-btn.dim { opacity:0.42; transform:scale(0.97); }
+        .tc-chip { display:inline-flex; align-items:center; gap:5px; padding:5px 12px 5px 8px; border-radius:999px; font-size:0.78rem; font-weight:800; color:white; text-shadow:0 1px 3px rgba(0,0,0,0.35); box-shadow:0 2px 8px rgba(0,0,0,0.15); animation:tcChipIn 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+        @keyframes tcChipIn { from{transform:scale(0.5);opacity:0} to{transform:scale(1);opacity:1} }
+        .tc-tag { display:inline-flex; align-items:center; gap:5px; padding:4px 11px 4px 8px; border-radius:999px; font-size:0.75rem; font-weight:700; color:white; text-shadow:0 1px 3px rgba(0,0,0,0.35); box-shadow:0 2px 7px rgba(0,0,0,0.14); }
         .tc-results-wrap { animation:tcFadeUp 0.28s ease; }
         @keyframes tcFadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-        /* 深色模式 */
-        .dark-mode .tc-btn { background:#1f2937; border-bottom-color:#374151; }
-        .dark-mode .tc-btn:hover { background:#253347; }
-        .dark-mode .tc-btn .tc-name { color:#f1f5f9; }
-        .dark-mode .tc-btn.sel1, .dark-mode .tc-btn.sel2 { background:var(--tc-color); }
-        .dark-mode .tc-btn.sel1 .tc-name, .dark-mode .tc-btn.sel2 .tc-name { color:white; }
+        @media(max-width:480px){ #tc-grid{grid-template-columns:repeat(3,1fr)!important;} }
         </style>
 
         <script>
         (function(){
-        // Official Pokémon type icons from Pokémon HOME / Serebii
-        const TC_ICON_BASE = 'https://www.serebii.net/pokedex-sv/type/';
         const TC_TYPES = {
-            Normal:   { zh:'一般', color:'#9FA19F', icon: TC_ICON_BASE+'normal.gif'   },
-            Fire:     { zh:'火',   color:'#E62829', icon: TC_ICON_BASE+'fire.gif'     },
-            Water:    { zh:'水',   color:'#2980EF', icon: TC_ICON_BASE+'water.gif'    },
-            Electric: { zh:'電',   color:'#FAC000', icon: TC_ICON_BASE+'electric.gif' },
-            Grass:    { zh:'草',   color:'#3FA129', icon: TC_ICON_BASE+'grass.gif'    },
-            Ice:      { zh:'冰',   color:'#3DCEF3', icon: TC_ICON_BASE+'ice.gif'      },
-            Fighting: { zh:'格鬥', color:'#FF8000', icon: TC_ICON_BASE+'fighting.gif' },
-            Poison:   { zh:'毒',   color:'#9141CB', icon: TC_ICON_BASE+'poison.gif'   },
-            Ground:   { zh:'地面', color:'#915121', icon: TC_ICON_BASE+'ground.gif'   },
-            Flying:   { zh:'飛行', color:'#82BAF0', icon: TC_ICON_BASE+'flying.gif'   },
-            Psychic:  { zh:'超能', color:'#EF4179', icon: TC_ICON_BASE+'psychic.gif'  },
-            Bug:      { zh:'蟲',   color:'#92A119', icon: TC_ICON_BASE+'bug.gif'      },
-            Rock:     { zh:'岩石', color:'#AFA981', icon: TC_ICON_BASE+'rock.gif'     },
-            Ghost:    { zh:'幽靈', color:'#704170', icon: TC_ICON_BASE+'ghost.gif'    },
-            Dragon:   { zh:'龍',   color:'#5060E1', icon: TC_ICON_BASE+'dragon.gif'   },
-            Dark:     { zh:'惡',   color:'#624D4E', icon: TC_ICON_BASE+'dark.gif'     },
-            Steel:    { zh:'鋼',   color:'#60A1B8', icon: TC_ICON_BASE+'steel.gif'    },
-            Fairy:    { zh:'妖精', color:'#EF70EF', icon: TC_ICON_BASE+'fairy.gif'    },
+            Normal:   { zh:'一般', color:'#9FA19F', emoji:'⭕' },
+            Fire:     { zh:'火',   color:'#E62829', emoji:'🔥' },
+            Water:    { zh:'水',   color:'#2980EF', emoji:'💧' },
+            Electric: { zh:'電',   color:'#FAC000', emoji:'⚡' },
+            Grass:    { zh:'草',   color:'#3FA129', emoji:'🌿' },
+            Ice:      { zh:'冰',   color:'#3DCEF3', emoji:'❄️' },
+            Fighting: { zh:'格鬥', color:'#FF8000', emoji:'🥊' },
+            Poison:   { zh:'毒',   color:'#9141CB', emoji:'☠️' },
+            Ground:   { zh:'地面', color:'#915121', emoji:'🏔️' },
+            Flying:   { zh:'飛行', color:'#82BAF0', emoji:'🦅' },
+            Psychic:  { zh:'超能', color:'#EF4179', emoji:'🔮' },
+            Bug:      { zh:'蟲',   color:'#92A119', emoji:'🐛' },
+            Rock:     { zh:'岩石', color:'#AFA981', emoji:'🪨' },
+            Ghost:    { zh:'幽靈', color:'#704170', emoji:'👻' },
+            Dragon:   { zh:'龍',   color:'#5060E1', emoji:'🐉' },
+            Dark:     { zh:'惡',   color:'#624D4E', emoji:'🌑' },
+            Steel:    { zh:'鋼',   color:'#60A1B8', emoji:'⚙️' },
+            Fairy:    { zh:'妖精', color:'#EF70EF', emoji:'🌸' },
         };
         const TC_ATK = {
             Normal:   {Rock:0.5,Ghost:0,Steel:0.5},
@@ -2265,13 +2225,8 @@
                 const btn = document.createElement('button');
                 btn.className = 'tc-btn';
                 btn.id = 'tcb-' + t;
-                btn.style.setProperty('--tc-color', info.color);
-                btn.innerHTML =
-                    '<span class="tc-badge" style="background:'+info.color+'22">'
-                    +  '<img src="'+info.icon+'" alt="'+info.zh+'" onerror="this.style.display=\'none\'">'
-                    + '</span>'
-                    + '<span class="tc-name">'+info.zh+'</span>'
-                    + '<span class="tc-check">✓</span>';
+                btn.style.backgroundColor = info.color;
+                btn.innerHTML = '<span style="font-size:1.35rem;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2))">' + info.emoji + '</span><span style="font-size:0.82rem;font-weight:800;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.4);letter-spacing:0.03em;white-space:nowrap">' + info.zh + '</span>';
                 btn.onclick = function(){ tcClick(t); };
                 g.appendChild(btn);
             });
@@ -2316,6 +2271,15 @@
                 else if(tcSel[1]===t) b.classList.add('sel2');
                 else if(tcSel.length>0) b.classList.add('dim');
             });
+            const chips = document.getElementById('tc-chips');
+            if(tcSel.length === 0){
+                chips.innerHTML = '<span style="font-size:0.78rem;color:#94a3b8;font-style:italic">點選下方屬性按鈕開始查詢</span>';
+            } else {
+                chips.innerHTML = tcSel.map(t => {
+                    const info = TC_TYPES[t];
+                    return '<span class="tc-chip" style="background:'+info.color+'">'+info.emoji+' <span>'+info.zh+'</span></span>';
+                }).join('');
+            }
             tcRenderResults();
         }
 
@@ -2358,7 +2322,7 @@
                 html += '<div style="margin-bottom:14px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:26px;border-radius:7px;font-size:0.8rem;font-weight:900;background:'+cfg.bg+';color:white">'+cfg.label+'</span><span style="font-size:0.78rem;font-weight:700;color:#64748b">'+cfg.desc+'</span></div><div style="display:flex;flex-wrap:wrap;gap:6px">';
                 types.forEach(t => {
                     const info = TC_TYPES[t];
-                    html += '<span class="tc-tag" style="background:'+info.color+'"><img src="'+info.icon+'" alt="'+info.zh+'"> '+info.zh+'</span>';
+                    html += '<span class="tc-tag" style="background:'+info.color+'">'+info.emoji+' '+info.zh+'</span>';
                 });
                 html += '</div></div>';
             });
