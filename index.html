@@ -200,7 +200,9 @@
         .dark-mode .mode-switch { background-color: #374151; }
         .dark-mode .mode-switch .mode-switch-knob { transform: translateX(28px); background: #1f2937; }
 
-        .news-item { position: relative; padding-left: 24px; border-left: 2px solid #e2e8f0; }
+        .news-item { position: relative; padding-left: 16px; border-left: 2px solid #e2e8f0; }
+        #news-container > div { font-size: 0.88rem; }
+        #news-container .text-sm { font-size: 0.8rem !important; }
         .dark-mode .news-item { border-left-color: #4a5568; }
         .news-dot { position: absolute; left: -7px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background-color: #00AEEF; border: 2px solid white; }
         .dark-mode .news-dot { border-color: #2d3748; }
@@ -1003,17 +1005,17 @@
                                 最新情報與更新公告
                                 <button class="edit-ui admin-btn" onclick="addNewsCard()" contenteditable="false">[+] 新增公告</button>
                             </div>
-                            <div id="news-container" class="space-y-4"><div class="bg-white border-l-4 border-blue-500 shadow-md p-6" style="position: relative;">
+                            <div id="news-container" class="space-y-2"><div class="bg-white border-l-4 border-blue-500 shadow-sm p-3" style="position: relative;">
             <button class="edit-ui admin-btn admin-btn-delete absolute top-3 right-3" onclick="this.closest('#news-container &gt; div').remove()" contenteditable="false">[x] 刪除</button>
-            <div class="mb-3">
-                <span class="bg-blue-600 text-white text-xs px-2 py-1 font-bold whitespace-nowrap">更新</span>
-                <h3 class="inline text-xl font-bold text-blue-900 uppercase ml-2">v1.1 - 介面優化</h3>
+            <div class="mb-1">
+                <span class="bg-blue-600 text-white text-xs px-2 py-0.5 font-bold whitespace-nowrap">更新</span>
+                <h3 class="inline text-base font-bold text-blue-900 uppercase ml-2">v1.1 - 介面優化</h3>
             </div>
-            <div class="news-item ml-2 pb-1">
+            <div class="news-item ml-1 pb-0">
                 <div class="news-dot !bg-blue-500"></div>
                 <p class="text-gray-700 text-sm">UI導覽列重組與功能調整。</p>
             </div>
-            <div class="text-right mt-2">
+            <div class="text-right mt-1">
                 <span class="text-gray-400 text-xs font-bold">2026-04-13</span>
             </div></div>
                             
@@ -1745,7 +1747,7 @@
                         
                     </div>
                 </div>
-                <div class="sc-section" data-id="sec-1774697795410">
+                <div class="sc-section" data-id="sec-1774697795410" style="content-visibility:auto;contain-intrinsic-size:auto 120px;">
                     <div class="sc-sec-header" onclick="scToggle('sec-1774697795410')">
                         <span class="sc-sec-icon">🛡️</span>
                         <span class="sc-sec-title">雕塑版權保護系統</span>
@@ -1794,7 +1796,7 @@
                         
                     </div>
                 </div>
-                <div class="sc-section" data-id="sec-1774974099450">
+                <div class="sc-section" data-id="sec-1774974099450" style="content-visibility:auto;contain-intrinsic-size:auto 80px;">
                     <div class="sc-sec-header" onclick="scToggle('sec-1774974099450')">
                         <span class="sc-sec-icon">💧</span>
                         <span class="sc-sec-title">釣魚系統</span>
@@ -1818,7 +1820,7 @@
                         
                     </div>
                 </div>
-                <div class="sc-section" data-id="sec-1775811704528">
+                <div class="sc-section" data-id="sec-1775811704528" style="content-visibility:auto;contain-intrinsic-size:auto 80px;">
                     <div class="sc-sec-header" onclick="scToggle('sec-1775811704528')">
                         <span class="sc-sec-icon">🌐</span>
                         <span class="sc-sec-title">好友系統</span>
