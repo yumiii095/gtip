@@ -1563,10 +1563,10 @@ function executeFinalSave() {
     const _savedDark = (() => { try { return localStorage.getItem('cobblemon_dark'); } catch(e) { return null; } })();
     if (_savedDark === '1') {
         document.body.classList.add('dark-mode');
-        document.getElementById('mode-knob').innerText = '☀️';
+        document.getElementById('mode-knob').innerText = '🌙';
     } else {
         document.body.classList.remove('dark-mode');
-        document.getElementById('mode-knob').innerText = '🌙';
+        document.getElementById('mode-knob').innerText = '☀️';
     }
     showPage('home');
 
@@ -1657,7 +1657,7 @@ function addNewsCard() {
 function toggleDarkMode() {
     document.body.classList.toggle('dark-mode');
     const isDark = document.body.classList.contains('dark-mode');
-    document.getElementById('mode-knob').innerText = isDark ? '☀️' : '🌙';
+    document.getElementById('mode-knob').innerText = isDark ? '🌙' : '☀️';
     try { localStorage.setItem('cobblemon_dark', isDark ? '1' : '0'); } catch(e) {}
 }
 
