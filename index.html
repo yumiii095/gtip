@@ -2136,7 +2136,7 @@
                     <!-- Selection bar -->
                     <div style="display:flex; align-items:center; gap:10px; padding:13px 18px; background:linear-gradient(90deg,#f8fafc,#f0f7ff); border-radius:10px; margin-bottom:16px; border:1px solid #e2e8f0; min-height:56px;">
                         <span style="font-size:0.72rem; font-weight:700; color:#64748b; white-space:nowrap;">已選屬性：</span>
-                        <div id="tc-chips" style="display:flex; gap:7px; align-items:center; flex-wrap:wrap; flex:1;"><span class="tc-chip" style="background:#3FA129">🌿 <span>草</span></span></div>
+                        <div id="tc-chips" style="display:flex; gap:7px; align-items:center; flex-wrap:wrap; flex:1;"><span style="font-size:0.78rem;color:#94a3b8;font-style:italic">點選下方屬性按鈕開始查詢</span></div>
                         <button onclick="tcReset()" style="display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 8px; border: 1.5px solid rgb(226, 232, 240); background: white; font-size: 0.75rem; font-weight: 700; color: rgb(100, 116, 139); cursor: pointer; font-family: inherit;" onmouseover="this.style.borderColor='#ef4444';this.style.color='#ef4444';this.style.background='#fef2f2'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b';this.style.background='white'" contenteditable="false">
                             ↺ 重置
                         </button>
@@ -2152,12 +2152,12 @@
                     <span style="font-size:18px;">📊</span>
                     <span id="tc-result-title" style="font-weight:800; font-size:0.95rem; color:#003366;">此屬性組合攻擊各防禦屬性的效果</span>
                 </div>
-                <div id="tc-results" style="padding:18px 20px;"><div class="tc-results-wrap"><div style="margin-bottom:14px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:26px;border-radius:7px;font-size:0.8rem;font-weight:900;background:#dc2626;color:white">2×</span><span style="font-size:0.78rem;font-weight:700;color:#64748b">效果絕佳</span></div><div style="display:flex;flex-wrap:wrap;gap:6px"><span class="tc-tag" style="background:#E62829">🔥 火</span><span class="tc-tag" style="background:#3DCEF3">❄️ 冰</span><span class="tc-tag" style="background:#9141CB">☠️ 毒</span><span class="tc-tag" style="background:#82BAF0">🦅 飛行</span><span class="tc-tag" style="background:#92A119">🐛 蟲</span></div></div><div style="margin-bottom:14px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:26px;border-radius:7px;font-size:0.8rem;font-weight:900;background:#64748b;color:white">1×</span><span style="font-size:0.78rem;font-weight:700;color:#64748b">普通效果</span></div><div style="display:flex;flex-wrap:wrap;gap:6px"><span class="tc-tag" style="background:#9FA19F">⭕ 一般</span><span class="tc-tag" style="background:#FF8000">🥊 格鬥</span><span class="tc-tag" style="background:#EF4179">🔮 超能</span><span class="tc-tag" style="background:#AFA981">🪨 岩石</span><span class="tc-tag" style="background:#704170">👻 幽靈</span><span class="tc-tag" style="background:#5060E1">🐉 龍</span><span class="tc-tag" style="background:#624D4E">🌑 惡</span><span class="tc-tag" style="background:#60A1B8">⚙️ 鋼</span><span class="tc-tag" style="background:#EF70EF">🌸 妖精</span></div></div><div style="margin-bottom:14px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:26px;border-radius:7px;font-size:0.8rem;font-weight:900;background:#2563eb;color:white">½×</span><span style="font-size:0.78rem;font-weight:700;color:#64748b">效果不太好</span></div><div style="display:flex;flex-wrap:wrap;gap:6px"><span class="tc-tag" style="background:#2980EF">💧 水</span><span class="tc-tag" style="background:#FAC000">⚡ 電</span><span class="tc-tag" style="background:#3FA129">🌿 草</span><span class="tc-tag" style="background:#915121">🏔️ 地面</span></div></div></div></div>
+                <div id="tc-results" style="padding:18px 20px;"><div style="text-align:center;padding:36px 0 28px;color:#64748b"><div style="font-size:3rem;margin-bottom:10px">🔍</div><p style="font-size:0.85rem;font-weight:500">請先選擇屬性</p><div style="font-size:0.75rem;margin-top:5px;color:#94a3b8">選擇 1 或 2 種屬性後，結果將自動顯示</div></div></div>
             </div>
         </main>
 
         <style>
-        .tc-btn { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; padding:8px 4px 7px; border-radius:11px; border:2.5px solid transparent; cursor:pointer; transition:transform 0.13s, box-shadow 0.13s, opacity 0.13s; box-shadow:0 2px 6px rgba(0,0,0,0.12),inset 0 1px 0 rgba(255,255,255,0.25); user-select:none; -webkit-tap-highlight-color:transparent; font-family:inherit; }
+        .tc-btn { position:relative; display:flex; flex-direction:row; align-items:center; justify-content:center; gap:5px; padding:8px 6px 7px; border-radius:11px; border:2.5px solid transparent; cursor:pointer; transition:transform 0.13s, box-shadow 0.13s, opacity 0.13s; box-shadow:0 2px 6px rgba(0,0,0,0.12),inset 0 1px 0 rgba(255,255,255,0.25); user-select:none; -webkit-tap-highlight-color:transparent; font-family:inherit; }
         .tc-btn:hover { transform:translateY(-2px) scale(1.04); box-shadow:0 5px 16px rgba(0,0,0,0.20),inset 0 1px 0 rgba(255,255,255,0.25); }
         .tc-btn:active { transform:scale(0.96); }
         .tc-btn.sel1 { border-color:#fff; box-shadow:0 0 0 3px #003366,0 4px 14px rgba(0,0,0,0.25); transform:scale(1.07); }
@@ -2214,7 +2214,7 @@
             Fairy:    {Fire:0.5,Fighting:2,Poison:0.5,Dragon:2,Dark:2,Steel:0.5},
         };
         const TC_KEYS = Object.keys(TC_TYPES);
-        let tcMode = 'defense', tcSel = [];
+        let tcMode = 'offense', tcSel = [];
 
         function tcBuildGrid(){
             const g = document.getElementById('tc-grid');
@@ -2226,7 +2226,7 @@
                 btn.className = 'tc-btn';
                 btn.id = 'tcb-' + t;
                 btn.style.backgroundColor = info.color;
-                btn.innerHTML = '<span style="font-size:1.35rem;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2))">' + info.emoji + '</span><span style="font-size:0.62rem;font-weight:800;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.4);letter-spacing:0.03em;white-space:nowrap">' + info.zh + '</span>';
+                btn.innerHTML = '<span style="font-size:1.35rem;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2))">' + info.emoji + '</span><span style="font-size:0.82rem;font-weight:800;color:white;text-shadow:0 1px 3px rgba(0,0,0,0.4);letter-spacing:0.03em;white-space:nowrap">' + info.zh + '</span>';
                 btn.onclick = function(){ tcClick(t); };
                 g.appendChild(btn);
             });
@@ -2331,10 +2331,14 @@
         }
 
         // Init when DOM is ready
-        if(document.readyState === 'loading'){
-            document.addEventListener('DOMContentLoaded', tcBuildGrid);
-        } else {
+        function tcInit(){
             tcBuildGrid();
+            tcSetMode('defense');
+        }
+        if(document.readyState === 'loading'){
+            document.addEventListener('DOMContentLoaded', tcInit);
+        } else {
+            tcInit();
         }
         })();
         </script>
