@@ -1836,6 +1836,8 @@ window.onload = async function () {
             window.ADS_DATA = data.ads;
             // 同步寫入 localStorage，讓後續操作保持一致
             try { localStorage.setItem('cobblemon_ads', JSON.stringify(window.ADS_DATA)); } catch(e) {}
+            // JSON 載入後重新渲染首頁廣告區（DOMContentLoaded 時資料尚未就緒）
+            renderAdSidebar();
         }
 
         if (Array.isArray(data.serverCommands) && data.serverCommands.length > 0) {

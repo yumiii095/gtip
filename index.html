@@ -1635,13 +1635,15 @@
                 else if(tcSel.length>0) b.classList.add('dim');
             });
             const chips = document.getElementById('tc-chips');
-            if(tcSel.length === 0){
-                chips.innerHTML = '<span style="font-size:0.78rem;color:#94a3b8;font-style:italic">點選下方屬性按鈕開始查詢</span>';
-            } else {
-                chips.innerHTML = tcSel.map(t => {
-                    const info = TC_TYPES[t];
-                    return '<span class="tc-chip" style="background:'+info.color+'">'+info.emoji+' <span>'+info.zh+'</span></span>';
-                }).join('');
+            if(chips){
+                if(tcSel.length === 0){
+                    chips.innerHTML = '<span style="font-size:0.78rem;color:#94a3b8;font-style:italic">點選下方屬性按鈕開始查詢</span>';
+                } else {
+                    chips.innerHTML = tcSel.map(t => {
+                        const info = TC_TYPES[t];
+                        return '<span class="tc-chip" style="background:'+info.color+'">'+info.emoji+' <span>'+info.zh+'</span></span>';
+                    }).join('');
+                }
             }
             tcRenderResults();
         }
