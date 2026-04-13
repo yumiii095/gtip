@@ -1605,12 +1605,7 @@ function executeFinalSave() {
         // 確保匯出的 HTML 不帶 dark-mode，讓新檔案預設淺色模式
         const _hadDark = document.body.classList.contains('dark-mode');
         document.body.classList.remove('dark-mode');
-        // 匯出前將 scSections 還原為 loading 狀態，確保 HTML 不內嵌靜態指令資料
-        const scSec = document.getElementById('scSections');
-        const scSecBackup = scSec ? scSec.innerHTML : null;
-        if (scSec) scSec.innerHTML = '<div id="sc-loading-msg" style="text-align:center;padding:40px;color:#64748b;font-size:0.9rem;">⏳ 載入指令資料中...</div>';
         const exportedHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-        if (scSec && scSecBackup !== null) scSec.innerHTML = scSecBackup;
         if (_hadDark) document.body.classList.add('dark-mode');
         Object.assign(document.createElement('a'), {
             href     : URL.createObjectURL(new Blob([exportedHtml], { type: 'text/html' })),
@@ -1836,8 +1831,6 @@ window.onload = async function () {
             window.ADS_DATA = data.ads;
             // 同步寫入 localStorage，讓後續操作保持一致
             try { localStorage.setItem('cobblemon_ads', JSON.stringify(window.ADS_DATA)); } catch(e) {}
-            // JSON 載入後重新渲染首頁廣告區（DOMContentLoaded 時資料尚未就緒）
-            renderAdSidebar();
         }
 
         if (Array.isArray(data.serverCommands) && data.serverCommands.length > 0) {
