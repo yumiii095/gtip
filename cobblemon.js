@@ -394,14 +394,7 @@ function copyCmd(btn) {
         btn.classList.add('copied');
         setTimeout(() => { btn.textContent = '複製'; btn.classList.remove('copied'); }, 1800);
     };
-    navigator.clipboard?.writeText(text).then(feedback).catch(() => {
-        const ta = Object.assign(document.createElement('textarea'), { value: text });
-        ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px';
-        document.body.appendChild(ta);
-        ta.select();
-        try { document.execCommand('copy'); feedback(); } catch (err) {}
-        document.body.removeChild(ta);
-    });
+    navigator.clipboard?.writeText(text).then(feedback);
 }
 
 function addCmdRow(btn) {
