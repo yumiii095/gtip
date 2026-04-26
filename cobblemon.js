@@ -1579,12 +1579,9 @@ function executeFinalSave() {
         ...strategyEntries,
     ];
 
-    const serverCmds = window.scData || [];
-
     const jsonPayload = {
         data_version   : version,
         commands       : extractCommandsFromDOM(),
-        serverCommands : serverCmds,
         search_index   : ALL_DATA,
         strategies     : extractStrategiesFromDOM(),
         ads            : window.ADS_DATA || [],
@@ -1598,13 +1595,19 @@ function executeFinalSave() {
         // 確保匯出的 HTML 不帶 dark-mode，讓新檔案預設淺色模式
         const _hadDark = document.body.classList.contains('dark-mode');
         document.body.classList.remove('dark-mode');
-        // 匯出前將 scSections 還原為 loading 狀態，確保 HTML 不內嵌靜態指令資料
+        // 取得當前最新 scData，更新 HTML 內的內嵌資料
         const scSec = document.getElementById('scSections');
         const scSecBackup = scSec ? scSec.innerHTML : null;
-        if (scSec) scSec.innerHTML = '<div id="sc-loading-msg" style="text-align:center;padding:40px;color:#64748b;font-size:0.9rem;">⏳ 載入指令資料中...</div>';
-        const exportedHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+        if (scSec) scSec.innerHTML = '';
+        let exportedHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
         if (scSec && scSecBackup !== null) scSec.innerHTML = scSecBackup;
         if (_hadDark) document.body.classList.add('dark-mode');
+        // 將內嵌的 scData 替換為最新版本
+        const latestScData = JSON.stringify(window.scData || [], null, 0);
+        exportedHtml = exportedHtml.replace(
+            /const initial = \[([\s\S]*?)\];(\s*window\.scData = initial;)/,
+            'const initial = ' + latestScData + ';$2'
+        );
         Object.assign(document.createElement('a'), {
             href     : URL.createObjectURL(new Blob([exportedHtml], { type: 'text/html' })),
             download : 'index.html',
@@ -1829,10 +1832,6 @@ window.onload = async function () {
             renderSponsorGrid();
         }
 
-        if (Array.isArray(data.serverCommands) && data.serverCommands.length > 0) {
-            window.scData = data.serverCommands.map(s => Object.assign({}, s));
-            if (typeof window.scRender === 'function') window.scRender();
-        }
     }
 
     initFuse();
