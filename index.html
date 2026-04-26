@@ -1590,7 +1590,7 @@
             window.pdxLoad = async function() {
                 if (_loaded) return;
                 try {
-                    const res = await fetch('poke.json');
+                    const res = await fetch('poke.json?v=20260426');
                     if (!res.ok) throw new Error('HTTP ' + res.status);
                     POKEDEX = await res.json();
                     _loaded = true;
@@ -2503,7 +2503,7 @@
     })();
     </script>
 
-    <script src="cobblemon.js" defer=""></script>
+    <script src="cobblemon.js?v=20260426" defer=""></script>
 
     <script>
     // ── Global UI: Rounded search bar overrides ──────────────────────

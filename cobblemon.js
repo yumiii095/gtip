@@ -1503,11 +1503,33 @@ function extractStrategiesFromDOM() {
     }));
 }
 
+// 產生 Cache Busting 用的建置版本號（YYYYMMDDHHmm，台北時區）
+function _buildCacheBusterVer() {
+    const now  = new Date();
+    const fmt  = new Intl.DateTimeFormat('zh-TW', {
+        timeZone: 'Asia/Taipei',
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', hour12: false,
+    });
+    const parts = {};
+    fmt.formatToParts(now).forEach(p => { if (p.type !== 'literal') parts[p.type] = p.value; });
+    return `${parts.year}${parts.month}${parts.day}${parts.hour}${parts.minute}`;
+}
+
+// 將檔案內所有 ?v=xxxx 統一替換為新版本號
+// 比對範圍：?v= 後面非空白且非引號、結尾或 & 之前的字元
+function _stampCacheBuster(text, ver) {
+    return text.replace(/\?v=[^"'\s&)<>]+/g, '?v=' + ver);
+}
+
 function executeFinalSave() {
     const summary    = document.getElementById('modal-summary').value || '攻略站內容更新';
     const detail     = document.getElementById('modal-detail').value;
     const version    = document.getElementById('modal-version').value;
     const updateType = document.querySelector('input[name="update-type"]:checked')?.value || 'minor';
+
+    // 本次發佈統一使用的 Cache Busting 版本號
+    const _buildVer = _buildCacheBusterVer();
 
     const publishAnnouncement = updateType !== 'maintenance'
         || (document.getElementById('modal-publish-maintenance')?.checked ?? true);
@@ -1608,6 +1630,8 @@ function executeFinalSave() {
             /const initial = \[([\s\S]*?)\];(\s*window\.scData = initial;)/,
             'const initial = ' + latestScData + ';$2'
         );
+        // ── Cache Busting：將 HTML 內所有 ?v=xxx 替換成本次建置版本號 ──
+        exportedHtml = _stampCacheBuster(exportedHtml, _buildVer);
         Object.assign(document.createElement('a'), {
             href     : URL.createObjectURL(new Blob([exportedHtml], { type: 'text/html' })),
             download : 'index.html',
@@ -1615,9 +1639,11 @@ function executeFinalSave() {
     }, 300);
 
     setTimeout(() => {
-        fetch('cobblemon.js')
+        fetch('cobblemon.js?v=' + Date.now())
             .then(r => r.text())
             .then(src => {
+                // ── Cache Busting：將 JS 內所有 ?v=xxx 替換成本次建置版本號 ──
+                src = _stampCacheBuster(src, _buildVer);
                 Object.assign(document.createElement('a'), {
                     href     : URL.createObjectURL(new Blob([src], { type: 'application/javascript' })),
                     download : 'cobblemon.js',
@@ -1811,7 +1837,7 @@ window.onload = async function () {
 
     if (!data) {
         try {
-            const res = await fetch('cobblemon_data.json');
+            const res = await fetch('cobblemon_data.json?v=20260426');
             if (res.ok) data = await res.json();
         } catch (e) {
             console.error('[Cobblemon] JSON 載入失敗：', e);
