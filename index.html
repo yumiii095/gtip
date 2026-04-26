@@ -1526,7 +1526,7 @@
                     <div id="pdx-drop-hot" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:12px"></div>
                 </div>
 
-                <div id="pdx-drop-results" style="background:white; border-radius:14px; border:1px solid #e2e8f0; box-shadow:0 4px 24px rgba(6,78,59,0.08); padding:18px 20px; min-height:200px">
+                <div id="pdx-drop-results" class="pdx-drop-panel" style="border-radius:14px; border:1px solid #e2e8f0; box-shadow:0 4px 24px rgba(6,78,59,0.08); padding:18px 20px; min-height:200px">
                     <div style="text-align:center; padding:36px 0 28px; color:#64748b">
                         <div style="font-size:3rem; margin-bottom:10px">🎯</div>
                         <p style="font-size:0.9rem; font-weight:500">輸入物品名稱開始查詢</p>
@@ -1571,6 +1571,36 @@
         .dark-mode .pdx-hot-chip { background:#064e3b; border-color:#047857; color:#a7f3d0; }
         .dark-mode .pdx-modal { background:#1f2937; color:#f3f4f6; }
         .dark-mode .pdx-result-row { border-bottom-color:#374151; }
+
+        /* ─── 反查掉落物 — 淺色模式配色 ─── */
+        .pdx-drop-panel        { background:#ffffff; }
+        .pdx-drop-empty        { color:#64748b; }
+        .pdx-drop-empty-sub    { color:#94a3b8; }
+        .pdx-drop-summary      { color:#64748b; }
+        .pdx-drop-summary strong { color:#047857; }
+        .pdx-drop-group-title  { color:#064e3b; }
+        .pdx-drop-group-count  { color:#6b7280; }
+        .pdx-drop-no           { color:#10b981; background:#ecfdf5; }
+        .pdx-name              { color:#1f2937; }
+        .pdx-drop-chance       { color:#047857; }
+        .pdx-drop-chance-rare  { color:#92400e; }
+        .pdx-drop-qty          { color:#64748b; }
+        /* ─── 反查掉落物 — 深色模式覆蓋 ─── */
+        .dark-mode .pdx-drop-panel        { background:#1f2937; border-color:#374151 !important; }
+        .dark-mode .pdx-drop-empty        { color:#cbd5e1; }
+        .dark-mode .pdx-drop-empty-sub    { color:#94a3b8; }
+        .dark-mode .pdx-drop-summary      { color:#cbd5e1; }
+        .dark-mode .pdx-drop-summary strong { color:#34d399; }
+        .dark-mode .pdx-drop-group-title  { color:#a7f3d0; border-bottom-color:#065f46 !important; }
+        .dark-mode .pdx-drop-group-count  { color:#94a3b8; }
+        .dark-mode .pdx-drop-no           { color:#6ee7b7; background:#064e3b; }
+        .dark-mode .pdx-name              { color:#f3f4f6; }
+        .dark-mode .pdx-drop-chance       { color:#34d399; }
+        .dark-mode .pdx-drop-chance-rare  { color:#fcd34d; }
+        .dark-mode .pdx-drop-qty          { color:#cbd5e1; }
+        /* hover 行(JS 會把 background 設成淺綠 #f0fdf4),深色模式覆蓋 */
+        .dark-mode .pdx-result-row[style*="background: rgb(240, 253, 244)"],
+        .dark-mode .pdx-result-row[style*="background: #f0fdf4"] { background:#064e3b !important; }
 
         @media (max-width:480px) {
             #pdx-list { grid-template-columns:1fr !important; }
@@ -1786,7 +1816,7 @@
                 const q = document.getElementById('pdx-drop-search').value.trim();
                 const out = document.getElementById('pdx-drop-results');
                 if (!q) {
-                    out.innerHTML = '<div style="text-align:center; padding:36px 0 28px; color:#64748b"><div style="font-size:3rem; margin-bottom:10px">🎯</div><p style="font-size:0.9rem; font-weight:500">輸入物品名稱開始查詢</p><div style="font-size:0.75rem; margin-top:5px; color:#94a3b8">或點擊上方熱門物品標籤</div></div>';
+                    out.innerHTML = '<div class="pdx-drop-empty" style="text-align:center; padding:36px 0 28px"><div style="font-size:3rem; margin-bottom:10px">🎯</div><p style="font-size:0.9rem; font-weight:500">輸入物品名稱開始查詢</p><div class="pdx-drop-empty-sub" style="font-size:0.75rem; margin-top:5px">或點擊上方熱門物品標籤</div></div>';
                     return;
                 }
                 const ql = q.toLowerCase();
@@ -1800,7 +1830,7 @@
                 });
 
                 if (matches.length === 0) {
-                    out.innerHTML = '<div style="text-align:center; padding:36px 0; color:#64748b"><div style="font-size:3rem; margin-bottom:10px">🤔</div><p style="font-size:0.95rem; font-weight:600">沒有寶可夢會掉落「' + _esc(q) + '」</p><p style="font-size:0.78rem; margin-top:6px">試試其他關鍵字</p></div>';
+                    out.innerHTML = '<div class="pdx-drop-empty" style="text-align:center; padding:36px 0"><div style="font-size:3rem; margin-bottom:10px">🤔</div><p style="font-size:0.95rem; font-weight:600">沒有寶可夢會掉落「' + _esc(q) + '」</p><p style="font-size:0.78rem; margin-top:6px">試試其他關鍵字</p></div>';
                     return;
                 }
 
@@ -1810,7 +1840,7 @@
                     (byItem[m.drop.item] = byItem[m.drop.item] || []).push(m);
                 });
 
-                let html = '<div style="margin-bottom:12px; font-size:0.82rem; color:#64748b">找到 <strong style="color:#047857">' + matches.length + '</strong> 筆掉落紀錄,涵蓋 <strong style="color:#047857">' + Object.keys(byItem).length + '</strong> 種物品</div>';
+                let html = '<div class="pdx-drop-summary" style="margin-bottom:12px; font-size:0.82rem">找到 <strong>' + matches.length + '</strong> 筆掉落紀錄,涵蓋 <strong>' + Object.keys(byItem).length + '</strong> 種物品</div>';
 
                 Object.keys(byItem).sort((a,b) => byItem[b].length - byItem[a].length).forEach(itemName => {
                     const list = byItem[itemName];
@@ -1821,17 +1851,17 @@
                         return bv - av;
                     });
                     html += '<div style="margin-bottom:18px">' +
-                        '<div style="font-size:0.92rem; font-weight:800; color:#064e3b; margin-bottom:6px; padding-bottom:6px; border-bottom:2px solid #d1fae5">' +
-                            hl(itemName, q) + ' <span style="font-size:0.72rem; color:#6b7280; font-weight:600">(' + list.length + ' 隻)</span>' +
+                        '<div class="pdx-drop-group-title" style="font-size:0.92rem; font-weight:800; margin-bottom:6px; padding-bottom:6px; border-bottom:2px solid #d1fae5">' +
+                            hl(itemName, q) + ' <span class="pdx-drop-group-count" style="font-size:0.72rem; font-weight:600">(' + list.length + ' 隻)</span>' +
                         '</div>';
                     list.forEach(m => {
                         const d = m.drop;
-                        const right = d.chance ? '<span style="font-weight:700; font-size:0.82rem; color:' + (isRareDrop(d) ? '#92400e' : '#047857') + '">' + _esc(d.chance) + '</span>'
-                                    : d.quantity ? '<span style="color:#64748b; font-size:0.82rem">×' + _esc(d.quantity) + '</span>'
+                        const right = d.chance ? '<span class="' + (isRareDrop(d) ? 'pdx-drop-chance-rare' : 'pdx-drop-chance') + '" style="font-weight:700; font-size:0.82rem">' + _esc(d.chance) + '</span>'
+                                    : d.quantity ? '<span class="pdx-drop-qty" style="font-size:0.82rem">×' + _esc(d.quantity) + '</span>'
                                     : '';
                         html += '<div class="pdx-result-row" onclick="pdxOpenDetail(' + m.pokemon.no + ')" style="cursor:pointer; border-radius:8px; transition:background 0.13s" onmouseover="this.style.background=\'#f0fdf4\'" onmouseout="this.style.background=\'\'">' +
-                            '<span style="font-family:monospace; font-size:0.74rem; color:#10b981; background:#ecfdf5; padding:2px 8px; border-radius:999px; font-weight:700">#' + String(m.pokemon.no).padStart(4, '0') + '</span>' +
-                            '<span style="flex:1; font-weight:600; color:#1f2937" class="pdx-name">' + _esc(m.pokemon.name) + '</span>' +
+                            '<span class="pdx-drop-no" style="font-family:monospace; font-size:0.74rem; padding:2px 8px; border-radius:999px; font-weight:700">#' + String(m.pokemon.no).padStart(4, '0') + '</span>' +
+                            '<span style="flex:1; font-weight:600" class="pdx-name">' + _esc(m.pokemon.name) + '</span>' +
                             right +
                         '</div>';
                     });
@@ -1839,10 +1869,6 @@
                 });
 
                 out.innerHTML = html;
-                // 深色模式名字顏色補上
-                if (document.body.classList.contains('dark-mode')) {
-                    out.querySelectorAll('.pdx-name').forEach(el => el.style.color = '#f3f4f6');
-                }
             };
 
             // ESC 關閉詳細視窗
