@@ -1674,6 +1674,8 @@ function showPage(pageId) {
     document.getElementById('mobile-menu').classList.remove('open');
     // 切換到贊助/廣告相關頁時重新渲染（保持 editing 狀態同步）
     if (pageId === 'sponsor') { renderAdSidebar(); renderSponsorGrid(); }
+    // 切換到圖鑑分頁時觸發 JSON 載入(只會載一次)
+    if (pageId === 'pokedex' && typeof window.pdxLoad === 'function') { window.pdxLoad(); }
     // 廣告詳情頁隱藏 header（導覽列）與 footer，其他頁面顯示
     const footer = document.querySelector('footer');
     if (footer) footer.style.display = (pageId === 'ad-detail') ? 'none' : '';

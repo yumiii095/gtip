@@ -930,6 +930,7 @@
                 <ul class="flex space-x-1 font-bold">
                     <li><button onclick="showPage('home')" class="px-3 py-2 hover:bg-blue-50 text-blue-900 rounded-lg transition-colors" contenteditable="false">首頁</button></li>
                     <li><button onclick="showPage('commands')" class="px-3 py-2 hover:bg-blue-50 text-blue-900 rounded-lg transition-colors" contenteditable="false">指令集</button></li>
+                    <li><button onclick="showPage('pokedex')" class="px-3 py-2 hover:bg-emerald-50 text-emerald-700 rounded-lg transition-colors" contenteditable="false">📖 圖鑑</button></li>
                     <li><button onclick="showPage('typechart')" class="px-3 py-2 hover:bg-pink-50 text-pink-700 rounded-lg transition-colors" contenteditable="false">屬性克制表</button></li>
                     <li><button onclick="showPage('strategy')" class="px-3 py-2 hover:bg-purple-50 text-purple-700 rounded-lg transition-colors" contenteditable="false">攻略區</button></li>
                     <li><button onclick="showPage('sponsor')" class="px-3 py-2 hover:bg-yellow-50 text-yellow-600 rounded-lg font-bold transition-colors" contenteditable="false">🌟 贊助伺服器</button></li>
@@ -943,6 +944,7 @@
             <div class="flex flex-col p-4 space-y-2 font-bold">
                 <button onclick="showPage('home')" class="text-left py-2 border-b rounded-lg px-2 hover:bg-gray-50" contenteditable="false">🏠 首頁</button>
                 <button onclick="showPage('commands')" class="text-left py-2 border-b text-blue-900 rounded-lg px-2 hover:bg-blue-50" contenteditable="false">📋 指令集</button>
+                <button onclick="showPage('pokedex')" class="text-left py-2 border-b text-emerald-700 rounded-lg px-2 hover:bg-emerald-50" contenteditable="false">📖 寶可夢圖鑑</button>
                 <button onclick="showPage('typechart')" class="text-left py-2 border-b text-pink-700 rounded-lg px-2 hover:bg-pink-50" contenteditable="false"> 屬性克制表</button>
                 <button onclick="showPage('strategy')" class="text-left py-2 border-b text-purple-700 rounded-lg px-2 hover:bg-purple-50" contenteditable="false">⚔️ 攻略區</button>
                 <button onclick="showPage('sponsor')" class="text-left py-2 border-b text-yellow-600 font-bold rounded-lg px-2 hover:bg-yellow-50" contenteditable="false">🌟 贊助伺服器</button>
@@ -1459,6 +1461,398 @@
     </div>
 
     <!-- 屬性克制表分頁 -->
+    <!-- ════════════════════════════════════════════════
+         寶可夢圖鑑分頁(列表 + 搜尋 + 反查掉落物)
+    ════════════════════════════════════════════════ -->
+    <div id="pokedex-page" class="page-content hidden">
+        <div class="edit-ignore" contenteditable="false" style="background: linear-gradient(135deg, #064e3b 0%, #047857 60%, #10b981 100%); border-bottom: 2px solid #059669; padding: 20px 24px 18px">
+            <div style="max-width:1100px; margin:0 auto; display:flex; align-items:center; gap:14px">
+                <span style="font-size:30px; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3))">📖</span>
+                <div>
+                    <h2 style="color:white; font-size:1.35rem; font-weight:900; letter-spacing:0.02em; text-shadow:0 1px 4px rgba(0,0,0,0.3); margin:0">寶可夢圖鑑</h2>
+                    <p style="color:rgba(255,255,255,0.78); font-size:0.78rem; margin:2px 0 0 0">查詢全國圖鑑編號、掉落物與生態域加成</p>
+                </div>
+                <span id="pdx-count-badge" style="margin-left:auto; background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.3); color:white; font-size:0.7rem; font-weight:700; padding:3px 10px; border-radius:999px">載入中…</span>
+            </div>
+        </div>
+
+        <main style="max-width:1100px; margin:0 auto; padding:20px 16px 40px">
+            <!-- 模式分頁:瀏覽圖鑑 / 反查掉落物 -->
+            <div id="pdx-mode-tabs" style="display:flex; gap:8px; margin-bottom:18px">
+                <button id="pdx-tab-list" onclick="pdxSetMode('list')" class="pdx-tab pdx-tab-active" contenteditable="false">📚 瀏覽圖鑑</button>
+                <button id="pdx-tab-drop" onclick="pdxSetMode('drop')" class="pdx-tab" contenteditable="false">🎁 反查掉落物</button>
+            </div>
+
+            <!-- ─── 模式 A:瀏覽圖鑑 ─── -->
+            <div id="pdx-mode-list">
+                <!-- 搜尋列 -->
+                <div style="background:white; border-radius:14px; border:1px solid #e2e8f0; box-shadow:0 4px 24px rgba(6,78,59,0.08); padding:14px 16px; margin-bottom:16px; display:flex; gap:10px; align-items:center; flex-wrap:wrap">
+                    <span style="font-size:18px">🔍</span>
+                    <input id="pdx-search" type="text" placeholder="搜尋編號或名稱(例如:25、皮卡丘、噴火龍)"
+                        style="flex:1 1 220px; min-width:0; padding:8px 12px; border:1.5px solid #d1d5db; border-radius:8px; font-size:0.9rem; outline:none; transition:border-color 0.15s"
+                        oninput="pdxRenderList()" onfocus="this.style.borderColor='#10b981'" onblur="this.style.borderColor='#d1d5db'">
+                    <select id="pdx-filter" onchange="pdxRenderList()"
+                        style="padding:8px 12px; border:1.5px solid #d1d5db; border-radius:8px; font-size:0.85rem; background:white; cursor:pointer">
+                        <option value="all">全部</option>
+                        <option value="has-drop">有掉落物</option>
+                        <option value="has-bonus">有生態域加成</option>
+                        <option value="no-data">資料未公開</option>
+                    </select>
+                    <button onclick="pdxClearSearch()" class="btn-sq" style="padding:8px 14px; background:#f1f5f9; color:#475569; border:1.5px solid #d1d5db; border-radius:8px; font-size:0.82rem; font-weight:600; cursor:pointer">清除</button>
+                </div>
+
+                <!-- 列表結果 -->
+                <div id="pdx-list-status" style="text-align:center; padding:48px 0; color:#64748b">
+                    <div style="font-size:3rem; margin-bottom:10px">⏳</div>
+                    <p style="font-size:0.9rem">正在載入圖鑑資料…</p>
+                </div>
+                <div id="pdx-list" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:12px"></div>
+                <div id="pdx-list-more" style="text-align:center; margin-top:18px; display:none">
+                    <button onclick="pdxShowMore()" class="btn-sq" style="padding:10px 28px; background:linear-gradient(135deg,#047857,#10b981); color:white; border:none; border-radius:10px; font-size:0.9rem; font-weight:700; cursor:pointer; box-shadow:0 4px 12px rgba(16,185,129,0.3)">載入更多 ↓</button>
+                </div>
+            </div>
+
+            <!-- ─── 模式 B:反查掉落物 ─── -->
+            <div id="pdx-mode-drop" style="display:none">
+                <div style="background:white; border-radius:14px; border:1px solid #e2e8f0; box-shadow:0 4px 24px rgba(6,78,59,0.08); padding:14px 16px; margin-bottom:16px">
+                    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:12px">
+                        <span style="font-size:18px">🎁</span>
+                        <span style="font-weight:800; color:#064e3b; font-size:0.95rem">輸入物品名稱,查詢哪些寶可夢會掉</span>
+                    </div>
+                    <input id="pdx-drop-search" type="text" placeholder="例如:奇蹟種子、烈焰粉、皮革、莓莓果"
+                        style="width:100%; padding:10px 14px; border:1.5px solid #d1d5db; border-radius:10px; font-size:0.95rem; outline:none; transition:border-color 0.15s"
+                        oninput="pdxRenderDropSearch()" onfocus="this.style.borderColor='#10b981'" onblur="this.style.borderColor='#d1d5db'">
+                    <!-- 熱門物品快捷 -->
+                    <div id="pdx-drop-hot" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:12px"></div>
+                </div>
+
+                <div id="pdx-drop-results" style="background:white; border-radius:14px; border:1px solid #e2e8f0; box-shadow:0 4px 24px rgba(6,78,59,0.08); padding:18px 20px; min-height:200px">
+                    <div style="text-align:center; padding:36px 0 28px; color:#64748b">
+                        <div style="font-size:3rem; margin-bottom:10px">🎯</div>
+                        <p style="font-size:0.9rem; font-weight:500">輸入物品名稱開始查詢</p>
+                        <div style="font-size:0.75rem; margin-top:5px; color:#94a3b8">或點擊上方熱門物品標籤</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <style>
+        .pdx-tab { flex:1 1 0%; padding:10px 0; border-radius:10px; border:2px solid #e2e8f0; background:#f8fafc; color:#64748b; font-size:0.82rem; font-weight:700; cursor:pointer; font-family:inherit; transition:all 0.15s; }
+        .pdx-tab:hover { background:#f1f5f9; }
+        .pdx-tab-active { border-color:#047857 !important; background:linear-gradient(135deg,#047857,#10b981) !important; color:white !important; box-shadow:0 4px 12px rgba(16,185,129,0.25); }
+        .pdx-card { background:white; border:1px solid #e2e8f0; border-radius:12px; padding:14px; transition:all 0.15s; cursor:pointer; position:relative; overflow:hidden; }
+        .pdx-card:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(6,78,59,0.12); border-color:#10b981; }
+        .pdx-card-no { font-family:'Courier New',monospace; font-size:0.7rem; font-weight:700; color:#10b981; background:#ecfdf5; padding:2px 8px; border-radius:999px; display:inline-block; }
+        .pdx-card-name { font-size:1rem; font-weight:800; color:#064e3b; margin:6px 0 8px; }
+        .pdx-drop-chip { display:inline-flex; align-items:center; gap:4px; background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; font-size:0.72rem; padding:2px 8px; border-radius:999px; font-weight:600; margin:2px 3px 2px 0; }
+        .pdx-drop-chip-rare { background:#fef3c7; border-color:#fcd34d; color:#92400e; }
+        .pdx-drop-chip-empty { background:#f3f4f6; border-color:#e5e7eb; color:#9ca3af; font-style:italic; }
+        .pdx-bonus-tag { display:inline-block; background:#fef3c7; color:#78350f; font-size:0.65rem; padding:1px 6px; border-radius:4px; font-weight:700; margin-top:6px; border:1px solid #fcd34d; }
+        .pdx-hot-chip { background:#ecfdf5; border:1px solid #6ee7b7; color:#065f46; font-size:0.74rem; padding:4px 10px; border-radius:999px; cursor:pointer; font-weight:600; transition:all 0.13s; }
+        .pdx-hot-chip:hover { background:#10b981; color:white; transform:translateY(-1px); }
+        .pdx-result-row { display:flex; align-items:center; gap:12px; padding:10px 4px; border-bottom:1px solid #f3f4f6; }
+        .pdx-result-row:last-child { border-bottom:none; }
+        .pdx-modal-overlay { position:fixed; inset:0; background:rgba(15,23,42,0.6); z-index:9998; display:flex; align-items:center; justify-content:center; padding:16px; backdrop-filter:blur(4px); }
+        .pdx-modal { background:white; border-radius:16px; max-width:560px; width:100%; max-height:85vh; overflow-y:auto; box-shadow:0 25px 60px rgba(0,0,0,0.4); animation:pdxModalIn 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+        @keyframes pdxModalIn { from{opacity:0; transform:scale(0.92)} to{opacity:1; transform:scale(1)} }
+        mark.pdx-hl { background:#fde68a; color:#78350f; padding:0 2px; border-radius:2px; font-weight:800; }
+
+        /* 深色模式 */
+        .dark-mode .pdx-tab { background:#374151; color:#9ca3af; border-color:#4b5563; }
+        .dark-mode .pdx-tab:hover { background:#4b5563; }
+        .dark-mode .pdx-card { background:#1f2937; border-color:#374151; }
+        .dark-mode .pdx-card:hover { border-color:#10b981; }
+        .dark-mode .pdx-card-name { color:#f3f4f6; }
+        .dark-mode .pdx-card-no { background:#064e3b; color:#6ee7b7; }
+        .dark-mode .pdx-drop-chip { background:#064e3b; border-color:#047857; color:#a7f3d0; }
+        .dark-mode .pdx-drop-chip-rare { background:#451a03; border-color:#92400e; color:#fcd34d; }
+        .dark-mode .pdx-drop-chip-empty { background:#1f2937; border-color:#374151; color:#6b7280; }
+        .dark-mode .pdx-bonus-tag { background:#451a03; border-color:#92400e; color:#fcd34d; }
+        .dark-mode .pdx-hot-chip { background:#064e3b; border-color:#047857; color:#a7f3d0; }
+        .dark-mode .pdx-modal { background:#1f2937; color:#f3f4f6; }
+        .dark-mode .pdx-result-row { border-bottom-color:#374151; }
+
+        @media (max-width:480px) {
+            #pdx-list { grid-template-columns:1fr !important; }
+        }
+        </style>
+
+        <script>
+        /* ─── 寶可夢圖鑑邏輯 ─── */
+        (function() {
+            let POKEDEX = [];          // 全部資料
+            let _mode = 'list';         // 'list' | 'drop'
+            let _pageSize = 60;
+            let _showCount = _pageSize;
+            let _loaded = false;
+
+            // 載入 JSON
+            window.pdxLoad = async function() {
+                if (_loaded) return;
+                try {
+                    const res = await fetch('poke.json');
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    POKEDEX = await res.json();
+                    _loaded = true;
+                    document.getElementById('pdx-count-badge').textContent = POKEDEX.length + ' 隻寶可夢';
+                    document.getElementById('pdx-list-status').style.display = 'none';
+                    pdxBuildHotItems();
+                    pdxRenderList();
+                } catch (e) {
+                    document.getElementById('pdx-list-status').innerHTML =
+                        '<div style="font-size:3rem; margin-bottom:10px">😿</div>' +
+                        '<p style="font-size:0.9rem; color:#dc2626; font-weight:600">載入 poke.json 失敗</p>' +
+                        '<p style="font-size:0.78rem; margin-top:6px">' + (e.message || '請確認 poke.json 與 index.html 在同一目錄') + '</p>';
+                    document.getElementById('pdx-count-badge').textContent = '載入失敗';
+                }
+            };
+
+            window.pdxSetMode = function(m) {
+                _mode = m;
+                document.getElementById('pdx-tab-list').classList.toggle('pdx-tab-active', m === 'list');
+                document.getElementById('pdx-tab-drop').classList.toggle('pdx-tab-active', m === 'drop');
+                document.getElementById('pdx-mode-list').style.display = (m === 'list') ? '' : 'none';
+                document.getElementById('pdx-mode-drop').style.display = (m === 'drop') ? '' : 'none';
+            };
+
+            window.pdxClearSearch = function() {
+                document.getElementById('pdx-search').value = '';
+                document.getElementById('pdx-filter').value = 'all';
+                _showCount = _pageSize;
+                pdxRenderList();
+            };
+
+            window.pdxShowMore = function() {
+                _showCount += _pageSize;
+                pdxRenderList(true);
+            };
+
+            // 取得「資料未公開」狀態
+            function isNoData(p) {
+                const r = (p.drops_raw || '').trim();
+                return /無資料|^\(無\)$/.test(r) || (r === '' && p.drops.length === 0);
+            }
+
+            // 高亮關鍵字
+            function hl(text, q) {
+                if (!q) return _esc(text);
+                const i = text.toLowerCase().indexOf(q.toLowerCase());
+                if (i < 0) return _esc(text);
+                return _esc(text.slice(0, i)) + '<mark class="pdx-hl">' + _esc(text.slice(i, i + q.length)) + '</mark>' + _esc(text.slice(i + q.length));
+            }
+            function _esc(s) {
+                return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+            }
+
+            // 把 chance 字串轉成「稀有度」用來決定顏色:>=10% 普通,<10% 稀有
+            function isRareDrop(d) {
+                if (!d.chance) return false;
+                const n = parseFloat(d.chance);
+                return !isNaN(n) && n < 10;
+            }
+
+            // 渲染卡片
+            function renderCard(p, q) {
+                const noData = isNoData(p);
+                let dropsHtml = '';
+                if (noData) {
+                    dropsHtml = '<span class="pdx-drop-chip pdx-drop-chip-empty">' + _esc(p.drops_raw || '資料未公開') + '</span>';
+                } else if (p.drops.length === 0) {
+                    dropsHtml = '<span class="pdx-drop-chip pdx-drop-chip-empty">無掉落物</span>';
+                } else {
+                    dropsHtml = p.drops.slice(0, 4).map(d => {
+                        const rare = isRareDrop(d);
+                        const tail = d.chance ? ' ' + d.chance : (d.quantity ? ' ×' + d.quantity : '');
+                        return '<span class="pdx-drop-chip' + (rare ? ' pdx-drop-chip-rare' : '') + '">' + _esc(d.item) + tail + '</span>';
+                    }).join('');
+                    if (p.drops.length > 4) {
+                        dropsHtml += '<span class="pdx-drop-chip pdx-drop-chip-empty">+' + (p.drops.length - 4) + '</span>';
+                    }
+                }
+                const bonus = p.biome_bonus ? '<div><span class="pdx-bonus-tag">🌿 有生態域加成</span></div>' : '';
+                return '<div class="pdx-card" onclick="pdxOpenDetail(' + p.no + ')">' +
+                    '<div style="display:flex; align-items:center; justify-content:space-between">' +
+                        '<span class="pdx-card-no">#' + String(p.no).padStart(4, '0') + '</span>' +
+                    '</div>' +
+                    '<div class="pdx-card-name">' + hl(p.name, q) + '</div>' +
+                    '<div style="line-height:1.7">' + dropsHtml + '</div>' +
+                    bonus +
+                '</div>';
+            }
+
+            // 主列表渲染
+            window.pdxRenderList = function(append) {
+                if (!_loaded) return;
+                const q = document.getElementById('pdx-search').value.trim();
+                const filter = document.getElementById('pdx-filter').value;
+                if (!append) _showCount = _pageSize;
+
+                let filtered = POKEDEX.filter(p => {
+                    // 過濾器
+                    if (filter === 'has-drop' && (isNoData(p) || p.drops.length === 0)) return false;
+                    if (filter === 'has-bonus' && !p.biome_bonus) return false;
+                    if (filter === 'no-data' && !isNoData(p)) return false;
+                    // 搜尋
+                    if (!q) return true;
+                    const ql = q.toLowerCase();
+                    if (String(p.no).includes(q)) return true;
+                    if (p.name.toLowerCase().includes(ql)) return true;
+                    return false;
+                });
+
+                const listEl = document.getElementById('pdx-list');
+                const moreEl = document.getElementById('pdx-list-more');
+                if (filtered.length === 0) {
+                    listEl.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:48px 0; color:#64748b"><div style="font-size:3rem; margin-bottom:10px">🔍</div><p style="font-size:0.95rem; font-weight:600">找不到相符的寶可夢</p><p style="font-size:0.78rem; margin-top:6px">試試其他關鍵字或調整篩選條件</p></div>';
+                    moreEl.style.display = 'none';
+                    return;
+                }
+                listEl.innerHTML = filtered.slice(0, _showCount).map(p => renderCard(p, q)).join('');
+                moreEl.style.display = (filtered.length > _showCount) ? '' : 'none';
+            };
+
+            // 詳細視窗
+            window.pdxOpenDetail = function(no) {
+                const p = POKEDEX.find(x => x.no === no);
+                if (!p) return;
+                const noData = isNoData(p);
+                let drops = '';
+                if (noData) {
+                    drops = '<p style="color:#9ca3af; font-style:italic; font-size:0.9rem">' + _esc(p.drops_raw || '資料未公開') + '</p>';
+                } else if (p.drops.length === 0) {
+                    drops = '<p style="color:#9ca3af; font-size:0.9rem">無掉落物</p>';
+                } else {
+                    drops = '<div style="display:flex; flex-direction:column; gap:6px">' + p.drops.map(d => {
+                        const rare = isRareDrop(d);
+                        const right = d.chance ? '<span style="font-weight:700; color:' + (rare ? '#92400e' : '#047857') + '">' + _esc(d.chance) + '</span>'
+                                    : d.quantity ? '<span style="color:#64748b">×' + _esc(d.quantity) + '</span>'
+                                    : '';
+                        return '<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:' + (rare ? '#fef3c7' : '#f0fdf4') + '; border-radius:8px; font-size:0.88rem">' +
+                            '<span style="font-weight:600">' + _esc(d.item) + '</span>' + right +
+                        '</div>';
+                    }).join('') + '</div>';
+                }
+                const bonus = p.biome_bonus ?
+                    '<div style="margin-top:14px"><div style="font-size:0.78rem; font-weight:700; color:#78350f; margin-bottom:6px">🌿 生態域加成</div><div style="background:#fef3c7; border:1px solid #fcd34d; border-radius:8px; padding:10px 12px; font-size:0.85rem; color:#78350f; line-height:1.6">' + _esc(p.biome_bonus) + '</div></div>'
+                    : '';
+
+                const html = '<div class="pdx-modal-overlay" onclick="if(event.target===this)pdxCloseDetail()">' +
+                    '<div class="pdx-modal">' +
+                        '<div style="background:linear-gradient(135deg,#047857,#10b981); padding:18px 22px; color:white; display:flex; align-items:center; justify-content:space-between">' +
+                            '<div>' +
+                                '<div style="font-family:monospace; font-size:0.78rem; opacity:0.85; font-weight:700">#' + String(p.no).padStart(4, '0') + '</div>' +
+                                '<div style="font-size:1.4rem; font-weight:900; margin-top:2px">' + _esc(p.name) + '</div>' +
+                            '</div>' +
+                            '<button onclick="pdxCloseDetail()" style="background:rgba(255,255,255,0.2); border:none; color:white; width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:18px; font-weight:700">✕</button>' +
+                        '</div>' +
+                        '<div style="padding:18px 22px">' +
+                            '<div style="font-size:0.78rem; font-weight:700; color:#047857; margin-bottom:8px">🎁 掉落物與機率</div>' +
+                            drops + bonus +
+                            (p.drops_raw && !noData ? '<div style="margin-top:14px; padding:8px 12px; background:#f8fafc; border-radius:8px; font-size:0.74rem; color:#64748b; font-family:monospace; word-break:break-all">原始資料:' + _esc(p.drops_raw) + '</div>' : '') +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+                const wrap = document.createElement('div');
+                wrap.id = 'pdx-modal-wrap';
+                wrap.innerHTML = html;
+                document.body.appendChild(wrap);
+            };
+            window.pdxCloseDetail = function() {
+                const w = document.getElementById('pdx-modal-wrap');
+                if (w) w.remove();
+            };
+
+            // ─── 反查掉落物 ───
+            // 抽出所有不重複物品名,計算出現次數,取前幾名做熱門快捷
+            function pdxBuildHotItems() {
+                const counts = {};
+                POKEDEX.forEach(p => p.drops.forEach(d => {
+                    counts[d.item] = (counts[d.item] || 0) + 1;
+                }));
+                const hot = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0, 12);
+                document.getElementById('pdx-drop-hot').innerHTML =
+                    '<span style="font-size:0.72rem; color:#6b7280; align-self:center; margin-right:4px">熱門:</span>' +
+                    hot.map(([name, n]) =>
+                        '<span class="pdx-hot-chip" onclick="pdxQuickSearch(\'' + name.replace(/'/g, "\\'") + '\')">' + _esc(name) + ' <span style="opacity:0.65">' + n + '</span></span>'
+                    ).join('');
+            }
+
+            window.pdxQuickSearch = function(name) {
+                document.getElementById('pdx-drop-search').value = name;
+                pdxRenderDropSearch();
+            };
+
+            window.pdxRenderDropSearch = function() {
+                const q = document.getElementById('pdx-drop-search').value.trim();
+                const out = document.getElementById('pdx-drop-results');
+                if (!q) {
+                    out.innerHTML = '<div style="text-align:center; padding:36px 0 28px; color:#64748b"><div style="font-size:3rem; margin-bottom:10px">🎯</div><p style="font-size:0.9rem; font-weight:500">輸入物品名稱開始查詢</p><div style="font-size:0.75rem; margin-top:5px; color:#94a3b8">或點擊上方熱門物品標籤</div></div>';
+                    return;
+                }
+                const ql = q.toLowerCase();
+                const matches = [];
+                POKEDEX.forEach(p => {
+                    p.drops.forEach(d => {
+                        if (d.item.toLowerCase().includes(ql)) {
+                            matches.push({ pokemon: p, drop: d });
+                        }
+                    });
+                });
+
+                if (matches.length === 0) {
+                    out.innerHTML = '<div style="text-align:center; padding:36px 0; color:#64748b"><div style="font-size:3rem; margin-bottom:10px">🤔</div><p style="font-size:0.95rem; font-weight:600">沒有寶可夢會掉落「' + _esc(q) + '」</p><p style="font-size:0.78rem; margin-top:6px">試試其他關鍵字</p></div>';
+                    return;
+                }
+
+                // 按物品名分組
+                const byItem = {};
+                matches.forEach(m => {
+                    (byItem[m.drop.item] = byItem[m.drop.item] || []).push(m);
+                });
+
+                let html = '<div style="margin-bottom:12px; font-size:0.82rem; color:#64748b">找到 <strong style="color:#047857">' + matches.length + '</strong> 筆掉落紀錄,涵蓋 <strong style="color:#047857">' + Object.keys(byItem).length + '</strong> 種物品</div>';
+
+                Object.keys(byItem).sort((a,b) => byItem[b].length - byItem[a].length).forEach(itemName => {
+                    const list = byItem[itemName];
+                    // 同物品內按機率高到低排
+                    list.sort((a,b) => {
+                        const av = parseFloat(a.drop.chance) || 0;
+                        const bv = parseFloat(b.drop.chance) || 0;
+                        return bv - av;
+                    });
+                    html += '<div style="margin-bottom:18px">' +
+                        '<div style="font-size:0.92rem; font-weight:800; color:#064e3b; margin-bottom:6px; padding-bottom:6px; border-bottom:2px solid #d1fae5">' +
+                            hl(itemName, q) + ' <span style="font-size:0.72rem; color:#6b7280; font-weight:600">(' + list.length + ' 隻)</span>' +
+                        '</div>';
+                    list.forEach(m => {
+                        const d = m.drop;
+                        const right = d.chance ? '<span style="font-weight:700; font-size:0.82rem; color:' + (isRareDrop(d) ? '#92400e' : '#047857') + '">' + _esc(d.chance) + '</span>'
+                                    : d.quantity ? '<span style="color:#64748b; font-size:0.82rem">×' + _esc(d.quantity) + '</span>'
+                                    : '';
+                        html += '<div class="pdx-result-row" onclick="pdxOpenDetail(' + m.pokemon.no + ')" style="cursor:pointer; border-radius:8px; transition:background 0.13s" onmouseover="this.style.background=\'#f0fdf4\'" onmouseout="this.style.background=\'\'">' +
+                            '<span style="font-family:monospace; font-size:0.74rem; color:#10b981; background:#ecfdf5; padding:2px 8px; border-radius:999px; font-weight:700">#' + String(m.pokemon.no).padStart(4, '0') + '</span>' +
+                            '<span style="flex:1; font-weight:600; color:#1f2937" class="pdx-name">' + _esc(m.pokemon.name) + '</span>' +
+                            right +
+                        '</div>';
+                    });
+                    html += '</div>';
+                });
+
+                out.innerHTML = html;
+                // 深色模式名字顏色補上
+                if (document.body.classList.contains('dark-mode')) {
+                    out.querySelectorAll('.pdx-name').forEach(el => el.style.color = '#f3f4f6');
+                }
+            };
+
+            // ESC 關閉詳細視窗
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') pdxCloseDetail();
+            });
+        })();
+        </script>
+    </div>
+
     <div id="typechart-page" class="page-content hidden">
         <div class="edit-ignore" contenteditable="false" style="background: linear-gradient(135deg, #003366 0%, #005599 60%, #00AEEF 100%); border-bottom: 2px solid #0077cc; padding: 20px 24px 18px">
             <div style="max-width:900px; margin:0 auto; display:flex; align-items:center; gap:14px">
