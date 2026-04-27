@@ -1519,7 +1519,7 @@ function _buildCacheBusterVer() {
 // 將檔案內所有 ?v=202604270803 統一替換為新版本號
 // 比對範圍：?v= 後面非空白且非引號、結尾或 & 之前的字元
 function _stampCacheBuster(text, ver) {
-    return text.replace(/\?v=202604270803"'\s&)<>]+/g, '?v=' + ver);
+    return text.replace(/\?v=[^"'\s&)<>]+/g, '?v=' + ver);
 }
 
 function executeFinalSave() {
