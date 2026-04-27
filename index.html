@@ -1572,6 +1572,27 @@
         .dark-mode .pdx-modal { background:#1f2937; color:#f3f4f6; }
         .dark-mode .pdx-result-row { border-bottom-color:#374151; }
 
+        /* 詳情彈窗 — 掉落物 row */
+        .pdx-modal-drop-row { display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:#f0fdf4; border-radius:8px; font-size:0.88rem; }
+        .pdx-modal-drop-row-rare { background:#fef3c7; }
+        .pdx-modal-drop-name { font-weight:600; color:#1f2937; }
+        .pdx-modal-drop-chance { color:#047857; }
+        .pdx-modal-drop-chance-rare { color:#92400e; }
+        .pdx-modal-drop-qty { color:#64748b; }
+        .pdx-modal-section-title { font-size:0.78rem; font-weight:700; color:#047857; margin-bottom:8px; }
+        .pdx-modal-bonus-title { font-size:0.78rem; font-weight:700; color:#78350f; margin-bottom:6px; }
+        .pdx-modal-bonus-box { background:#fef3c7; border:1px solid #fcd34d; border-radius:8px; padding:10px 12px; font-size:0.85rem; color:#78350f; line-height:1.6; }
+        /* 詳情彈窗 — 掉落物 row（深色模式） */
+        .dark-mode .pdx-modal-drop-row { background:#064e3b; }
+        .dark-mode .pdx-modal-drop-row-rare { background:#451a03; }
+        .dark-mode .pdx-modal-drop-name { color:#f3f4f6; }
+        .dark-mode .pdx-modal-drop-chance { color:#34d399; }
+        .dark-mode .pdx-modal-drop-chance-rare { color:#fcd34d; }
+        .dark-mode .pdx-modal-drop-qty { color:#cbd5e1; }
+        .dark-mode .pdx-modal-section-title { color:#34d399; }
+        .dark-mode .pdx-modal-bonus-title { color:#fcd34d; }
+        .dark-mode .pdx-modal-bonus-box { background:#451a03; border-color:#92400e; color:#fde68a; }
+
         /* ─── 反查掉落物 — 淺色模式配色 ─── */
         .pdx-drop-panel        { background:#ffffff; }
         .pdx-drop-empty        { color:#64748b; }
@@ -1754,16 +1775,18 @@
                 } else {
                     drops = '<div style="display:flex; flex-direction:column; gap:6px">' + p.drops.map(d => {
                         const rare = isRareDrop(d);
-                        const right = d.chance ? '<span style="font-weight:700; color:' + (rare ? '#92400e' : '#047857') + '">' + _esc(d.chance) + '</span>'
-                                    : d.quantity ? '<span style="color:#64748b">×' + _esc(d.quantity) + '</span>'
+                        const rowClass = rare ? 'pdx-modal-drop-row pdx-modal-drop-row-rare' : 'pdx-modal-drop-row';
+                        const chanceClass = rare ? 'pdx-modal-drop-chance-rare' : 'pdx-modal-drop-chance';
+                        const right = d.chance ? '<span class="' + chanceClass + '" style="font-weight:700">' + _esc(d.chance) + '</span>'
+                                    : d.quantity ? '<span class="pdx-modal-drop-qty">×' + _esc(d.quantity) + '</span>'
                                     : '';
-                        return '<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:' + (rare ? '#fef3c7' : '#f0fdf4') + '; border-radius:8px; font-size:0.88rem">' +
-                            '<span style="font-weight:600">' + _esc(d.item) + '</span>' + right +
+                        return '<div class="' + rowClass + '">' +
+                            '<span class="pdx-modal-drop-name">' + _esc(d.item) + '</span>' + right +
                         '</div>';
                     }).join('') + '</div>';
                 }
                 const bonus = p.biome_bonus ?
-                    '<div style="margin-top:14px"><div style="font-size:0.78rem; font-weight:700; color:#78350f; margin-bottom:6px">🌿 生態域加成</div><div style="background:#fef3c7; border:1px solid #fcd34d; border-radius:8px; padding:10px 12px; font-size:0.85rem; color:#78350f; line-height:1.6">' + _esc(p.biome_bonus) + '</div></div>'
+                    '<div style="margin-top:14px"><div class="pdx-modal-bonus-title">🌿 生態域加成</div><div class="pdx-modal-bonus-box">' + _esc(p.biome_bonus) + '</div></div>'
                     : '';
 
                 const html = '<div class="pdx-modal-overlay" onclick="if(event.target===this)pdxCloseDetail()">' +
@@ -1776,7 +1799,7 @@
                             '<button onclick="pdxCloseDetail()" style="background:rgba(255,255,255,0.2); border:none; color:white; width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:18px; font-weight:700">✕</button>' +
                         '</div>' +
                         '<div style="padding:18px 22px">' +
-                            '<div style="font-size:0.78rem; font-weight:700; color:#047857; margin-bottom:8px">🎁 掉落物與機率</div>' +
+                            '<div class="pdx-modal-section-title">🎁 掉落物與機率</div>' +
                             drops + bonus +
                         '</div>' +
                     '</div>' +
