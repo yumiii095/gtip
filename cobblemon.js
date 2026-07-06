@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Cobblemon 方可夢樂園 — 攻略站
  * cobblemon.js  ·  主要互動邏輯
  *
@@ -166,10 +166,6 @@ function rankResults(query, limit = 8) {
         .filter(r => r.score > 0)
         .sort((a, b) => b.score - a.score)
         .slice(0, limit);
-}
-
-function initFuse() {
-    if (!Array.isArray(ALL_DATA)) ALL_DATA = [];
 }
 
 
@@ -1520,7 +1516,7 @@ function _buildCacheBusterVer() {
     return `${parts.year}${parts.month}${parts.day}${parts.hour}${parts.minute}`;
 }
 
-// 將檔案內所有 ?v=202604290127 統一替換為新版本號
+// 將檔案內所有 ?v=202607061216 統一替換為新版本號
 // 比對範圍：?v= 後面非空白且非引號、結尾或 & 之前的字元
 function _stampCacheBuster(text, ver) {
     return text.replace(/\?v=[\w.\-]+/g, '?v=' + ver);
@@ -1634,7 +1630,7 @@ function executeFinalSave() {
             /const initial = \[([\s\S]*?)\];(\s*window\.scData = initial;)/,
             'const initial = ' + latestScData + ';$2'
         );
-        // ── Cache Busting：將 HTML 內所有 ?v=202604290127 替換成本次建置版本號 ──
+        // ── Cache Busting：將 HTML 內所有 ?v=202607061216 替換成本次建置版本號 ──
         exportedHtml = _stampCacheBuster(exportedHtml, _buildVer);
         Object.assign(document.createElement('a'), {
             href     : URL.createObjectURL(new Blob([exportedHtml], { type: 'text/html' })),
@@ -1646,7 +1642,7 @@ function executeFinalSave() {
         fetch('cobblemon.js?v=' + Date.now())
             .then(r => r.text())
             .then(src => {
-                // ── Cache Busting：將 JS 內所有 ?v=202604290127 替換成本次建置版本號 ──
+                // ── Cache Busting：將 JS 內所有 ?v=202607061216 替換成本次建置版本號 ──
                 src = _stampCacheBuster(src, _buildVer);
                 Object.assign(document.createElement('a'), {
                     href     : URL.createObjectURL(new Blob([src], { type: 'application/javascript' })),
@@ -1713,19 +1709,6 @@ function toggleMobileMenu() {
     document.getElementById('mobile-menu').classList.toggle('open');
 }
 
-
-function _exposeInlineHandlers() {
-    Object.assign(window, {
-        addAdCard, addCmdRow, addNewsCard, addNewSection, applyFormat,
-        closeAdFormModal, closeAdPage, closeModal, closeStratModal, copyCmd,
-        deleteAd, editAdInfo, executeFinalSave, executeHomeSearch,
-        handleGlobalSearch, insertHRule, insertImageFromUrl, insertLink,
-        insertNotice, insertTip, navigateToResult, openAdPage, openPublishModal,
-        saveAdPageEdits, saveStratEdits, showPage, submitAdForm, toggleAccordion,
-        toggleDarkMode, toggleEditMode, toggleMobileMenu, updateVersionPreview
-    });
-}
-_exposeInlineHandlers();
 
 /* ════════════════════════════════════════════════════
    11. EVENTS — 全域事件監聽
@@ -1854,7 +1837,7 @@ window.onload = async function () {
 
     if (!data) {
         try {
-            const res = await fetch('cobblemon_data.json?v=202604290127');
+            const res = await fetch('cobblemon_data.json?v=202607061216');
             if (res.ok) data = await res.json();
         } catch (e) {
             console.error('[Cobblemon] JSON 載入失敗：', e);
@@ -1881,4 +1864,3 @@ window.onload = async function () {
     initCommands();
     initStrategies();
 };
-
