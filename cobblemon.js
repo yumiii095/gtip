@@ -1596,7 +1596,7 @@ function _buildCacheBusterVer() {
     return `${parts.year}${parts.month}${parts.day}${parts.hour}${parts.minute}`;
 }
 
-// 將檔案內所有 ?v=202607062004 統一替換為新版本號
+// 將檔案內所有 ?v=202607061452 統一替換為新版本號
 // 比對範圍：?v= 後面非空白且非引號、結尾或 & 之前的字元
 function _stampCacheBuster(text, ver) {
     return text.replace(/\?v=[\w.\-]+/g, '?v=' + ver);
@@ -1630,20 +1630,20 @@ function executeFinalSave() {
 
     if (publishAnnouncement) {
         const log = document.createElement('div');
-        log.className    = `bg-white border-l-4 ${badge.borderCls} shadow-sm p-3`;
+        log.className    = `bg-white border-l-4 ${badge.borderCls} shadow-md p-6`;
         log.style.position = 'relative';
         log.innerHTML = `
             <button class="edit-ui admin-btn admin-btn-delete absolute top-3 right-3"
                 onclick="this.closest('#news-container > div').remove()" contenteditable="false">[x] 刪除</button>
-            <div class="mb-1">
-                <span class="${badge.badgeCls} text-white text-xs px-2 py-0.5 font-bold whitespace-nowrap">${badge.label}</span>
-                <h3 class="inline text-base font-bold text-blue-900 uppercase ml-2">${version} - ${summary}</h3>
+            <div class="mb-3">
+                <span class="${badge.badgeCls} text-white text-xs px-2 py-1 font-bold whitespace-nowrap">${badge.label}</span>
+                <h3 class="inline text-xl font-bold text-blue-900 uppercase ml-2">${version} - ${summary}</h3>
             </div>
-            <div class="news-item ml-1 pb-0">
+            <div class="news-item ml-2 pb-1">
                 <div class="news-dot ${badge.dotCls}"></div>
                 <p class="text-gray-700 text-sm">${detail}</p>
             </div>
-            <div class="text-right mt-1">
+            <div class="text-right mt-2">
                 <span class="text-gray-400 text-xs font-bold">${dateStr}</span>
             </div>`;
         newsContainer.prepend(log);
@@ -1711,7 +1711,7 @@ function executeFinalSave() {
             /const initial = \[([\s\S]*?)\];(\s*window\.scData = initial;)/,
             'const initial = ' + latestScData + ';$2'
         );
-        // ── Cache Busting：將 HTML 內所有 ?v=202607062004 替換成本次建置版本號 ──
+        // ── Cache Busting：將 HTML 內所有 ?v=202607061452 替換成本次建置版本號 ──
         exportedHtml = _stampCacheBuster(exportedHtml, _buildVer);
         Object.assign(document.createElement('a'), {
             href     : URL.createObjectURL(new Blob([exportedHtml], { type: 'text/html' })),
@@ -1723,7 +1723,7 @@ function executeFinalSave() {
         fetch('cobblemon.js?v=' + Date.now())
             .then(r => r.text())
             .then(src => {
-                // ── Cache Busting：將 JS 內所有 ?v=202607062004 替換成本次建置版本號 ──
+                // ── Cache Busting：將 JS 內所有 ?v=202607061452 替換成本次建置版本號 ──
                 src = _stampCacheBuster(src, _buildVer);
                 Object.assign(document.createElement('a'), {
                     href     : URL.createObjectURL(new Blob([src], { type: 'application/javascript' })),
@@ -1739,19 +1739,19 @@ function addNewsCard() {
         timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit',
     }).replace(/\//g, '-');
     const card = document.createElement('div');
-    card.className = 'bg-white border-l-4 border-blue-500 shadow-sm p-3 relative';
+    card.className = 'bg-white border-l-4 border-blue-500 shadow-md p-6 relative';
     card.innerHTML = `
         <button class="edit-ui admin-btn admin-btn-delete absolute top-3 right-3"
             onclick="this.closest('#news-container > div').remove()" contenteditable="false">[x] 刪除</button>
-        <div class="mb-1">
-            <span class="bg-blue-600 text-white text-xs px-2 py-0.5 font-bold whitespace-nowrap">公告</span>
-            <h3 class="inline text-base font-bold text-blue-900 uppercase ml-2" contenteditable="true">公告標題</h3>
+        <div class="mb-3">
+            <span class="bg-blue-600 text-white text-xs px-2 py-1 font-bold whitespace-nowrap">公告</span>
+            <h3 class="inline text-xl font-bold text-blue-900 uppercase ml-2" contenteditable="true">公告標題</h3>
         </div>
-        <div class="news-item ml-1 pb-0">
+        <div class="news-item ml-2 pb-1">
             <div class="news-dot"></div>
             <p class="text-gray-700 text-sm" contenteditable="true">在此輸入公告內容...</p>
         </div>
-        <div class="text-right mt-1">
+        <div class="text-right mt-2">
             <span class="text-gray-400 text-xs font-bold" contenteditable="true">${dateStr}</span>
         </div>`;
     document.getElementById('news-container').prepend(card);
@@ -1932,7 +1932,7 @@ window.onload = async function () {
 
     if (!data) {
         try {
-            const res = await fetch('cobblemon_data.json?v=202607062004');
+            const res = await fetch('cobblemon_data.json?v=202607061452');
             if (res.ok) data = await res.json();
         } catch (e) {
             console.error('[Cobblemon] JSON 載入失敗：', e);
