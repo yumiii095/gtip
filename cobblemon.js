@@ -744,30 +744,20 @@ function _initFooterTapSecret() {
         if (_footerTapCount >= 5) {
             _footerTapCount = 0;
             toggleEditMode(true);
-            _showToast('編輯模式已開啟');
         } else {
             _footerTapTimer = setTimeout(() => { _footerTapCount = 0; }, 2000);
         }
     });
 }
 
-function _showToast(msg) {
-    const old = document.querySelector('.edit-toast');
-    if (old) old.remove();
-    const toast = document.createElement('div');
-    toast.className = 'edit-toast';
-    toast.textContent = msg;
-    toast.style.cssText = [
-        'position:fixed', 'bottom:80px', 'left:50%', 'transform:translateX(-50%)',
-        'background:rgba(15,23,42,0.92)', 'color:#fff', 'padding:10px 18px',
-        'border-radius:18px', 'font-size:14px', 'font-weight:700',
-        'z-index:99999', 'pointer-events:none', 'box-shadow:0 8px 24px rgba(0,0,0,0.25)',
-        'transition:opacity 0.25s'
-    ].join(';');
-    document.body.appendChild(toast);
-    setTimeout(() => { toast.style.opacity = '0'; }, 1500);
-    setTimeout(() => { toast.remove(); }, 1900);
+function _removeTransientEditUi(root = document) {
+    root.querySelectorAll('.edit-toast').forEach(el => el.remove());
 }
+
+function _showToast(msg) {
+    _removeTransientEditUi();
+}
+
 
 function _rememberSelection() {
     const sel = window.getSelection();
@@ -896,7 +886,6 @@ function toggleEditMode(enable) {
             renderAdSidebar();
             renderSponsorGrid();
         }, 50);
-        _showToast('編輯模式已開啟');
         return;
     }
 
@@ -920,7 +909,7 @@ function toggleEditMode(enable) {
 
     renderAdSidebar();
     renderSponsorGrid();
-    _showToast('已退出編輯模式');
+    _removeTransientEditUi();
 }
 
 function _initScCmdSortables() {
@@ -1705,6 +1694,7 @@ function executeFinalSave() {
     }).click();
 
     setTimeout(() => {
+        _removeTransientEditUi();
         // 確保匯出的 HTML 不帶 dark-mode，讓新檔案預設淺色模式
         const _hadDark = document.body.classList.contains('dark-mode');
         document.body.classList.remove('dark-mode');
@@ -1819,6 +1809,7 @@ _exposeInlineHandlers();
 ════════════════════════════════════════════════════ */
 
 document.addEventListener('DOMContentLoaded', function () {
+    _removeTransientEditUi();
     initStrategies();
     initAds();
     // [修改3] 初始化頁腳5連點開啟編輯模式
