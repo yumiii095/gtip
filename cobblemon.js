@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Cobblemon 方可夢樂園 — 攻略站
  * cobblemon.js  ·  主要互動邏輯
  *
@@ -166,6 +166,10 @@ function rankResults(query, limit = 8) {
         .filter(r => r.score > 0)
         .sort((a, b) => b.score - a.score)
         .slice(0, limit);
+}
+
+function initFuse() {
+    if (!Array.isArray(ALL_DATA)) ALL_DATA = [];
 }
 
 
@@ -1710,6 +1714,19 @@ function toggleMobileMenu() {
 }
 
 
+function _exposeInlineHandlers() {
+    Object.assign(window, {
+        addAdCard, addCmdRow, addNewsCard, addNewSection, applyFormat,
+        closeAdFormModal, closeAdPage, closeModal, closeStratModal, copyCmd,
+        deleteAd, editAdInfo, executeFinalSave, executeHomeSearch,
+        handleGlobalSearch, insertHRule, insertImageFromUrl, insertLink,
+        insertNotice, insertTip, navigateToResult, openAdPage, openPublishModal,
+        saveAdPageEdits, saveStratEdits, showPage, submitAdForm, toggleAccordion,
+        toggleDarkMode, toggleEditMode, toggleMobileMenu, updateVersionPreview
+    });
+}
+_exposeInlineHandlers();
+
 /* ════════════════════════════════════════════════════
    11. EVENTS — 全域事件監聽
 ════════════════════════════════════════════════════ */
@@ -1864,3 +1881,4 @@ window.onload = async function () {
     initCommands();
     initStrategies();
 };
+
