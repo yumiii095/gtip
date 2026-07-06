@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Cobblemon 方可夢樂園 — 攻略站
  * cobblemon.js  ·  主要互動邏輯
  *
@@ -166,6 +166,10 @@ function rankResults(query, limit = 8) {
         .filter(r => r.score > 0)
         .sort((a, b) => b.score - a.score)
         .slice(0, limit);
+}
+
+function initFuse() {
+    if (!Array.isArray(ALL_DATA)) ALL_DATA = [];
 }
 
 
@@ -701,211 +705,313 @@ function insertStrategyImage(input) {
    7. 編輯模式、格式工具列
 ════════════════════════════════════════════════════ */
 
-// ── 手機點頁腳5次開啟編輯模式 ─────────────────────────────
+// 編輯模式重寫版：只讓內容區可編輯，避免 body/contenteditable 破壞按鈕與 script。
 let _footerTapCount = 0;
 let _footerTapTimer = null;
+let _editModeClickGuard = null;
+let _savedSelectionRange = null;
+let _scCmdSortables = [];
+
+const EDITABLE_TEXT_SELECTOR = [
+    '.page-content h2', '.page-content h3', '.page-content h4',
+    '.page-content p', '.page-content li', '.page-content blockquote',
+    '.accordion-header', '.cmd-text', '.cmd-desc',
+    '#news-container h3', '#news-container p', '#news-container span.text-gray-400',
+    '#strategy-container .strat-card-title', '#strategy-container .strat-card-preview',
+    '#ad-detail-body h2', '#ad-detail-body h3', '#ad-detail-body h4',
+    '#ad-detail-body p', '#ad-detail-body li', '#ad-detail-body blockquote'
+].join(',');
+
+const NEVER_EDIT_SELECTOR = [
+    'script', 'style', 'link', 'meta', 'title',
+    'header', 'nav', 'footer', 'button', 'input', 'textarea', 'select', 'option',
+    'label', 'kbd', 'svg', 'img', 'canvas', 'iframe',
+    '.edit-ui', '.edit-ignore', '.format-toolbar', '#admin-toolbar', '#float-toolbar',
+    '#confirm-modal', '#ad-form-modal', '.suggestion-box', '.drag-handle', '.sc-drag-handle',
+    '.copy-btn', '.sc-copy-btn', '.admin-btn', '.rb', '.rb-swatch', '.rb-select'
+].join(',');
 
 function _initFooterTapSecret() {
     const footer = document.querySelector('footer');
-    if (!footer) return;
-    // 讓頁腳可點擊但不顯示任何視覺提示
+    if (!footer || footer._editTapReady) return;
+    footer._editTapReady = true;
     footer.style.cursor = 'default';
     footer.style.userSelect = 'none';
-    footer.addEventListener('click', function(e) {
-        // 已在編輯模式就不再累計
+    footer.addEventListener('click', function() {
         if (document.body.classList.contains('editing-active')) return;
-
         _footerTapCount++;
         clearTimeout(_footerTapTimer);
-
         if (_footerTapCount >= 5) {
             _footerTapCount = 0;
             toggleEditMode(true);
-            // 給手機一點視覺回饋 牛逼東東
-            _showToast('✏️ 編輯模式已開啟');
+            _showToast('編輯模式已開啟');
         } else {
-            // 2秒內沒繼續點就重置計數
             _footerTapTimer = setTimeout(() => { _footerTapCount = 0; }, 2000);
         }
     });
 }
 
-// 短暫顯示一個浮動提示（手機友善）
 function _showToast(msg) {
+    const old = document.querySelector('.edit-toast');
+    if (old) old.remove();
     const toast = document.createElement('div');
+    toast.className = 'edit-toast';
     toast.textContent = msg;
     toast.style.cssText = [
         'position:fixed', 'bottom:80px', 'left:50%', 'transform:translateX(-50%)',
-        'background:rgba(0,0,0,0.8)', 'color:#fff', 'padding:10px 20px',
-        'border-radius:20px', 'font-size:14px', 'font-weight:700',
-        'z-index:99999', 'pointer-events:none',
-        'transition:opacity 0.4s',
+        'background:rgba(15,23,42,0.92)', 'color:#fff', 'padding:10px 18px',
+        'border-radius:18px', 'font-size:14px', 'font-weight:700',
+        'z-index:99999', 'pointer-events:none', 'box-shadow:0 8px 24px rgba(0,0,0,0.25)',
+        'transition:opacity 0.25s'
     ].join(';');
     document.body.appendChild(toast);
-    setTimeout(() => { toast.style.opacity = '0'; }, 1600);
-    setTimeout(() => { toast.remove(); }, 2100);
+    setTimeout(() => { toast.style.opacity = '0'; }, 1500);
+    setTimeout(() => { toast.remove(); }, 1900);
+}
+
+function _rememberSelection() {
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount || sel.isCollapsed) return;
+    const node = sel.anchorNode && (sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentElement);
+    if (node && node.closest('[contenteditable="true"]')) {
+        _savedSelectionRange = sel.getRangeAt(0).cloneRange();
+    }
+}
+
+function _restoreSelection() {
+    if (!_savedSelectionRange) return false;
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(_savedSelectionRange);
+    return true;
+}
+
+function _isEditableCandidate(el) {
+    if (!el || el.closest(NEVER_EDIT_SELECTOR)) return false;
+    if (el.closest('#admin-toolbar,#float-toolbar,#confirm-modal,#ad-form-modal')) return false;
+    if (!el.closest('.page-content,#ad-detail-body,#strat-modal-body')) return false;
+    return true;
+}
+
+function _setEditable(el, editable) {
+    if (!el || el.nodeType !== 1) return;
+    if (!el.hasAttribute('data-ce-original')) {
+        el.setAttribute('data-ce-original', el.hasAttribute('contenteditable') ? el.getAttribute('contenteditable') : '__missing__');
+    }
+    el.setAttribute('contenteditable', editable ? 'true' : 'false');
+    if (editable) el.setAttribute('spellcheck', 'false');
+}
+
+function _restoreEditable(el) {
+    if (!el || !el.hasAttribute('data-ce-original')) return;
+    const original = el.getAttribute('data-ce-original');
+    el.removeAttribute('data-ce-original');
+    if (original === '__missing__') el.removeAttribute('contenteditable');
+    else el.setAttribute('contenteditable', original);
+}
+
+function _refreshEditableTargets() {
+    document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+        if (!_isEditableCandidate(el)) _setEditable(el, false);
+    });
+
+    document.querySelectorAll(EDITABLE_TEXT_SELECTOR).forEach(el => {
+        if (_isEditableCandidate(el)) _setEditable(el, true);
+    });
+
+    document.querySelectorAll(NEVER_EDIT_SELECTOR).forEach(el => {
+        if (el.hasAttribute('contenteditable') || el.closest('.editing-active')) {
+            _setEditable(el, false);
+        }
+    });
+}
+
+function _clearEditableTargets() {
+    document.querySelectorAll('[data-ce-original]').forEach(_restoreEditable);
+    document.body.contentEditable = 'false';
+    const ft = document.getElementById('float-toolbar');
+    if (ft) ft.classList.remove('visible');
+}
+
+function _readBaseVersion() {
+    const candidates = [
+        document.querySelector('#modal-version')?.value,
+        document.querySelector('#news-container h3')?.innerText,
+        document.querySelector('[data-version]')?.getAttribute('data-version')
+    ].filter(Boolean);
+    for (const text of candidates) {
+        const m = String(text).match(/v?(\d+(?:\.\d+)?)/i);
+        if (m) return parseFloat(m[1]);
+    }
+    return baseVersion || 1.0;
 }
 
 function toggleEditMode(enable) {
     const body = document.body;
-    if (enable) {
+    const shouldEnable = enable !== false;
+
+    if (shouldEnable) {
+        if (body.classList.contains('editing-active')) {
+            _refreshEditableTargets();
+            return;
+        }
+
         body.classList.add('editing-active');
-        body.contentEditable = 'true';
-        document.querySelectorAll('.edit-ignore,.edit-ui,header,nav,button,kbd,footer,.drag-handle,input,textarea,#confirm-modal,.format-toolbar')
-            .forEach(el => { el.contentEditable = 'false'; });
+        body.contentEditable = 'false';
+        baseVersion = _readBaseVersion();
+        _refreshEditableTargets();
+        updateVersionPreview(document.querySelector('input[name="update-type"]:checked')?.value || 'minor');
 
         const faqContainer = document.getElementById('faq-container');
-        if (faqContainer && typeof Sortable !== 'undefined') {
-            faqSortable = new Sortable(faqContainer, { animation: 150, handle: '.drag-handle', ghostClass: 'sortable-ghost' });
+        if (faqContainer && typeof Sortable !== 'undefined' && !faqSortable) {
+            faqSortable = new Sortable(faqContainer, {
+                animation: 150,
+                handle: '.drag-handle',
+                ghostClass: 'sortable-ghost'
+            });
         }
-
-        // ── [修改2] 指令集群組內的指令列可拖動排序 ─────────────
         _initScCmdSortables();
 
-        const firstNews = document.querySelector('#news-container h3');
-        if (firstNews) {
-            const m = firstNews.innerText.match(/v(\d+(\.\d+)?)/);
-            if (m) baseVersion = parseFloat(m[1]);
-        }
-        updateVersionPreview('minor');
-
-        _enterGuard = e => {
+        _enterGuard = function(e) {
+            if (!body.classList.contains('editing-active')) return;
             if (e.key !== 'Enter') return;
             const el = e.target;
-            if (['H3','H4'].includes(el.tagName)
-                || el.classList.contains('accordion-header')
-                || el.classList.contains('cmd-text')
-                || el.classList.contains('cmd-desc')) {
+            if (!el || !el.closest('[contenteditable="true"]')) return;
+            if (el.matches('h1,h2,h3,h4,.accordion-header,.cmd-text,.cmd-desc,.strat-card-title,.strat-card-preview')) {
                 e.preventDefault();
                 el.blur();
             }
         };
-        document.addEventListener('keydown', _enterGuard);
-        setTimeout(_setupImgDropTargets, 100);
-        renderAdSidebar();
-        renderSponsorGrid();
+        document.addEventListener('keydown', _enterGuard, true);
 
-    } else {
-        body.classList.remove('editing-active');
-        body.contentEditable = 'false';
-        renderAdSidebar();
-        renderSponsorGrid();
-        if (faqSortable) { faqSortable.destroy(); faqSortable = null; }
+        _editModeClickGuard = function(e) {
+            const protectedEl = e.target.closest(NEVER_EDIT_SELECTOR);
+            if (protectedEl) protectedEl.setAttribute('contenteditable', 'false');
+        };
+        document.addEventListener('mousedown', _editModeClickGuard, true);
 
-        // 清除所有指令列排序實例
-        _destroyScCmdSortables();
-
-        if (_enterGuard) { document.removeEventListener('keydown', _enterGuard); _enterGuard = null; }
+        setTimeout(() => {
+            _refreshEditableTargets();
+            _setupImgDropTargets();
+            renderAdSidebar();
+            renderSponsorGrid();
+        }, 50);
+        _showToast('編輯模式已開啟');
+        return;
     }
+
+    body.classList.remove('editing-active');
+    _clearEditableTargets();
+
+    if (faqSortable) {
+        try { faqSortable.destroy(); } catch(e) {}
+        faqSortable = null;
+    }
+    _destroyScCmdSortables();
+
+    if (_enterGuard) {
+        document.removeEventListener('keydown', _enterGuard, true);
+        _enterGuard = null;
+    }
+    if (_editModeClickGuard) {
+        document.removeEventListener('mousedown', _editModeClickGuard, true);
+        _editModeClickGuard = null;
+    }
+
+    renderAdSidebar();
+    renderSponsorGrid();
+    _showToast('已退出編輯模式');
 }
-
-// ── [修改2] 指令集群組內指令排序相關函式 ──────────────────────────
-
-// 儲存每個群組的 Sortable 實例，離開編輯模式時清除
-let _scCmdSortables = [];
 
 function _initScCmdSortables() {
     _destroyScCmdSortables();
     if (typeof Sortable === 'undefined') return;
 
-    // 對每個 sc-sec-body 內的每個 sc-cmd-group 啟用排序
-    document.querySelectorAll('#scSections .sc-sec-body').forEach(body => {
-        body.querySelectorAll('.sc-cmd-group').forEach(group => {
-            // 找出群組內所有指令列
-            const rows = Array.from(group.querySelectorAll('.sc-cmd-row'));
-            if (rows.length < 2) return; // 只有一列不需要排序
+    document.querySelectorAll('#scSections .sc-cmd-group').forEach(group => {
+        const rows = Array.from(group.querySelectorAll('.sc-cmd-row'));
+        if (rows.length < 2) return;
 
-            // 給群組加上拖移把手（編輯模式限定）
-            rows.forEach(row => {
-                if (!row.querySelector('.sc-drag-handle')) {
-                    const handle = document.createElement('span');
-                    handle.className = 'sc-drag-handle';
-                    handle.textContent = '⠿';
-                    handle.style.cssText = 'cursor:grab;color:#93c5fd;font-size:14px;padding:0 6px;flex-shrink:0;touch-action:none;';
-                    handle.setAttribute('contenteditable', 'false');
-                    row.prepend(handle);
-                }
-            });
-
-            const sortable = new Sortable(group, {
-                animation    : 150,
-                handle       : '.sc-drag-handle',
-                draggable    : '.sc-cmd-row',
-                ghostClass   : 'sortable-ghost',
-                onEnd        : function(evt) {
-                    // 同步更新 window.scData 中對應的指令順序
-                    _syncScCmdOrder(group);
-                },
-            });
-            _scCmdSortables.push(sortable);
+        rows.forEach(row => {
+            if (row.querySelector('.sc-drag-handle')) return;
+            const handle = document.createElement('span');
+            handle.className = 'sc-drag-handle';
+            handle.textContent = '⠿';
+            handle.title = '拖曳排序';
+            handle.setAttribute('contenteditable', 'false');
+            handle.style.cssText = 'cursor:grab;color:#93c5fd;font-size:14px;padding:0 6px;flex-shrink:0;touch-action:none;';
+            row.prepend(handle);
         });
+
+        const sortable = new Sortable(group, {
+            animation: 150,
+            handle: '.sc-drag-handle',
+            draggable: '.sc-cmd-row',
+            ghostClass: 'sortable-ghost',
+            onEnd: () => _syncScCmdOrder(group)
+        });
+        _scCmdSortables.push(sortable);
     });
 }
 
-// 把 DOM 的指令列順序同步回 window.scData
 function _syncScCmdOrder(groupEl) {
-    // 找到這個 group 屬於哪個 section
-    const secEl  = groupEl.closest('.sc-section');
+    const secEl = groupEl.closest('.sc-section');
     if (!secEl) return;
     const secId = secEl.dataset.id;
-    const sec   = (window.scData || []).find(s => s.id === secId);
+    const sec = (window.scData || []).find(s => s.id === secId);
     if (!sec) return;
 
-    // 找是第幾個 group（在 sc-sec-body 中的 index）
-    const bodyEl   = secEl.querySelector('.sc-sec-body');
-    const groups   = Array.from(bodyEl.querySelectorAll('.sc-cmd-group'));
+    const groups = Array.from(secEl.querySelectorAll('.sc-cmd-group'));
     const groupIdx = groups.indexOf(groupEl);
-    if (groupIdx < 0 || !sec.groups[groupIdx]) return;
+    if (groupIdx < 0 || !sec.groups || !sec.groups[groupIdx]) return;
 
-    // 讀出 DOM 目前的指令順序，更新到 scData
-    const newOrder = Array.from(groupEl.querySelectorAll('.sc-cmd-row')).map(row => {
-        const cmdEl  = row.querySelector('.sc-cmd, .sc-edit-cmd-input');
-        const descEl = row.querySelector('.sc-cmd-desc, .sc-edit-desc-input');
-        return {
-            cmd  : cmdEl  ? (cmdEl.value  || cmdEl.textContent || '').trim() : '',
-            desc : descEl ? (descEl.value || descEl.textContent || '').trim() : '',
-        };
-    }).filter(c => c.cmd);
-
-    sec.groups[groupIdx].cmds = newOrder;
+    sec.groups[groupIdx].cmds = Array.from(groupEl.querySelectorAll('.sc-cmd-row')).map(row => ({
+        cmd: (row.querySelector('.sc-cmd, .sc-edit-cmd-input, .cmd-text')?.value
+            || row.querySelector('.sc-cmd, .sc-edit-cmd-input, .cmd-text')?.textContent || '').trim(),
+        desc: (row.querySelector('.sc-cmd-desc, .sc-edit-desc-input, .cmd-desc')?.value
+            || row.querySelector('.sc-cmd-desc, .sc-edit-desc-input, .cmd-desc')?.textContent || '').trim()
+    })).filter(item => item.cmd);
 }
 
 function _destroyScCmdSortables() {
-    _scCmdSortables.forEach(s => { try { s.destroy(); } catch(e) {} });
+    _scCmdSortables.forEach(sortable => { try { sortable.destroy(); } catch(e) {} });
     _scCmdSortables = [];
-    // 移除所有拖移把手
-    document.querySelectorAll('.sc-drag-handle').forEach(h => h.remove());
+    document.querySelectorAll('.sc-drag-handle').forEach(handle => handle.remove());
 }
 
 function applyFormat(command, value = null) {
-    document.execCommand(command, false, value);
+    if (!document.body.classList.contains('editing-active')) return;
+    _restoreSelection();
+    try {
+        document.execCommand(command, false, value);
+    } catch(e) {
+        console.warn('[EditMode] format failed:', command, e);
+    }
     updateFormatState();
+    _rememberSelection();
 }
 
 function updateFormatState() {
-    try {
-        ['bold','italic','underline','strikeThrough'].forEach(cmd => {
-            const id  = 'rb-' + cmd.toLowerCase().replace('strikethrough','strike').replace('through','strike');
-            const btn = document.getElementById(id);
-            if (btn) btn.classList.toggle('active', document.queryCommandState(cmd));
-        });
-    } catch (e) {}
+    const map = {
+        bold: 'rb-bold',
+        italic: 'rb-italic',
+        underline: 'rb-underline',
+        strikeThrough: 'rb-strike'
+    };
+    Object.entries(map).forEach(([cmd, id]) => {
+        const btn = document.getElementById(id);
+        if (!btn) return;
+        let active = false;
+        try { active = document.queryCommandState(cmd); } catch(e) {}
+        btn.classList.toggle('active', active);
+    });
 }
 
 function _buildModalEditBar() {
     return `<div class="edit-ui" contenteditable="false"
         style="position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:4px;background:#0f172a;padding:8px 12px;border-radius:10px;margin-bottom:14px;flex-wrap:wrap;box-shadow:0 4px 14px rgba(0,0,0,0.3);">
-        <span style="font-size:11px;font-weight:700;color:#00AEEF;margin-right:4px;">✏️ 攻略編輯</span>
-        <select class="rb-select" style="max-width:72px;height:24px;" title="字體大小"
-            onmousedown="event.stopPropagation();"
-            onchange="applyFormat('fontSize',this.value)">
-            <option value="1">10px</option>
-            <option value="2">13px</option>
-            <option value="3" selected>16px</option>
-            <option value="4">18px</option>
-            <option value="5">24px</option>
-            <option value="6">32px</option>
-            <option value="7">48px</option>
+        <span style="font-size:11px;font-weight:700;color:#00AEEF;margin-right:4px;">編輯</span>
+        <select class="rb-select" style="max-width:72px;height:24px;" title="字體大小" onmousedown="event.stopPropagation();" onchange="applyFormat('fontSize',this.value)">
+            <option value="1">10px</option><option value="2">13px</option><option value="3" selected>16px</option><option value="4">18px</option><option value="5">24px</option><option value="6">32px</option><option value="7">48px</option>
         </select>
         <span class="rb-sep"></span>
         <button class="rb" onmousedown="event.preventDefault();applyFormat('bold')"><b>B</b></button>
@@ -913,52 +1019,35 @@ function _buildModalEditBar() {
         <button class="rb" onmousedown="event.preventDefault();applyFormat('underline')"><u>U</u></button>
         <button class="rb" onmousedown="event.preventDefault();applyFormat('strikeThrough')"><s>S</s></button>
         <span class="rb-sep"></span>
-        <div class="rb-swatch" style="background:#e11d48;" onmousedown="event.preventDefault();applyFormat('foreColor','#e11d48')"></div>
-        <div class="rb-swatch" style="background:#f97316;" onmousedown="event.preventDefault();applyFormat('foreColor','#f97316')"></div>
-        <div class="rb-swatch" style="background:#eab308;" onmousedown="event.preventDefault();applyFormat('foreColor','#eab308')"></div>
-        <div class="rb-swatch" style="background:#16a34a;" onmousedown="event.preventDefault();applyFormat('foreColor','#16a34a')"></div>
-        <div class="rb-swatch" style="background:#2563eb;" onmousedown="event.preventDefault();applyFormat('foreColor','#2563eb')"></div>
-        <div class="rb-swatch" style="background:#9333ea;" onmousedown="event.preventDefault();applyFormat('foreColor','#9333ea')"></div>
-        <span class="rb-sep"></span>
-        <div class="rb-swatch" style="background:#fef08a;" onmousedown="event.preventDefault();applyFormat('hiliteColor','#fef08a')"></div>
-        <div class="rb-swatch" style="background:#bbf7d0;" onmousedown="event.preventDefault();applyFormat('hiliteColor','#bbf7d0')"></div>
-        <div class="rb-swatch" style="background:#bfdbfe;" onmousedown="event.preventDefault();applyFormat('hiliteColor','#bfdbfe')"></div>
-        <span class="rb-sep"></span>
-        <button class="rb" onmousedown="event.preventDefault();applyFormat('justifyLeft')" title="靠左">
-            <svg viewBox="0 0 16 16" fill="currentColor" width="14"><rect x="1" y="2" width="14" height="2"/><rect x="1" y="7" width="9" height="2"/><rect x="1" y="12" width="12" height="2"/></svg>
-        </button>
-        <button class="rb" onmousedown="event.preventDefault();applyFormat('justifyCenter')" title="置中">
-            <svg viewBox="0 0 16 16" fill="currentColor" width="14"><rect x="1" y="2" width="14" height="2"/><rect x="3.5" y="7" width="9" height="2"/><rect x="2" y="12" width="12" height="2"/></svg>
-        </button>
-        <button class="rb" onmousedown="event.preventDefault();applyFormat('insertUnorderedList')" title="清單">≡</button>
-        <button class="rb" onmousedown="event.preventDefault();insertLink()" title="連結">🔗</button>
-        <span class="rb-sep"></span>
-        <label class="rb" style="cursor:pointer;" title="插入圖片">
-            🖼 <input type="file" accept="image/*" style="display:none" onchange="insertEditableImage(this)" contenteditable="false">
-        </label>
-        <button class="rb" onmousedown="event.preventDefault();insertTip()"    title="小提醒">💡</button>
-        <button class="rb" onmousedown="event.preventDefault();insertNotice()" title="注意">⚠️</button>
-        <button class="rb" onmousedown="event.preventDefault();insertHRule()"  style="font-size:11px;" title="分隔線">─</button>
-        <span class="rb-sep"></span>
-        <button class="rb" onmousedown="event.preventDefault();document.execCommand('undo')" title="復原">↩</button>
-        <button class="rb" onmousedown="event.preventDefault();document.execCommand('redo')" title="重做">↪</button>
-        <button onclick="saveStratEdits()"
-            style="background:#16a34a;color:white;border:none;padding:5px 14px;border-radius:6px;font-weight:700;cursor:pointer;margin-left:auto;font-size:12px;"
-            contenteditable="false">💾 儲存</button>
+        <button class="rb" onmousedown="event.preventDefault();insertLink()" title="連結">連結</button>
+        <label class="rb" style="cursor:pointer;" title="插入圖片">圖片 <input type="file" accept="image/*" style="display:none" onchange="insertEditableImage(this)" contenteditable="false"></label>
+        <button class="rb" onmousedown="event.preventDefault();insertTip()" title="小提醒">提醒</button>
+        <button class="rb" onmousedown="event.preventDefault();insertNotice()" title="注意">注意</button>
+        <button class="rb" onmousedown="event.preventDefault();insertHRule()" title="分隔線">分隔線</button>
+        <button onclick="saveStratEdits()" style="background:#16a34a;color:white;border:none;padding:5px 14px;border-radius:6px;font-weight:700;cursor:pointer;margin-left:auto;font-size:12px;" contenteditable="false">儲存</button>
     </div>`;
 }
 
 function _insertAtCursor(el) {
-    const sel = window.getSelection();
-    if (sel && sel.rangeCount) {
-        const r = sel.getRangeAt(0);
-        r.collapse(false);
-        r.insertNode(el);
-        r.setStartAfter(el);
-        r.collapse(true);
-        sel.removeAllRanges();
-        sel.addRange(r);
+    if (!_restoreSelection()) {
+        const target = document.activeElement?.closest('[contenteditable="true"]')
+            || document.querySelector('.page-content:not(.hidden) [contenteditable="true"]');
+        if (target) {
+            target.appendChild(el);
+            target.appendChild(document.createTextNode(' '));
+            return;
+        }
     }
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    range.deleteContents();
+    range.insertNode(el);
+    range.setStartAfter(el);
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
+    _rememberSelection();
 }
 
 function insertTip() {
@@ -966,9 +1055,7 @@ function insertTip() {
     el.className = 'mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 text-gray-800';
     el.style.cssText = 'position:relative;';
     el.setAttribute('contenteditable', 'true');
-    el.innerHTML = '<button class="edit-ui" contenteditable="false" onmousedown="event.preventDefault();event.stopPropagation();this.parentElement.remove()" '
-        + 'style="position:absolute;top:4px;right:6px;background:none;border:none;color:#ef4444;font-size:13px;cursor:pointer;line-height:1;padding:2px 5px;border-radius:4px;" title="刪除">✕</button>'
-        + '💡 <b>小提醒：</b>在此輸入文字...';
+    el.innerHTML = '<button class="edit-ui" contenteditable="false" onmousedown="event.preventDefault();event.stopPropagation();this.parentElement.remove()" style="position:absolute;top:4px;right:6px;background:none;border:none;color:#ef4444;font-size:13px;cursor:pointer;line-height:1;padding:2px 5px;border-radius:4px;" title="刪除">x</button><b>小提醒：</b>在此輸入文字...';
     _insertAtCursor(el);
 }
 
@@ -977,9 +1064,7 @@ function insertNotice() {
     el.className = 'notice-block';
     el.style.cssText = 'position:relative;';
     el.setAttribute('contenteditable', 'true');
-    el.innerHTML = '<button class="edit-ui" contenteditable="false" onmousedown="event.preventDefault();event.stopPropagation();this.parentElement.remove()" '
-        + 'style="position:absolute;top:4px;right:6px;background:none;border:none;color:#ef4444;font-size:13px;cursor:pointer;line-height:1;padding:2px 5px;border-radius:4px;" title="刪除">✕</button>'
-        + '<div class="notice-title">⚠️ 注意事項</div><p>在此輸入注意事項內容...</p>';
+    el.innerHTML = '<button class="edit-ui" contenteditable="false" onmousedown="event.preventDefault();event.stopPropagation();this.parentElement.remove()" style="position:absolute;top:4px;right:6px;background:none;border:none;color:#ef4444;font-size:13px;cursor:pointer;line-height:1;padding:2px 5px;border-radius:4px;" title="刪除">x</button><div class="notice-title">注意事項</div><p>在此輸入注意事項內容...</p>';
     _insertAtCursor(el);
 }
 
@@ -992,9 +1077,12 @@ function insertHRule() {
 function insertLink() {
     const url = prompt('輸入連結網址：', 'https://');
     if (!url) return;
-    document.execCommand('createLink', false, url);
-    document.querySelectorAll('[contenteditable] a:not([target])').forEach(a => {
-        if (a.href === url) { a.target = '_blank'; a.style.color = '#2563eb'; }
+    _restoreSelection();
+    try { document.execCommand('createLink', false, url); } catch(e) {}
+    document.querySelectorAll('[contenteditable="true"] a[href]').forEach(a => {
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.style.color = '#2563eb';
     });
 }
 
@@ -1005,10 +1093,14 @@ function insertImageFromUrl() {
 }
 
 function insertEditableImage(input) {
-    if (!input.files?.[0]) return;
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
     const reader = new FileReader();
-    reader.onload = e => { _createDraggableImage(e.target.result, input.files[0].name); input.value = ''; };
-    reader.readAsDataURL(input.files[0]);
+    reader.onload = e => {
+        _createDraggableImage(e.target.result, file.name || '圖片');
+        input.value = '';
+    };
+    reader.readAsDataURL(file);
 }
 
 function _clearCmdHL() {
@@ -1022,7 +1114,7 @@ function _applyHL(boxes, query) {
     const terms = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
     if (!terms.length) return;
     boxes.forEach(box => {
-        ['.cmd-text', '.cmd-desc'].forEach(sel => {
+        ['.cmd-text', '.cmd-desc', '.sc-cmd', '.sc-cmd-desc'].forEach(sel => {
             const span = box.querySelector(sel);
             if (!span || span.hasAttribute('data-orig-html')) return;
             span.setAttribute('data-orig-html', span.innerHTML);
@@ -1030,7 +1122,6 @@ function _applyHL(boxes, query) {
         });
     });
 }
-
 
 /* ════════════════════════════════════════════════════
    8. 可拖曳/可縮放圖片
@@ -1516,7 +1607,7 @@ function _buildCacheBusterVer() {
     return `${parts.year}${parts.month}${parts.day}${parts.hour}${parts.minute}`;
 }
 
-// 將檔案內所有 ?v=202607061216 統一替換為新版本號
+// 將檔案內所有 ?v=202604290127 統一替換為新版本號
 // 比對範圍：?v= 後面非空白且非引號、結尾或 & 之前的字元
 function _stampCacheBuster(text, ver) {
     return text.replace(/\?v=[\w.\-]+/g, '?v=' + ver);
@@ -1630,7 +1721,7 @@ function executeFinalSave() {
             /const initial = \[([\s\S]*?)\];(\s*window\.scData = initial;)/,
             'const initial = ' + latestScData + ';$2'
         );
-        // ── Cache Busting：將 HTML 內所有 ?v=202607061216 替換成本次建置版本號 ──
+        // ── Cache Busting：將 HTML 內所有 ?v=202604290127 替換成本次建置版本號 ──
         exportedHtml = _stampCacheBuster(exportedHtml, _buildVer);
         Object.assign(document.createElement('a'), {
             href     : URL.createObjectURL(new Blob([exportedHtml], { type: 'text/html' })),
@@ -1642,7 +1733,7 @@ function executeFinalSave() {
         fetch('cobblemon.js?v=' + Date.now())
             .then(r => r.text())
             .then(src => {
-                // ── Cache Busting：將 JS 內所有 ?v=202607061216 替換成本次建置版本號 ──
+                // ── Cache Busting：將 JS 內所有 ?v=202604290127 替換成本次建置版本號 ──
                 src = _stampCacheBuster(src, _buildVer);
                 Object.assign(document.createElement('a'), {
                     href     : URL.createObjectURL(new Blob([src], { type: 'application/javascript' })),
@@ -1709,6 +1800,19 @@ function toggleMobileMenu() {
     document.getElementById('mobile-menu').classList.toggle('open');
 }
 
+
+function _exposeInlineHandlers() {
+    Object.assign(window, {
+        addAdCard, addCmdRow, addNewsCard, addNewSection, applyFormat,
+        closeAdFormModal, closeAdPage, closeModal, closeStratModal, copyCmd,
+        deleteAd, editAdInfo, executeFinalSave, executeHomeSearch,
+        handleGlobalSearch, insertHRule, insertImageFromUrl, insertLink,
+        insertNotice, insertTip, navigateToResult, openAdPage, openPublishModal,
+        saveAdPageEdits, saveStratEdits, showPage, submitAdForm, toggleAccordion,
+        toggleDarkMode, toggleEditMode, toggleMobileMenu, updateVersionPreview
+    });
+}
+_exposeInlineHandlers();
 
 /* ════════════════════════════════════════════════════
    11. EVENTS — 全域事件監聽
@@ -1837,7 +1941,7 @@ window.onload = async function () {
 
     if (!data) {
         try {
-            const res = await fetch('cobblemon_data.json?v=202607061216');
+            const res = await fetch('cobblemon_data.json?v=202604290127');
             if (res.ok) data = await res.json();
         } catch (e) {
             console.error('[Cobblemon] JSON 載入失敗：', e);
@@ -1864,3 +1968,5 @@ window.onload = async function () {
     initCommands();
     initStrategies();
 };
+
+
