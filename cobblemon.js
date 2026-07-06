@@ -751,11 +751,16 @@ function _initFooterTapSecret() {
     });
 }
 
+function _removeTransientEditUi(root = document) {
+    root.querySelectorAll('.edit-toast').forEach(el => el.remove());
+}
+
 function _showToast(msg) {
-    const old = document.querySelector('.edit-toast');
-    if (old) old.remove();
+    _removeTransientEditUi();
+    if (msg === '已退出編輯模式') return;
     const toast = document.createElement('div');
     toast.className = 'edit-toast';
+    toast.setAttribute('contenteditable', 'false');
     toast.textContent = msg;
     toast.style.cssText = [
         'position:fixed', 'bottom:80px', 'left:50%', 'transform:translateX(-50%)',
@@ -920,7 +925,7 @@ function toggleEditMode(enable) {
 
     renderAdSidebar();
     renderSponsorGrid();
-    _showToast('已退出編輯模式');
+    _removeTransientEditUi();
 }
 
 function _initScCmdSortables() {
@@ -1705,6 +1710,7 @@ function executeFinalSave() {
     }).click();
 
     setTimeout(() => {
+        _removeTransientEditUi();
         // 確保匯出的 HTML 不帶 dark-mode，讓新檔案預設淺色模式
         const _hadDark = document.body.classList.contains('dark-mode');
         document.body.classList.remove('dark-mode');
@@ -1819,6 +1825,7 @@ _exposeInlineHandlers();
 ════════════════════════════════════════════════════ */
 
 document.addEventListener('DOMContentLoaded', function () {
+    _removeTransientEditUi();
     initStrategies();
     initAds();
     // [修改3] 初始化頁腳5連點開啟編輯模式
