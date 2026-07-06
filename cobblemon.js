@@ -751,15 +751,11 @@ function _initFooterTapSecret() {
     });
 }
 
-function _removeTransientEditUi(root = document) {
-    root.querySelectorAll('.edit-toast').forEach(el => el.remove());
-}
-
 function _showToast(msg) {
-    _removeTransientEditUi();
+    const old = document.querySelector('.edit-toast');
+    if (old) old.remove();
     const toast = document.createElement('div');
     toast.className = 'edit-toast';
-    toast.setAttribute('contenteditable', 'false');
     toast.textContent = msg;
     toast.style.cssText = [
         'position:fixed', 'bottom:80px', 'left:50%', 'transform:translateX(-50%)',
@@ -1611,7 +1607,7 @@ function _buildCacheBusterVer() {
     return `${parts.year}${parts.month}${parts.day}${parts.hour}${parts.minute}`;
 }
 
-// 將檔案內所有 ?v=202607061252 統一替換為新版本號
+// 將檔案內所有 ?v=202607061338 統一替換為新版本號
 // 比對範圍：?v= 後面非空白且非引號、結尾或 & 之前的字元
 function _stampCacheBuster(text, ver) {
     return text.replace(/\?v=[\w.\-]+/g, '?v=' + ver);
@@ -1709,7 +1705,6 @@ function executeFinalSave() {
     }).click();
 
     setTimeout(() => {
-        _removeTransientEditUi();
         // 確保匯出的 HTML 不帶 dark-mode，讓新檔案預設淺色模式
         const _hadDark = document.body.classList.contains('dark-mode');
         document.body.classList.remove('dark-mode');
@@ -1726,7 +1721,7 @@ function executeFinalSave() {
             /const initial = \[([\s\S]*?)\];(\s*window\.scData = initial;)/,
             'const initial = ' + latestScData + ';$2'
         );
-        // ── Cache Busting：將 HTML 內所有 ?v=202607061252 替換成本次建置版本號 ──
+        // ── Cache Busting：將 HTML 內所有 ?v=202607061338 替換成本次建置版本號 ──
         exportedHtml = _stampCacheBuster(exportedHtml, _buildVer);
         Object.assign(document.createElement('a'), {
             href     : URL.createObjectURL(new Blob([exportedHtml], { type: 'text/html' })),
@@ -1738,7 +1733,7 @@ function executeFinalSave() {
         fetch('cobblemon.js?v=' + Date.now())
             .then(r => r.text())
             .then(src => {
-                // ── Cache Busting：將 JS 內所有 ?v=202607061252 替換成本次建置版本號 ──
+                // ── Cache Busting：將 JS 內所有 ?v=202607061338 替換成本次建置版本號 ──
                 src = _stampCacheBuster(src, _buildVer);
                 Object.assign(document.createElement('a'), {
                     href     : URL.createObjectURL(new Blob([src], { type: 'application/javascript' })),
@@ -1824,7 +1819,6 @@ _exposeInlineHandlers();
 ════════════════════════════════════════════════════ */
 
 document.addEventListener('DOMContentLoaded', function () {
-    _removeTransientEditUi();
     initStrategies();
     initAds();
     // [修改3] 初始化頁腳5連點開啟編輯模式
@@ -1947,7 +1941,7 @@ window.onload = async function () {
 
     if (!data) {
         try {
-            const res = await fetch('cobblemon_data.json?v=202607061252');
+            const res = await fetch('cobblemon_data.json?v=202607061338');
             if (res.ok) data = await res.json();
         } catch (e) {
             console.error('[Cobblemon] JSON 載入失敗：', e);
