@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Cobblemon 方可夢樂園 — 攻略站
  * cobblemon.js  ·  主要互動邏輯
  *
@@ -751,9 +751,12 @@ function _initFooterTapSecret() {
     });
 }
 
+function _clearEditToasts() {
+    document.querySelectorAll('.edit-toast').forEach(el => el.remove());
+}
+
 function _showToast(msg) {
-    const old = document.querySelector('.edit-toast');
-    if (old) old.remove();
+    _clearEditToasts();
     const toast = document.createElement('div');
     toast.className = 'edit-toast';
     toast.textContent = msg;
@@ -920,7 +923,7 @@ function toggleEditMode(enable) {
 
     renderAdSidebar();
     renderSponsorGrid();
-    _showToast('已退出編輯模式');
+    if (!window.__suppressEditToast) _showToast('已退出編輯模式');
 }
 
 function _initScCmdSortables() {
@@ -1607,7 +1610,7 @@ function _buildCacheBusterVer() {
     return `${parts.year}${parts.month}${parts.day}${parts.hour}${parts.minute}`;
 }
 
-// 將檔案內所有 ?v=202607061252 統一替換為新版本號
+// 將檔案內所有 ?v=202604290127 統一替換為新版本號
 // 比對範圍：?v= 後面非空白且非引號、結尾或 & 之前的字元
 function _stampCacheBuster(text, ver) {
     return text.replace(/\?v=[\w.\-]+/g, '?v=' + ver);
@@ -1660,7 +1663,10 @@ function executeFinalSave() {
         newsContainer.prepend(log);
     }
     closeModal();
+    window.__suppressEditToast = true;
     toggleEditMode(false);
+    window.__suppressEditToast = false;
+    _clearEditToasts();
     // 確保已刪除的攻略不被寫入 JSON
     _syncStrategiesDataFromDOM();
 
@@ -1712,7 +1718,9 @@ function executeFinalSave() {
         const scSec = document.getElementById('scSections');
         const scSecBackup = scSec ? scSec.innerHTML : null;
         if (scSec) scSec.innerHTML = '';
+        _clearEditToasts();
         let exportedHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+        exportedHtml = exportedHtml.replace(/<div[^>]*class="[^"]*edit-toast[^"]*"[\s\S]*?<\/div>/g, '');
         if (scSec && scSecBackup !== null) scSec.innerHTML = scSecBackup;
         if (_hadDark) document.body.classList.add('dark-mode');
         // 將內嵌的 scData 替換為最新版本
@@ -1721,7 +1729,7 @@ function executeFinalSave() {
             /const initial = \[([\s\S]*?)\];(\s*window\.scData = initial;)/,
             'const initial = ' + latestScData + ';$2'
         );
-        // ── Cache Busting：將 HTML 內所有 ?v=202607061252 替換成本次建置版本號 ──
+        // ── Cache Busting：將 HTML 內所有 ?v=202604290127 替換成本次建置版本號 ──
         exportedHtml = _stampCacheBuster(exportedHtml, _buildVer);
         Object.assign(document.createElement('a'), {
             href     : URL.createObjectURL(new Blob([exportedHtml], { type: 'text/html' })),
@@ -1733,7 +1741,7 @@ function executeFinalSave() {
         fetch('cobblemon.js?v=' + Date.now())
             .then(r => r.text())
             .then(src => {
-                // ── Cache Busting：將 JS 內所有 ?v=202607061252 替換成本次建置版本號 ──
+                // ── Cache Busting：將 JS 內所有 ?v=202604290127 替換成本次建置版本號 ──
                 src = _stampCacheBuster(src, _buildVer);
                 Object.assign(document.createElement('a'), {
                     href     : URL.createObjectURL(new Blob([src], { type: 'application/javascript' })),
@@ -1819,6 +1827,7 @@ _exposeInlineHandlers();
 ════════════════════════════════════════════════════ */
 
 document.addEventListener('DOMContentLoaded', function () {
+    _clearEditToasts();
     initStrategies();
     initAds();
     // [修改3] 初始化頁腳5連點開啟編輯模式
@@ -1941,7 +1950,7 @@ window.onload = async function () {
 
     if (!data) {
         try {
-            const res = await fetch('cobblemon_data.json?v=202607061252');
+            const res = await fetch('cobblemon_data.json?v=202604290127');
             if (res.ok) data = await res.json();
         } catch (e) {
             console.error('[Cobblemon] JSON 載入失敗：', e);
