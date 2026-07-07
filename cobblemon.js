@@ -1008,6 +1008,24 @@ function _buildModalEditBar() {
         <button class="rb" onmousedown="event.preventDefault();applyFormat('underline')"><u>U</u></button>
         <button class="rb" onmousedown="event.preventDefault();applyFormat('strikeThrough')"><s>S</s></button>
         <span class="rb-sep"></span>
+        <div class="rb-swatch" style="background:#e11d48;" onmousedown="event.preventDefault();applyFormat('foreColor','#e11d48')" title="字體顏色"></div>
+        <div class="rb-swatch" style="background:#f97316;" onmousedown="event.preventDefault();applyFormat('foreColor','#f97316')" title="字體顏色"></div>
+        <div class="rb-swatch" style="background:#eab308;" onmousedown="event.preventDefault();applyFormat('foreColor','#eab308')" title="字體顏色"></div>
+        <div class="rb-swatch" style="background:#16a34a;" onmousedown="event.preventDefault();applyFormat('foreColor','#16a34a')" title="字體顏色"></div>
+        <div class="rb-swatch" style="background:#2563eb;" onmousedown="event.preventDefault();applyFormat('foreColor','#2563eb')" title="字體顏色"></div>
+        <div class="rb-swatch" style="background:#9333ea;" onmousedown="event.preventDefault();applyFormat('foreColor','#9333ea')" title="字體顏色"></div>
+        <div class="rb-swatch" style="background:#111827;" onmousedown="event.preventDefault();applyFormat('foreColor','#111827')" title="字體顏色"></div>
+        <input type="color" class="rb-swatch" style="padding:0;border:1px solid #475569;cursor:pointer;" value="#000000"
+            onmousedown="event.stopPropagation();" onchange="applyFormat('foreColor',this.value)" title="自訂字體顏色">
+        <span class="rb-sep"></span>
+        <div class="rb-swatch" style="background:#fef08a;" onmousedown="event.preventDefault();applyFormat('hiliteColor','#fef08a')" title="底色"></div>
+        <div class="rb-swatch" style="background:#bbf7d0;" onmousedown="event.preventDefault();applyFormat('hiliteColor','#bbf7d0')" title="底色"></div>
+        <div class="rb-swatch" style="background:#bfdbfe;" onmousedown="event.preventDefault();applyFormat('hiliteColor','#bfdbfe')" title="底色"></div>
+        <div class="rb-swatch" style="background:#fbcfe8;" onmousedown="event.preventDefault();applyFormat('hiliteColor','#fbcfe8')" title="底色"></div>
+        <div class="rb-swatch" style="background:transparent;border:1px dashed #94a3b8;" onmousedown="event.preventDefault();applyFormat('hiliteColor','transparent')" title="清除底色"></div>
+        <input type="color" class="rb-swatch" style="padding:0;border:1px solid #475569;cursor:pointer;" value="#fef08a"
+            onmousedown="event.stopPropagation();" onchange="applyFormat('hiliteColor',this.value)" title="自訂底色">
+        <span class="rb-sep"></span>
         <button class="rb" onmousedown="event.preventDefault();insertLink()" title="連結">連結</button>
         <label class="rb" style="cursor:pointer;" title="插入圖片">圖片 <input type="file" accept="image/*" style="display:none" onchange="insertEditableImage(this)" contenteditable="false"></label>
         <button class="rb" onmousedown="event.preventDefault();insertTip()" title="小提醒">提醒</button>
