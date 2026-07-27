@@ -1071,8 +1071,22 @@
         <main class="container mx-auto py-12 px-4">
             <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
                 <div class="md:col-span-3 edit-ignore" contenteditable="false">
-                    <div class="section-title">快速導航</div>
-                    <div class="flex flex-col border bg-white shadow-sm border-gray-200 rounded-2xl overflow-hidden">
+                    <div class="section-title flex items-center gap-2" style="border-bottom-color:#e11d48; color:#e11d48;">
+                        <span style="animation: pulseGlow 1.6s ease-in-out infinite;">🌟</span>
+                        新手專區
+                        <span style="background:#e11d48; color:#fff; font-size:11px; font-weight:800; padding:2px 8px; border-radius:999px; animation: pulseGlow 1.6s ease-in-out infinite;">必看</span>
+                    </div>
+                    <style>
+                        @keyframes pulseGlow {
+                            0%, 100% { opacity: 1; transform: scale(1); }
+                            50% { opacity: 0.6; transform: scale(1.15); }
+                        }
+                        @keyframes borderGlow {
+                            0%, 100% { box-shadow: 0 0 0 0 rgba(225,29,72,0.35), 0 2px 8px rgba(0,0,0,0.06); }
+                            50% { box-shadow: 0 0 0 6px rgba(225,29,72,0), 0 2px 8px rgba(0,0,0,0.06); }
+                        }
+                    </style>
+                    <div class="flex flex-col border-2 bg-white shadow-sm rounded-2xl overflow-hidden" style="border-color:#fca5b1; animation: borderGlow 2s ease-in-out infinite;">
                         <button onclick="showPage('newbie')" class="p-4 border-b text-left hover:bg-red-50 font-bold text-red-600 transition-colors" contenteditable="false">▶ 鍵盤快捷鍵</button>
                         <button onclick="showPage('tutorial')" class="p-4 border-b text-left hover:bg-green-50 font-bold text-green-700 transition-colors" contenteditable="false">▶ 入門教學指南</button>
                         <button onclick="showPage('faq')" class="p-4 text-left hover:bg-orange-50 font-bold text-orange-600 transition-colors" contenteditable="false">▶ 常見問題解答</button>
