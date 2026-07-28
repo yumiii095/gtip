@@ -595,6 +595,105 @@ function saveStratEdits() {
     if (btn) { btn.textContent = '✅ 已儲存'; setTimeout(() => { if (btn) btn.textContent = '💾 儲存'; }, 1500); }
 }
 
+function openStratById(id) {
+    const strat = (window.STRATEGIES_DATA || []).find(s => s.id === id);
+    if (strat) {
+        openStratModal(strat);
+        return;
+    }
+    // 找不到資料時，嘗試從畫面上現有卡片組出基本內容
+    const card = document.getElementById(id);
+    if (card) {
+        const title   = card.querySelector('.strat-card-title')?.innerText || '攻略';
+        const preview = card.querySelector('.strat-card-preview')?.innerText || '';
+        const icon    = card.querySelector('.strat-card-icon')?.innerText    || '📖';
+        openStratModal({
+            id, title,
+            html: `<h3 class="text-2xl font-bold text-purple-900 mb-6 flex items-center">${icon} ${title}</h3><p class="text-gray-600">${preview}</p>`,
+        });
+        return;
+    }
+    alert('找不到對應的攻略文章，可能已被刪除或尚未儲存。');
+}
+
+function openStratLinkPicker(btn) {
+    if (!document.body.classList.contains('editing-active')) return;
+    if (!_hasLiveEditableSelection()) {
+        alert('請先框選要加上攻略連結的文字，再點這個按鈕');
+        return;
+    }
+    // 記住目前框選範圍，稍後套用連結時需要用到
+    _rememberSelection();
+
+    document.querySelectorAll('._strat-link-picker').forEach(p => p.remove());
+
+    const strats = window.STRATEGIES_DATA || [];
+    const picker = document.createElement('div');
+    picker.className = '_strat-link-picker';
+    picker.setAttribute('contenteditable', 'false');
+    picker.style.cssText = [
+        'position:fixed', 'z-index:99999', 'background:#1e293b',
+        'border:1.5px solid #3b82f6', 'border-radius:12px', 'padding:8px',
+        'display:flex', 'flex-direction:column', 'gap:2px', 'width:280px',
+        'max-height:340px', 'overflow-y:auto',
+        'box-shadow:0 8px 32px rgba(0,0,0,0.45)',
+    ].join(';');
+
+    const header = document.createElement('div');
+    header.textContent = '選擇要連結的攻略文章：';
+    header.style.cssText = 'color:#94a3b8;font-size:12px;font-weight:700;padding:4px 8px 6px;';
+    picker.appendChild(header);
+
+    if (!strats.length) {
+        const empty = document.createElement('div');
+        empty.textContent = '目前沒有可連結的攻略文章';
+        empty.style.cssText = 'color:#94a3b8;font-size:13px;padding:8px;';
+        picker.appendChild(empty);
+    } else {
+        strats.forEach(strat => {
+            const item = document.createElement('button');
+            item.textContent = (strat.icon ? strat.icon + ' ' : '') + strat.title;
+            item.setAttribute('contenteditable', 'false');
+            item.style.cssText = 'text-align:left;background:none;border:none;color:#e2e8f0;font-size:13px;padding:7px 8px;border-radius:6px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:background 0.15s;';
+            item.onmouseenter = () => { item.style.background = '#334155'; };
+            item.onmouseleave = () => { item.style.background = 'none'; };
+            item.onmousedown = e => {
+                e.preventDefault();
+                e.stopPropagation();
+                _applyStratLink(strat.id);
+                picker.remove();
+                document.removeEventListener('mousedown', closeHandler, true);
+            };
+            picker.appendChild(item);
+        });
+    }
+
+    const rect = btn.getBoundingClientRect();
+    picker.style.top  = Math.min(rect.bottom + 6, window.innerHeight - 200) + 'px';
+    picker.style.left = Math.max(4, Math.min(rect.left, window.innerWidth - 290)) + 'px';
+    document.body.appendChild(picker);
+
+    const closeHandler = e => {
+        if (!picker.contains(e.target) && e.target !== btn) {
+            picker.remove();
+            document.removeEventListener('mousedown', closeHandler, true);
+        }
+    };
+    setTimeout(() => document.addEventListener('mousedown', closeHandler, true), 10);
+}
+
+function _applyStratLink(stratId) {
+    if (!_restoreSelection()) return;
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return;
+    const text = sel.toString();
+    if (!text) return;
+    const safeText = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const html = `<a href="javascript:void(0)" class="strat-link" onclick="event.preventDefault();openStratById('${stratId}')">${safeText}</a>`;
+    document.execCommand('insertHTML', false, html);
+    _rememberSelection();
+}
+
 function closeStratModal() {
     const modalBody = document.getElementById('strat-modal-body');
     if (modalBody && modalBody.getAttribute('contenteditable') === 'true') {
@@ -1117,6 +1216,7 @@ function _buildModalEditBar() {
         <button class="rb" onmousedown="event.preventDefault();applyFormat('indent')" title="增加縮排">⇥</button>
         <span class="rb-sep"></span>
         <button class="rb" onmousedown="event.preventDefault();insertLink()" title="連結">連結</button>
+        <button class="rb" onmousedown="event.preventDefault();openStratLinkPicker(this)" title="將框選文字連結到攻略文章" style="white-space:nowrap;">🔗 連結攻略</button>
         <label class="rb" style="cursor:pointer;" title="插入圖片">圖片 <input type="file" accept="image/*" style="display:none" onchange="insertEditableImage(this)" contenteditable="false"></label>
         <button class="rb" onmousedown="event.preventDefault();insertTip()" title="小提醒">提醒</button>
         <button class="rb" onmousedown="event.preventDefault();insertNotice()" title="注意">注意</button>
@@ -1487,6 +1587,7 @@ function _buildAdEditBar(adId) {
         </button>
         <button class="rb" onmousedown="event.preventDefault();applyFormat('insertUnorderedList')" title="清單">≡</button>
         <button class="rb" onmousedown="event.preventDefault();insertLink()" title="連結">🔗</button>
+        <button class="rb" onmousedown="event.preventDefault();openStratLinkPicker(this)" title="將框選文字連結到攻略文章">🔗攻略</button>
         <span class="rb-sep"></span>
         <label class="rb" style="cursor:pointer;" title="插入圖片">
             🖼 <input type="file" accept="image/*" style="display:none" onchange="insertEditableImage(this)" contenteditable="false">
