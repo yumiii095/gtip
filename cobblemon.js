@@ -595,6 +595,27 @@ function saveStratEdits() {
     if (btn) { btn.textContent = '✅ 已儲存'; setTimeout(() => { if (btn) btn.textContent = '💾 儲存'; }, 1500); }
 }
 
+function navigateToStrat(id) {
+    showPage('strategy');
+    let attempts = 0;
+    const tryScroll = () => {
+        const card = document.getElementById(id);
+        if (card) {
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            card.classList.add('strat-card-highlight');
+            setTimeout(() => card.classList.remove('strat-card-highlight'), 2200);
+            return;
+        }
+        attempts++;
+        if (attempts < 20) {
+            setTimeout(tryScroll, 150);
+        } else {
+            alert('找不到對應的攻略文章，可能已被刪除。');
+        }
+    };
+    setTimeout(tryScroll, 60);
+}
+
 function openStratById(id) {
     const strat = (window.STRATEGIES_DATA || []).find(s => s.id === id);
     if (strat) {
@@ -689,7 +710,7 @@ function _applyStratLink(stratId) {
     const text = sel.toString();
     if (!text) return;
     const safeText = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    const html = `<a href="javascript:void(0)" class="strat-link" onclick="event.preventDefault();openStratById('${stratId}')">${safeText}</a>`;
+    const html = `<a href="javascript:void(0)" class="strat-link" onclick="event.preventDefault();navigateToStrat('${stratId}')">${safeText}</a>`;
     document.execCommand('insertHTML', false, html);
     _rememberSelection();
 }
