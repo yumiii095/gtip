@@ -510,7 +510,13 @@ function initStrategies() {
         });
     }
 
-    if (!window.STRATEGIES_DATA) return;
+    if (!window.STRATEGIES_DATA) {
+        container.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:56px 20px;color:#94a3b8;font-size:0.95rem;">
+            <div class="strat-loading-spinner"></div>
+            ⏳ 攻略資料載入中，請稍候...
+        </div>`;
+        return;
+    }
 
     container.innerHTML = '';
     window.STRATEGIES_DATA.forEach((strat, idx) => {
@@ -604,6 +610,8 @@ function navigateToStrat(id) {
             card.scrollIntoView({ behavior: 'smooth', block: 'center' });
             card.classList.add('strat-card-highlight');
             setTimeout(() => card.classList.remove('strat-card-highlight'), 2200);
+            // 捲動到定位後，順便自動開啟該篇攻略文章
+            setTimeout(() => openStratById(id), 450);
             return;
         }
         attempts++;
