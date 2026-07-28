@@ -604,6 +604,7 @@ function saveStratEdits() {
 function navigateToStrat(id) {
     showPage('strategy');
     let attempts = 0;
+    const MAX_ATTEMPTS = 400; // 400 * 150ms ≈ 60 秒，涵蓋 cobblemon_data.json 較慢的載入情況
     const tryScroll = () => {
         const card = document.getElementById(id);
         if (card) {
@@ -615,7 +616,7 @@ function navigateToStrat(id) {
             return;
         }
         attempts++;
-        if (attempts < 20) {
+        if (attempts < MAX_ATTEMPTS) {
             setTimeout(tryScroll, 150);
         } else {
             console.warn('[navigateToStrat] 找不到攻略卡片：', id);
