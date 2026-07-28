@@ -864,8 +864,29 @@
         <!-- Ribbon -->
         <div id="admin-ribbon">
 
+            <!-- 段落樣式 -->
+            <div class="ribbon-group">
+                <select class="rb-select" id="rb-formatblock" style="max-width:88px" onchange="applyFormat('formatBlock',this.value)" title="段落樣式" contenteditable="false">
+                    <option value="<p>" selected="">內文</option>
+                    <option value="<h2>">標題 1</option>
+                    <option value="<h3>">標題 2</option>
+                    <option value="<h4>">標題 3</option>
+                    <option value="<blockquote>">引言</option>
+                </select>
+            </div>
+
             <!-- 字型 -->
             <div class="ribbon-group">
+                <select class="rb-select" id="rb-fontname" style="max-width:96px" onchange="applyFormat('fontName',this.value)" title="字型" contenteditable="false">
+                    <option value="'Noto Sans TC',sans-serif" selected="">預設字型</option>
+                    <option value="'Microsoft JhengHei',sans-serif">微軟正黑體</option>
+                    <option value="'PMingLiU',serif">新細明體</option>
+                    <option value="'DFKai-SB','BiauKai',serif">標楷體</option>
+                    <option value="Georgia,serif">Georgia</option>
+                    <option value="'Times New Roman',serif">Times New Roman</option>
+                    <option value="Arial,sans-serif">Arial</option>
+                    <option value="'Courier New',monospace">Courier New</option>
+                </select>
                 <select class="rb-select" id="rb-fontsize" onchange="applyFormat('fontSize',this.value)" title="字體大小" contenteditable="false">
                     <option value="1">10px</option>
                     <option value="2">13px</option>
@@ -874,6 +895,14 @@
                     <option value="5">24px</option>
                     <option value="6">32px</option>
                     <option value="7">48px</option>
+                </select>
+                <select class="rb-select" id="rb-lineheight" style="max-width:66px" onchange="applyLineHeight(this.value)" title="行距" contenteditable="false">
+                    <option value="">行距</option>
+                    <option value="1">1.0</option>
+                    <option value="1.15">1.15</option>
+                    <option value="1.5">1.5</option>
+                    <option value="2">2.0</option>
+                    <option value="2.5">2.5</option>
                 </select>
             </div>
 
@@ -917,6 +946,9 @@
                 </button>
                 <button class="rb" onmousedown="event.preventDefault();applyFormat('justifyRight')" title="靠右" contenteditable="false">
                     <svg viewBox="0 0 20 20" fill="currentColor"><rect x="2" y="4" width="16" height="2" rx="1"></rect><rect x="8" y="9" width="10" height="2" rx="1"></rect><rect x="4" y="14" width="14" height="2" rx="1"></rect></svg>
+                </button>
+                <button class="rb" onmousedown="event.preventDefault();applyFormat('justifyFull')" title="兩端對齊" contenteditable="false">
+                    <svg viewBox="0 0 20 20" fill="currentColor"><rect x="2" y="4" width="16" height="2" rx="1"></rect><rect x="2" y="9" width="16" height="2" rx="1"></rect><rect x="2" y="14" width="16" height="2" rx="1"></rect></svg>
                 </button>
             </div>
 

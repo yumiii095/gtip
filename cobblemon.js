@@ -979,6 +979,57 @@ function applyFormat(command, value = null) {
     _rememberSelection();
 }
 
+function _hasLiveEditableSelection() {
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount || sel.isCollapsed) return false;
+    const node = sel.anchorNode && (sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentElement);
+    return !!(node && node.closest('[contenteditable="true"]'));
+}
+
+const _BLOCK_TAGS = ['P','H1','H2','H3','H4','LI','BLOCKQUOTE','DIV'];
+
+function _closestBlock(node, root) {
+    let el = node && (node.nodeType === 1 ? node : node.parentElement);
+    while (el && el !== root) {
+        if (_BLOCK_TAGS.includes(el.tagName)) return el;
+        el = el.parentElement;
+    }
+    return null;
+}
+
+function applyLineHeight(value) {
+    if (!document.body.classList.contains('editing-active') || !value) return;
+    if (!_hasLiveEditableSelection()) _restoreSelection();
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    const anchorEl = range.commonAncestorContainer.nodeType === 1
+        ? range.commonAncestorContainer : range.commonAncestorContainer.parentElement;
+    const root = anchorEl && anchorEl.closest('[contenteditable="true"]');
+    if (!root) return;
+
+    const blocks = new Set();
+    const startBlock = _closestBlock(range.startContainer, root);
+    const endBlock   = _closestBlock(range.endContainer, root);
+    if (startBlock) blocks.add(startBlock);
+    if (endBlock) blocks.add(endBlock);
+
+    if (startBlock !== endBlock) {
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, {
+            acceptNode(node) {
+                return (_BLOCK_TAGS.includes(node.tagName) && range.intersectsNode(node))
+                    ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+            }
+        });
+        let node;
+        while (node = walker.nextNode()) blocks.add(node);
+    }
+
+    if (blocks.size === 0 && root) blocks.add(root);
+    blocks.forEach(b => { if (b) b.style.lineHeight = value; });
+    _rememberSelection();
+}
+
 function updateFormatState() {
     const map = {
         bold: 'rb-bold',
@@ -999,8 +1050,33 @@ function _buildModalEditBar() {
     return `<div class="edit-ui" contenteditable="false"
         style="position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:4px;background:#0f172a;padding:8px 12px;border-radius:10px;margin-bottom:14px;flex-wrap:wrap;box-shadow:0 4px 14px rgba(0,0,0,0.3);">
         <span style="font-size:11px;font-weight:700;color:#00AEEF;margin-right:4px;">編輯</span>
+        <select class="rb-select" style="max-width:90px;height:24px;" title="段落樣式" onmousedown="event.stopPropagation();" onchange="applyFormat('formatBlock',this.value)">
+            <option value="<p>" selected>內文</option>
+            <option value="<h2>">標題 1</option>
+            <option value="<h3>">標題 2</option>
+            <option value="<h4>">標題 3</option>
+            <option value="<blockquote>">引言</option>
+        </select>
+        <select class="rb-select" style="max-width:96px;height:24px;" title="字型" onmousedown="event.stopPropagation();" onchange="applyFormat('fontName',this.value)">
+            <option value="'Noto Sans TC',sans-serif" selected>預設字型</option>
+            <option value="'Microsoft JhengHei',sans-serif">微軟正黑體</option>
+            <option value="'PMingLiU',serif">新細明體</option>
+            <option value="'DFKai-SB','BiauKai',serif">標楷體</option>
+            <option value="Georgia,serif">Georgia</option>
+            <option value="'Times New Roman',serif">Times New Roman</option>
+            <option value="Arial,sans-serif">Arial</option>
+            <option value="'Courier New',monospace">Courier New</option>
+        </select>
         <select class="rb-select" style="max-width:72px;height:24px;" title="字體大小" onmousedown="event.stopPropagation();" onchange="applyFormat('fontSize',this.value)">
             <option value="1">10px</option><option value="2">13px</option><option value="3" selected>16px</option><option value="4">18px</option><option value="5">24px</option><option value="6">32px</option><option value="7">48px</option>
+        </select>
+        <select class="rb-select" style="max-width:68px;height:24px;" title="行距" onmousedown="event.stopPropagation();" onchange="applyLineHeight(this.value)">
+            <option value="">行距</option>
+            <option value="1">1.0</option>
+            <option value="1.15">1.15</option>
+            <option value="1.5">1.5</option>
+            <option value="2">2.0</option>
+            <option value="2.5">2.5</option>
         </select>
         <span class="rb-sep"></span>
         <button class="rb" onmousedown="event.preventDefault();applyFormat('bold')"><b>B</b></button>
@@ -1025,6 +1101,16 @@ function _buildModalEditBar() {
         <div class="rb-swatch" style="background:transparent;border:1px dashed #94a3b8;" onmousedown="event.preventDefault();applyFormat('hiliteColor','transparent')" title="清除底色"></div>
         <input type="color" class="rb-swatch" style="padding:0;border:1px solid #475569;cursor:pointer;" value="#fef08a"
             onmousedown="event.stopPropagation();" onchange="applyFormat('hiliteColor',this.value)" title="自訂底色">
+        <span class="rb-sep"></span>
+        <button class="rb" onmousedown="event.preventDefault();applyFormat('justifyLeft')" title="靠左">◀≡</button>
+        <button class="rb" onmousedown="event.preventDefault();applyFormat('justifyCenter')" title="置中">≡</button>
+        <button class="rb" onmousedown="event.preventDefault();applyFormat('justifyRight')" title="靠右">≡▶</button>
+        <button class="rb" onmousedown="event.preventDefault();applyFormat('justifyFull')" title="兩端對齊">≡≡</button>
+        <span class="rb-sep"></span>
+        <button class="rb" onmousedown="event.preventDefault();applyFormat('insertUnorderedList')" title="項目清單">• 清單</button>
+        <button class="rb" onmousedown="event.preventDefault();applyFormat('insertOrderedList')" title="編號清單">1. 清單</button>
+        <button class="rb" onmousedown="event.preventDefault();applyFormat('outdent')" title="減少縮排">⇤</button>
+        <button class="rb" onmousedown="event.preventDefault();applyFormat('indent')" title="增加縮排">⇥</button>
         <span class="rb-sep"></span>
         <button class="rb" onmousedown="event.preventDefault();insertLink()" title="連結">連結</button>
         <label class="rb" style="cursor:pointer;" title="插入圖片">圖片 <input type="file" accept="image/*" style="display:none" onchange="insertEditableImage(this)" contenteditable="false"></label>
@@ -1155,6 +1241,9 @@ function _createDraggableImage(src, name) {
     imgToolbar.className = 'img-toolbar';
     imgToolbar.setAttribute('contenteditable', 'false');
     imgToolbar.innerHTML = `
+        <button class="rb" style="font-size:10px;padding:2px 5px;" onmousedown="event.preventDefault();moveImgUp(this)"   title="上移">▲</button>
+        <button class="rb" style="font-size:10px;padding:2px 5px;" onmousedown="event.preventDefault();moveImgDown(this)" title="下移">▼</button>
+        <span class="rb-sep"></span>
         <button class="rb" style="font-size:10px;padding:2px 5px;" onmousedown="event.preventDefault();setImgAlign(this,'left')"   title="靠左">◀</button>
         <button class="rb" style="font-size:10px;padding:2px 5px;" onmousedown="event.preventDefault();setImgAlign(this,'center')" title="置中">■</button>
         <button class="rb" style="font-size:10px;padding:2px 5px;" onmousedown="event.preventDefault();setImgAlign(this,'right')"  title="靠右">▶</button>
@@ -1239,6 +1328,20 @@ function _setupImgDropTargets() {
             window._dragImgEl = null;
         });
     });
+}
+
+function moveImgUp(btn) {
+    const wrapper = btn.closest('.drag-img');
+    if (!wrapper) return;
+    const prev = wrapper.previousElementSibling;
+    if (prev) wrapper.parentNode.insertBefore(wrapper, prev);
+}
+
+function moveImgDown(btn) {
+    const wrapper = btn.closest('.drag-img');
+    if (!wrapper) return;
+    const next = wrapper.nextElementSibling;
+    if (next) wrapper.parentNode.insertBefore(next, wrapper);
 }
 
 function setImgAlign(btn, align) {
