@@ -596,6 +596,10 @@ function saveStratEdits() {
 }
 
 function closeStratModal() {
+    const modalBody = document.getElementById('strat-modal-body');
+    if (modalBody && modalBody.getAttribute('contenteditable') === 'true') {
+        saveStratEdits();
+    }
     document.getElementById('strat-modal').classList.remove('open');
     document.getElementById('strat-modal-body').removeAttribute('contenteditable');
     document.body.style.overflow = '';
@@ -2003,7 +2007,7 @@ window.addEventListener('keydown', e => {
         e.preventDefault();
         toggleEditMode(true);
     }
-    if (e.key === 'Escape') closeStratModal();
+    if (e.key === 'Escape' && !document.body.classList.contains('editing-active')) closeStratModal();
 });
 
 window.addEventListener('scroll', () => {

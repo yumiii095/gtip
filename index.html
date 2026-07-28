@@ -765,7 +765,7 @@
     </div>
 
     <!-- Strategy detail modal -->
-    <div id="strat-modal" contenteditable="false" onclick="if(event.target===this)closeStratModal()" class="">
+    <div id="strat-modal" contenteditable="false" onclick="if(event.target===this && !document.body.classList.contains('editing-active'))closeStratModal()" class="">
         <div class="strat-modal-box">
             <button class="strat-modal-close" onclick="closeStratModal()" contenteditable="false">✕</button>
             <div id="strat-modal-body"><div class="edit-ui" contenteditable="false" style="position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:4px;background:#0f172a;padding:8px 12px;border-radius:10px;margin-bottom:14px;flex-wrap:wrap;box-shadow:0 4px 14px rgba(0,0,0,0.3);">
