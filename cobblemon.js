@@ -569,9 +569,7 @@ function openStratModal(strat) {
                         e.preventDefault();
                         const file = item.getAsFile();
                         if (!file) continue;
-                        const reader = new FileReader();
-                        reader.onload = ev => _createDraggableImage(ev.target.result, '貼上圖片');
-                        reader.readAsDataURL(file);
+                        _compressImageFile(file, dataUrl => _createDraggableImage(dataUrl, '貼上圖片'));
                         break;
                     }
                 }
@@ -821,16 +819,15 @@ function _openStratIconPicker(iconEl, stratId) {
 
 function insertStrategyImage(input) {
     if (!input.files?.[0]) return;
-    const reader = new FileReader();
-    reader.onload = e => {
+    const file = input.files[0];
+    _compressImageFile(file, dataUrl => {
         const img = Object.assign(document.createElement('img'), {
-            src: e.target.result, alt: input.files[0].name,
+            src: dataUrl, alt: file.name,
             className: 'max-w-full rounded mt-2 mb-2 mx-auto block',
         });
         input.closest('.border-dashed').insertAdjacentElement('beforebegin', img);
         input.value = '';
-    };
-    reader.readAsDataURL(input.files[0]);
+    });
 }
 
 
@@ -1322,11 +1319,54 @@ function insertImageFromUrl() {
 function insertEditableImage(input) {
     if (!input.files || !input.files[0]) return;
     const file = input.files[0];
+    _compressImageFile(file, dataUrl => {
+        _createDraggableImage(dataUrl, file.name || '圖片');
+        input.value = '';
+    });
+}
+
+// 壓縮/縮小圖片後再轉成 base64，避免手機原圖(常常好幾MB)直接內嵌進網頁，
+// 導致 index.html 越存越大、開啟頁面出現長時間空白畫面。
+function _compressImageFile(file, callback, maxDim = 1600, quality = 0.82) {
     const reader = new FileReader();
     reader.onload = e => {
-        _createDraggableImage(e.target.result, file.name || '圖片');
-        input.value = '';
+        const img = new Image();
+        img.onload = () => {
+            let width  = img.naturalWidth;
+            let height = img.naturalHeight;
+            if (width > maxDim || height > maxDim) {
+                if (width >= height) {
+                    height = Math.round(height * (maxDim / width));
+                    width  = maxDim;
+                } else {
+                    width  = Math.round(width * (maxDim / height));
+                    height = maxDim;
+                }
+            }
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width  = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                let dataUrl = canvas.toDataURL('image/jpeg', quality);
+                // 若原圖是 PNG 且壓縮後仍偏大，保留 PNG 格式以避免破壞透明背景，
+                // 但仍套用上面縮小後的尺寸。
+                if (file.type === 'image/png') {
+                    const pngUrl = canvas.toDataURL('image/png');
+                    if (pngUrl.length < 800 * 1024) dataUrl = pngUrl;
+                }
+                callback(dataUrl);
+            } catch (err) {
+                console.warn('[insertEditableImage] 壓縮失敗，改用原圖：', err);
+                callback(e.target.result);
+            }
+        };
+        img.onerror = () => callback(e.target.result);
+        img.src = e.target.result;
     };
+    reader.onerror = () => console.error('[insertEditableImage] 讀取圖片失敗');
     reader.readAsDataURL(file);
 }
 
