@@ -1998,7 +1998,42 @@ function executeFinalSave() {
         const scSec = document.getElementById('scSections');
         const scSecBackup = scSec ? scSec.innerHTML : null;
         if (scSec) scSec.innerHTML = '';
+
+        // ── 避免攻略卡片(含內嵌圖片)被一併烘焙進靜態 index.html。
+        //    攻略內容只應該存在 cobblemon_data.json，由前端在載入時動態渲染，
+        //    否則圖片會同時存在 index.html 與 cobblemon_data.json 兩份，
+        //    造成 index.html 檔案越存越大。
+        const stratContainer  = document.getElementById('strategy-container');
+        const stratBackup     = stratContainer ? stratContainer.innerHTML : null;
+        if (stratContainer) {
+            stratContainer.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:56px 20px;color:#94a3b8;font-size:0.95rem;">
+                <div class="strat-loading-spinner"></div>
+                ⏳ 攻略資料載入中，請稍候...
+            </div>`;
+        }
+        // 若攻略詳情彈窗當時剛好開著，關閉並清空，避免內容被存入靜態 HTML
+        const stratModal      = document.getElementById('strat-modal');
+        const stratModalBody  = document.getElementById('strat-modal-body');
+        const stratModalBackup = stratModalBody ? stratModalBody.innerHTML : null;
+        const modalWasOpen    = !!(stratModal && stratModal.classList.contains('open'));
+        if (stratModalBody) stratModalBody.innerHTML = '';
+        if (stratModal) stratModal.classList.remove('open');
+
+        // 同理，指令列表文字內容也只應該存在 cobblemon_data.json
+        const cmdContainer    = document.getElementById('accordion-container');
+        const cmdBackup       = cmdContainer ? cmdContainer.innerHTML : null;
+        if (cmdContainer) {
+            cmdContainer.innerHTML = '<div style="text-align:center;padding:40px;color:#94a3b8;font-size:0.9rem;">⏳ 指令資料載入中，請稍候...</div>';
+        }
+
         let exportedHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+
+        // 還原目前畫面，讓管理者手上的操作畫面不受匯出流程影響
+        if (stratContainer && stratBackup !== null) stratContainer.innerHTML = stratBackup;
+        if (stratModalBody && stratModalBackup !== null) stratModalBody.innerHTML = stratModalBackup;
+        if (modalWasOpen && stratModal) stratModal.classList.add('open');
+        if (cmdContainer && cmdBackup !== null) cmdContainer.innerHTML = cmdBackup;
+
         if (scSec && scSecBackup !== null) scSec.innerHTML = scSecBackup;
         if (_hadDark) document.body.classList.add('dark-mode');
         // 將內嵌的 scData 替換為最新版本
