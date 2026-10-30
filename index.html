@@ -24,14 +24,14 @@
                 extend: {
                     colors: {
                         ins: {
-                            bg: '#FDFBF7',
-                            card: '#FFFFFF',
-                            primary: '#2E7D32',
-                            secondary: '#5D4037',
-                            dark: '#212121',
-                            accent: '#43A047',
-                            tag: '#EFEBE9',
-                            green: '#388E3C'
+                            bg: '#0f1117',
+                            card: '#161a23',
+                            primary: '#10b981',
+                            secondary: '#94a3b8',
+                            dark: '#f8fafc',
+                            accent: '#34d399',
+                            tag: '#1f2533',
+                            green: '#059669'
                         }
                     },
                     fontFamily: {
@@ -49,11 +49,12 @@
         html {
             overflow-y: scroll;
             scrollbar-gutter: stable;
+            background-color: #0f1117;
         }
 
         body {
-            background-color: #FDFBF7;
-            color: #212121;
+            background-color: #0f1117;
+            color: #f1f5f9;
             font-family: 'Inter', 'Noto Sans TC', sans-serif;
             min-height: 100vh;
         }
@@ -66,24 +67,25 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #FDFBF7; }
-        ::-webkit-scrollbar-thumb { background: #D7CCC8; border-radius: 99px; }
-        ::-webkit-scrollbar-thumb:hover { background: #A1887F; }
+        ::-webkit-scrollbar-track { background: #0f1117; }
+        ::-webkit-scrollbar-thumb { background: #28303f; border-radius: 99px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b4559; }
 
         .glass-header {
-            background: rgba(253, 251, 247, 0.94);
+            background: rgba(15, 17, 23, 0.94);
             backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(224, 224, 224, 0.85);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.96);
+            background: rgba(22, 26, 35, 0.92);
             backdrop-filter: blur(10px);
-            border: 1px solid #E0E0E0;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #f1f5f9;
         }
 
         .ins-shadow {
-            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4), 0 2px 6px -1px rgba(0, 0, 0, 0.2);
         }
 
         /* ==========================================================================
@@ -325,47 +327,47 @@
         /* ==========================================================================
            3. cobblemon.js 元件樣式 (Search, Accordion, Strategy Cards, Modals)
            ========================================================================== */
-        .suggestion-box { max-height: 380px; overflow-y: auto; }
-        .suggestion-item { padding: 10px 14px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: background 0.15s; }
-        .suggestion-item:hover { background: #f8fafc; }
+        .suggestion-box { background: #161a23; border: 1px solid #28303f; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5); max-height: 380px; overflow-y: auto; }
+        .suggestion-item { padding: 10px 14px; border-bottom: 1px solid #28303f; cursor: pointer; transition: background 0.15s; color: #f1f5f9; }
+        .suggestion-item:hover { background: #1f2533; }
         .suggestion-item:last-child { border-bottom: none; }
-        .fuzzy-hl { background: #fef08a; padding: 0 2px; border-radius: 2px; }
+        .fuzzy-hl { background: #065f46; color: #6ee7b7; padding: 0 2px; border-radius: 2px; }
 
         /* 指令清單盒 (cmd-box) */
         .cmd-box {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 10px 14px; border-bottom: 1px solid #f1f5f9; gap: 8px;
+            padding: 10px 14px; border-bottom: 1px solid #28303f; gap: 8px;
             transition: background 0.15s;
         }
-        .cmd-box:hover { background: #f8fafc; }
-        .cmd-text { font-family: monospace; font-weight: 700; color: #1e293b; font-size: 13px; }
-        .cmd-desc { font-size: 13px; color: #64748b; margin-left: 8px; flex: 1; }
+        .cmd-box:hover { background: #1f2533; }
+        .cmd-text { font-family: monospace; font-weight: 700; color: #34d399; font-size: 13px; }
+        .cmd-desc { font-size: 13px; color: #94a3b8; margin-left: 8px; flex: 1; }
         .copy-btn {
-            padding: 4px 10px; font-size: 11px; font-weight: 600; background: #f1f5f9;
-            color: #475569; border-radius: 6px; cursor: pointer; border: none; transition: all 0.2s;
+            padding: 4px 10px; font-size: 11px; font-weight: 600; background: #1f2533;
+            color: #cbd5e1; border-radius: 6px; cursor: pointer; border: 1px solid #28303f; transition: all 0.2s;
         }
-        .copy-btn:hover { background: #e2e8f0; color: #0f172a; }
-        .copy-btn.copied { background: #dcfce7; color: #166534; }
-        .cmd-highlight { background: #fef9c3 !important; }
+        .copy-btn:hover { background: #334155; color: #ffffff; border-color: #475569; }
+        .copy-btn.copied { background: #065f46; color: #6ee7b7; border-color: #059669; }
+        .cmd-highlight { background: rgba(245, 158, 11, 0.2) !important; }
 
         /* 折疊手風琴 (accordion-item) */
-        .accordion-item { border-radius: 12px; margin-bottom: 12px; overflow: hidden; border: 1px solid #e2e8f0; }
-        .accordion-header { cursor: pointer; font-weight: 700; user-select: none; transition: background 0.15s; }
-        .accordion-header:hover { background: #f8fafc; }
-        .accordion-content { display: none; }
+        .accordion-item { border-radius: 12px; margin-bottom: 12px; overflow: hidden; border: 1px solid #28303f; background: #161a23; }
+        .accordion-header { cursor: pointer; font-weight: 700; user-select: none; transition: background 0.15s; color: #f1f5f9; }
+        .accordion-header:hover { background: #1f2533; }
+        .accordion-content { display: none; background: #161a23; }
         .accordion-active .accordion-content { display: block; }
 
         /* 攻略卡片 (strat-card) */
         .strat-card {
-            background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px;
+            background: #161a23; border: 1px solid #28303f; border-radius: 16px;
             padding: 20px; position: relative; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex; flex-direction: column; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            display: flex; flex-direction: column; box-shadow: 0 4px 14px rgba(0,0,0,0.3);
         }
-        .strat-card:hover { transform: translateY(-3px); box-shadow: 0 12px 24px -4px rgba(0,0,0,0.08); border-color: #cbd5e1; }
+        .strat-card:hover { transform: translateY(-3px); box-shadow: 0 12px 24px -4px rgba(0,0,0,0.6); border-color: #10b981; }
         .strat-card-icon { font-size: 2rem; margin-bottom: 10px; }
-        .strat-card-title { font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-bottom: 6px; }
-        .strat-card-preview { font-size: 0.85rem; color: #64748b; line-height: 1.5; flex: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-        .strat-card-arrow { position: absolute; bottom: 14px; right: 18px; font-size: 1.25rem; color: #94a3b8; font-weight: 700; }
+        .strat-card-title { font-size: 1.1rem; font-weight: 700; color: #f1f5f9; margin-bottom: 6px; }
+        .strat-card-preview { font-size: 0.85rem; color: #94a3b8; line-height: 1.5; flex: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .strat-card-arrow { position: absolute; bottom: 14px; right: 18px; font-size: 1.25rem; color: #10b981; font-weight: 700; }
 
         /* 攻略彈窗 (strat-modal - Office Word 風格) */
         #strat-modal {
@@ -411,11 +413,11 @@
 
         /* 贊助廣告格 (sponsor-slot) */
         .sponsor-slot {
-            background: #fffbeb; border: 1.5px dashed #fcd34d; border-radius: 18px;
+            background: rgba(245, 158, 11, 0.06); border: 1.5px dashed rgba(245, 158, 11, 0.35); border-radius: 18px;
             padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s;
             position: relative;
         }
-        .sponsor-slot:hover { transform: translateY(-2px); background: #fef3c7; border-color: #f59e0b; }
+        .sponsor-slot:hover { transform: translateY(-2px); background: rgba(245, 158, 11, 0.12); border-color: #f59e0b; }
         .ad-card-delete {
             background: #fee2e2; color: #b91c1c; border: none; border-radius: 99px;
             width: 24px; height: 24px; font-size: 11px; font-weight: 700; cursor: pointer;
@@ -482,7 +484,7 @@
                 
                 <!-- 左側 LOGO：純文字、無圖示、無副標題 (點擊回動態首頁) -->
                 <div @click="switchTab('home')" class="flex items-center cursor-pointer select-none shrink-0 group">
-                    <span class="text-base sm:text-lg font-bold text-stone-900 tracking-wide leading-tight whitespace-nowrap group-hover:text-emerald-700 transition-colors">
+                    <span class="text-base sm:text-lg font-bold text-stone-100 tracking-wide leading-tight whitespace-nowrap group-hover:text-emerald-400 transition-colors">
                         {{ siteTitle }}
                     </span>
                 </div>
@@ -492,10 +494,10 @@
                     <button v-for="tab in navTabs" :key="tab.id"
                             @click="switchTab(tab.id)" 
                             class="relative py-1.5 transition-colors cursor-pointer select-none shrink-0 whitespace-nowrap"
-                            :class="activeNavTab === tab.id ? 'font-bold text-black' : 'text-stone-600 hover:text-black'">
+                            :class="activeNavTab === tab.id ? 'font-bold text-emerald-400' : 'text-stone-400 hover:text-stone-100'">
                         <span>{{ tab.name }}</span>
                         <span v-if="activeNavTab === tab.id" 
-                              class="absolute bottom-0 left-0 w-full h-[2.5px] bg-stone-900 rounded-full"></span>
+                              class="absolute bottom-0 left-0 w-full h-[2.5px] bg-emerald-400 rounded-full"></span>
                     </button>
                 </nav>
             </div>
@@ -503,7 +505,7 @@
 
         <!-- 主要分頁切換內容區塊 -->
         <div class="flex-1 w-full pt-16 sm:pt-20">
-            <transition name="tab-fade" mode="out-in">
+            <transition name="tab-fade" mode="out-in" @after-enter="handleTabEnter">
 
                 <!-- 0. 首頁 分頁 (Home View - 完整原創動畫版，純淨底色) -->
                 <main v-if="activeNavTab === 'home'" id="home-page" key="home" 
@@ -517,7 +519,7 @@
                             
                             <!-- 首頁小標：COBBLEMON OASIS・官方攻略站 (逐字淡入或散落動畫) -->
                             <p :key="'sub-' + titleAnimKey"
-                               class="text-xs sm:text-sm font-semibold tracking-[0.26em] uppercase text-[#4A3F35] text-center mb-3 sm:mb-4 select-none font-sans"
+                               class="text-xs sm:text-sm font-semibold tracking-[0.26em] uppercase text-emerald-400 text-center mb-3 sm:mb-4 select-none font-sans"
                                :class="(!isPetalFalling && isReturnTitleAnim) ? 'subtitle-direct-fade' : ''"
                                :style="(!isPetalFalling && isReturnTitleAnim) ? { animationDelay: '1.0s' } : {}">
                                 <span v-for="(char, idx) in subtitleChars" :key="'s-'+idx"
@@ -663,7 +665,7 @@
                                        placeholder="搜尋指令、攻略、寶可夢... (Enter 送出)" 
                                        oninput="handleGlobalSearch(this, 'homeSuggestions')"
                                        onkeydown="if(event.key==='Enter') executeHomeSearch()"
-                                       class="w-full pl-11 pr-24 py-3 bg-white/95 border border-stone-200 rounded-2xl text-xs sm:text-sm shadow-sm focus:outline-none focus:border-stone-400 focus:bg-white transition">
+                                       class="w-full pl-11 pr-24 py-3 bg-[#141720] border border-[#28303f] rounded-2xl text-xs sm:text-sm text-stone-100 placeholder-stone-500 shadow-sm focus:outline-none focus:border-emerald-500 focus:bg-[#1a1f2b] transition">
                                 <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 text-sm"></i>
                                 <button onclick="executeHomeSearch()" 
                                         class="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-1.5 bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold rounded-xl transition cursor-pointer">
@@ -690,9 +692,9 @@
 
                 <!-- 1. 指令集 分頁 (Commands) -->
                 <main v-else-if="activeNavTab === 'commands'" id="commands-page" key="commands" class="page-content max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 w-full space-y-6">
-                    <div class="border-b border-stone-200 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="border-b border-[#28303f] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
-                            <h1 class="text-2xl sm:text-3xl font-bold text-stone-900">指令集</h1>
+                            <h1 class="text-2xl sm:text-3xl font-bold text-stone-100">指令集</h1>
                             <p class="text-xs sm:text-sm text-stone-500 mt-1">伺服器常用指令、權限與操作語法速查</p>
                         </div>
                         <button class="edit-ui text-xs px-3 py-1.5 bg-emerald-600 text-white rounded-lg font-bold" onclick="addNewSection('accordion-container','command')">+ 新增章節</button>
@@ -705,7 +707,7 @@
                                type="text" 
                                placeholder="篩選指令或描述..." 
                                oninput="handleGlobalSearch(this, 'innerSuggestions')"
-                               class="w-full pl-9 pr-4 py-2.5 bg-white border border-stone-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-stone-400 shadow-2xs">
+                               class="w-full pl-9 pr-4 py-2.5 bg-[#141720] border border-[#28303f] rounded-xl text-xs sm:text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:border-emerald-500 shadow-2xs">
                         <div id="innerSuggestions" class="suggestion-box hidden absolute left-0 right-0 top-full mt-1 bg-white rounded-xl shadow-lg border border-stone-200 overflow-hidden z-50 text-left"></div>
                     </div>
 
@@ -715,9 +717,9 @@
 
                 <!-- 2. 圖鑑 分頁 (Pokedex) -->
                 <main v-else-if="activeNavTab === 'pokedex'" id="pokedex-page" key="pokedex" class="page-content max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 w-full space-y-6">
-                    <div class="border-b border-stone-200 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="border-b border-[#28303f] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
-                            <h1 class="text-2xl sm:text-3xl font-bold text-stone-900">圖鑑速查</h1>
+                            <h1 class="text-2xl sm:text-3xl font-bold text-stone-100">圖鑑速查</h1>
                             <p class="text-xs sm:text-sm text-stone-500 mt-1">Cobblemon 寶可夢全圖鑑、掉落物與群系資訊 (已收錄 {{ pdxList.length }} 隻)</p>
                         </div>
                         <!-- 圖鑑快速搜尋框 -->
@@ -726,7 +728,7 @@
                             <input v-model="pdxQuery" 
                                    type="text" 
                                    placeholder="搜尋寶可夢名稱、編號或掉落物..." 
-                                   class="w-full pl-9 pr-4 py-2 bg-white border border-stone-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-stone-400 shadow-2xs">
+                                   class="w-full pl-9 pr-4 py-2 bg-[#141720] border border-[#28303f] rounded-xl text-xs sm:text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:border-emerald-500 shadow-2xs">
                         </div>
                     </div>
 
@@ -742,10 +744,10 @@
                             沒有找到符合「{{ pdxQuery }}」的寶可夢
                         </div>
                         <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <div v-for="item in filteredPokedex" :key="item.no" class="glass-card rounded-2xl p-4.5 border border-stone-200 hover:border-emerald-400 hover:shadow-md transition bg-white/80 space-y-2">
+                            <div v-for="item in filteredPokedex" :key="item.no" class="rounded-2xl p-4.5 border border-[#28303f] hover:border-emerald-500 hover:shadow-lg transition bg-[#161a23] space-y-2">
                                 <div class="flex items-center justify-between">
-                                    <span class="font-bold text-stone-900 text-base flex items-center gap-2">
-                                        <span class="text-xs font-mono px-2 py-0.5 rounded-md bg-stone-100 text-stone-600 font-semibold">#{{ String(item.no).padStart(3, '0') }}</span>
+                                    <span class="font-bold text-stone-100 text-base flex items-center gap-2">
+                                        <span class="text-xs font-mono px-2 py-0.5 rounded-md bg-[#1f2533] text-emerald-400 font-semibold border border-[#28303f]">#{{ String(item.no).padStart(3, '0') }}</span>
                                         {{ item.name }}
                                     </span>
                                 </div>
@@ -763,32 +765,339 @@
 
                         <!-- 載入更多按鈕 -->
                         <div v-if="pdxHasMore" class="text-center pt-6">
-                            <button @click="pdxDisplayLimit += 60" class="px-6 py-2.5 bg-white border border-stone-300 hover:bg-stone-50 rounded-full text-xs font-bold text-stone-700 shadow-sm cursor-pointer transition">
+                            <button @click="pdxDisplayLimit += 60" class="px-6 py-2.5 bg-[#161a23] border border-[#28303f] hover:bg-[#1f2533] rounded-full text-xs font-bold text-stone-200 shadow-sm cursor-pointer transition">
                                 載入更多寶可夢 (目前顯示 {{ filteredPokedex.length }} / {{ pdxTotalFiltered }})
                             </button>
                         </div>
                     </div>
                 </main>
 
-                <!-- 3. 屬性克制表 分頁 (Type Chart) -->
-                <main v-else-if="activeNavTab === 'type-chart'" id="type-chart-page" key="type-chart" class="page-content max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 w-full space-y-6">
-                    <div class="border-b border-stone-200 pb-4">
-                        <h1 class="text-2xl sm:text-3xl font-bold text-stone-900">屬性克制表</h1>
-                        <p class="text-xs sm:text-sm text-stone-500 mt-1">寶可夢 18 種屬性攻防相剋與倍率對照</p>
+                <!-- 3. 屬性克制表 分頁 (Type Chart - 完整互動式計算器 + 18x18 矩陣) -->
+                <main v-else-if="activeNavTab === 'type-chart'" id="type-chart-page" key="type-chart" class="page-content max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 w-full space-y-6 select-none">
+                    <div class="border-b border-[#28303f] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <h1 class="text-2xl sm:text-3xl font-bold text-stone-100 flex items-center gap-2">
+                                <span>⚡ 屬性克制表</span>
+                            </h1>
+                            <p class="text-xs sm:text-sm text-stone-400 mt-1">寶可夢 18 種屬性攻防相剋、雙屬性防守弱點與打擊面即時計算</p>
+                        </div>
+                        <!-- 切換模式按鈕 -->
+                        <div class="flex items-center gap-1.5 bg-[#141720] p-1 rounded-xl border border-[#28303f]">
+                            <button @click="tcMode = 'defend'" 
+                                    :class="tcMode === 'defend' ? 'bg-emerald-600 text-white font-bold shadow-sm' : 'text-stone-400 hover:text-stone-200'"
+                                    class="px-3 py-1.5 text-xs rounded-lg transition cursor-pointer">
+                                🛡️ 雙屬性防禦弱點
+                            </button>
+                            <button @click="tcMode = 'attack'" 
+                                    :class="tcMode === 'attack' ? 'bg-emerald-600 text-white font-bold shadow-sm' : 'text-stone-400 hover:text-stone-200'"
+                                    class="px-3 py-1.5 text-xs rounded-lg transition cursor-pointer">
+                                ⚔️ 單屬性進攻倍率
+                            </button>
+                            <button @click="tcMode = 'matrix'" 
+                                    :class="tcMode === 'matrix' ? 'bg-emerald-600 text-white font-bold shadow-sm' : 'text-stone-400 hover:text-stone-200'"
+                                    class="px-3 py-1.5 text-xs rounded-lg transition cursor-pointer">
+                                📊 18x18 總表
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="glass-card rounded-2xl p-6 ins-shadow">
-                        <div class="text-center py-16 text-stone-400 text-xs sm:text-sm">
-                            屬性克制表內容容器（可透過 JSON 或表格元件動態載入）
+                    <!-- 模式 1: 雙屬性防守弱點查詢器 -->
+                    <div v-if="tcMode === 'defend'" class="space-y-6">
+                        <div class="glass-card rounded-2xl p-5 sm:p-6 border border-[#28303f] bg-[#161a23]/90 space-y-5">
+                            <h3 class="text-sm font-bold text-stone-200 flex items-center gap-2">
+                                <span>🎯 點選要查詢的防守寶可夢屬性 (第一屬性必選，第二屬性可選)：</span>
+                            </h3>
+                            
+                            <!-- 第一屬性選擇 -->
+                            <div>
+                                <div class="text-xs font-semibold text-stone-400 mb-2 flex items-center gap-2">
+                                    <span>第 1 屬性：</span>
+                                    <span v-if="tcDef1" :style="{ backgroundColor: tcDef1.color }" class="text-white text-xs px-2.5 py-0.5 rounded-full font-bold shadow-xs">
+                                        {{ tcDef1.name }}
+                                    </span>
+                                </div>
+                                <div class="flex flex-wrap gap-2">
+                                    <button v-for="t in pokemonTypes" :key="'def1-'+t.id"
+                                            @click="tcDef1 = t"
+                                            :style="tcDef1 && tcDef1.id === t.id ? { backgroundColor: t.color, borderColor: '#fff' } : { borderColor: t.color + '44' }"
+                                            :class="tcDef1 && tcDef1.id === t.id ? 'text-white font-bold scale-105 shadow-md' : 'text-stone-300 hover:scale-102 bg-[#12151c]'"
+                                            class="px-3 py-1.5 rounded-xl text-xs border transition cursor-pointer flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full" :style="{ backgroundColor: t.color }"></span>
+                                        {{ t.name }}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 第二屬性選擇 -->
+                            <div>
+                                <div class="text-xs font-semibold text-stone-400 mb-2 flex items-center gap-2">
+                                    <span>第 2 屬性 (副屬性)：</span>
+                                    <span v-if="tcDef2" :style="{ backgroundColor: tcDef2.color }" class="text-white text-xs px-2.5 py-0.5 rounded-full font-bold shadow-xs">
+                                        {{ tcDef2.name }}
+                                    </span>
+                                    <span v-else class="text-stone-500 text-xs">(無副屬性，純單屬性)</span>
+                                </div>
+                                <div class="flex flex-wrap gap-2">
+                                    <button @click="tcDef2 = null" 
+                                            :class="!tcDef2 ? 'bg-stone-700 text-white font-bold' : 'text-stone-400 bg-[#12151c] hover:text-stone-200'"
+                                            class="px-3 py-1.5 rounded-xl text-xs border border-stone-700 transition cursor-pointer">
+                                        無副屬性
+                                    </button>
+                                    <button v-for="t in pokemonTypes" :key="'def2-'+t.id"
+                                            :disabled="tcDef1 && tcDef1.id === t.id"
+                                            @click="tcDef2 = t"
+                                            :style="tcDef2 && tcDef2.id === t.id ? { backgroundColor: t.color, borderColor: '#fff' } : { borderColor: t.color + '44' }"
+                                            :class="[
+                                                tcDef1 && tcDef1.id === t.id ? 'opacity-30 cursor-not-allowed bg-stone-900 border-stone-800' : 'cursor-pointer',
+                                                tcDef2 && tcDef2.id === t.id ? 'text-white font-bold scale-105 shadow-md' : 'text-stone-300 hover:scale-102 bg-[#12151c]'
+                                            ]"
+                                            class="px-3 py-1.5 rounded-xl text-xs border transition flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full" :style="{ backgroundColor: t.color }"></span>
+                                        {{ t.name }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 計算結果面板 -->
+                        <div class="glass-card rounded-2xl p-5 sm:p-6 border border-[#28303f] bg-[#161a23]/90 space-y-5">
+                            <div class="border-b border-[#28303f] pb-3 flex items-center justify-between">
+                                <h3 class="text-sm sm:text-base font-bold text-stone-100 flex items-center gap-2">
+                                    <span>🛡️ 防禦屬性組合受擊倍率分析：</span>
+                                    <span :style="{ backgroundColor: tcDef1.color }" class="text-white text-xs px-2.5 py-0.5 rounded-full font-bold">
+                                        {{ tcDef1.name }}
+                                    </span>
+                                    <span v-if="tcDef2" :style="{ backgroundColor: tcDef2.color }" class="text-white text-xs px-2.5 py-0.5 rounded-full font-bold">
+                                        {{ tcDef2.name }}
+                                    </span>
+                                </h3>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- 4x 致命弱點 -->
+                                <div class="bg-[#201518] border border-red-900/60 rounded-2xl p-4 space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-bold text-red-400 flex items-center gap-1.5">
+                                            <span class="px-2 py-0.5 rounded bg-red-600 text-white font-black text-[11px]">4×</span> 致命弱點 (受到 400% 傷害)
+                                        </span>
+                                        <span class="text-xs text-red-300 font-mono">{{ tcDefenseResults.x4.length }} 種</span>
+                                    </div>
+                                    <div v-if="tcDefenseResults.x4.length === 0" class="text-xs text-stone-500 py-1">無 4 倍弱點</div>
+                                    <div v-else class="flex flex-wrap gap-2 pt-1">
+                                        <span v-for="t in tcDefenseResults.x4" :key="t.id" :style="{ backgroundColor: t.color }" class="text-white text-xs px-3 py-1 rounded-full font-bold shadow-sm">
+                                            {{ t.name }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- 2x 弱點 -->
+                                <div class="bg-[#241a18] border border-orange-900/60 rounded-2xl p-4 space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-bold text-orange-400 flex items-center gap-1.5">
+                                            <span class="px-2 py-0.5 rounded bg-orange-600 text-white font-black text-[11px]">2×</span> 剋制弱點 (受到 200% 傷害)
+                                        </span>
+                                        <span class="text-xs text-orange-300 font-mono">{{ tcDefenseResults.x2.length }} 種</span>
+                                    </div>
+                                    <div v-if="tcDefenseResults.x2.length === 0" class="text-xs text-stone-500 py-1">無 2 倍弱點</div>
+                                    <div v-else class="flex flex-wrap gap-2 pt-1">
+                                        <span v-for="t in tcDefenseResults.x2" :key="t.id" :style="{ backgroundColor: t.color }" class="text-white text-xs px-3 py-1 rounded-full font-bold shadow-sm">
+                                            {{ t.name }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- 0.5x 抵抗 -->
+                                <div class="bg-[#15221b] border border-emerald-900/60 rounded-2xl p-4 space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                                            <span class="px-2 py-0.5 rounded bg-emerald-600 text-white font-black text-[11px]">½×</span> 傷害抵抗 (受到 50% 傷害)
+                                        </span>
+                                        <span class="text-xs text-emerald-300 font-mono">{{ tcDefenseResults.xHalf.length }} 種</span>
+                                    </div>
+                                    <div v-if="tcDefenseResults.xHalf.length === 0" class="text-xs text-stone-500 py-1">無 0.5 倍抗性</div>
+                                    <div v-else class="flex flex-wrap gap-2 pt-1">
+                                        <span v-for="t in tcDefenseResults.xHalf" :key="t.id" :style="{ backgroundColor: t.color }" class="text-white text-xs px-3 py-1 rounded-full font-bold shadow-sm">
+                                            {{ t.name }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- 0.25x 極佳抵抗 -->
+                                <div class="bg-[#122324] border border-teal-900/60 rounded-2xl p-4 space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-bold text-teal-400 flex items-center gap-1.5">
+                                            <span class="px-2 py-0.5 rounded bg-teal-600 text-white font-black text-[11px]">¼×</span> 雙重抵抗 (受到 25% 傷害)
+                                        </span>
+                                        <span class="text-xs text-teal-300 font-mono">{{ tcDefenseResults.xQuarter.length }} 種</span>
+                                    </div>
+                                    <div v-if="tcDefenseResults.xQuarter.length === 0" class="text-xs text-stone-500 py-1">無 0.25 倍抗性</div>
+                                    <div v-else class="flex flex-wrap gap-2 pt-1">
+                                        <span v-for="t in tcDefenseResults.xQuarter" :key="t.id" :style="{ backgroundColor: t.color }" class="text-white text-xs px-3 py-1 rounded-full font-bold shadow-sm">
+                                            {{ t.name }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- 0x 免疫無效 -->
+                                <div class="bg-[#141824] border border-blue-900/60 rounded-2xl p-4 space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-bold text-blue-400 flex items-center gap-1.5">
+                                            <span class="px-2 py-0.5 rounded bg-blue-600 text-white font-black text-[11px]">0×</span> 免疫無效 (完全不受傷害)
+                                        </span>
+                                        <span class="text-xs text-blue-300 font-mono">{{ tcDefenseResults.x0.length }} 種</span>
+                                    </div>
+                                    <div v-if="tcDefenseResults.x0.length === 0" class="text-xs text-stone-500 py-1">無免疫屬性</div>
+                                    <div v-else class="flex flex-wrap gap-2 pt-1">
+                                        <span v-for="t in tcDefenseResults.x0" :key="t.id" :style="{ backgroundColor: t.color }" class="text-white text-xs px-3 py-1 rounded-full font-bold shadow-sm">
+                                            {{ t.name }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- 1x 常規傷害 -->
+                                <div class="bg-[#181c25] border border-stone-800 rounded-2xl p-4 space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-bold text-stone-300 flex items-center gap-1.5">
+                                            <span class="px-2 py-0.5 rounded bg-stone-700 text-white font-black text-[11px]">1×</span> 正常傷害 (受到 100% 傷害)
+                                        </span>
+                                        <span class="text-xs text-stone-400 font-mono">{{ tcDefenseResults.x1.length }} 種</span>
+                                    </div>
+                                    <div class="flex flex-wrap gap-1.5 pt-1">
+                                        <span v-for="t in tcDefenseResults.x1" :key="t.id" :style="{ backgroundColor: t.color + '55', color: '#f1f5f9' }" class="text-[11px] px-2.5 py-0.5 rounded-full font-semibold border border-stone-700">
+                                            {{ t.name }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 模式 2: 單屬性進攻倍率 -->
+                    <div v-else-if="tcMode === 'attack'" class="space-y-6">
+                        <div class="glass-card rounded-2xl p-5 sm:p-6 border border-[#28303f] bg-[#161a23]/90 space-y-4">
+                            <h3 class="text-sm font-bold text-stone-200 flex items-center gap-2">
+                                <span>⚔️ 點選招式進攻屬性 (查看打擊面)：</span>
+                                <span v-if="tcAtk" :style="{ backgroundColor: tcAtk.color }" class="text-white text-xs px-2.5 py-0.5 rounded-full font-bold">
+                                    {{ tcAtk.name }} 屬性招式
+                                </span>
+                            </h3>
+                            <div class="flex flex-wrap gap-2">
+                                <button v-for="t in pokemonTypes" :key="'atk-'+t.id"
+                                        @click="tcAtk = t"
+                                        :style="tcAtk && tcAtk.id === t.id ? { backgroundColor: t.color, borderColor: '#fff' } : { borderColor: t.color + '44' }"
+                                        :class="tcAtk && tcAtk.id === t.id ? 'text-white font-bold scale-105 shadow-md' : 'text-stone-300 hover:scale-102 bg-[#12151c]'"
+                                        class="px-3 py-1.5 rounded-xl text-xs border transition cursor-pointer flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full" :style="{ backgroundColor: t.color }"></span>
+                                    {{ t.name }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 進攻結果面板 -->
+                        <div v-if="tcAtk" class="glass-card rounded-2xl p-5 sm:p-6 border border-[#28303f] bg-[#161a23]/90 space-y-5">
+                            <h3 class="text-sm sm:text-base font-bold text-stone-100 flex items-center gap-2 border-b border-[#28303f] pb-3">
+                                <span :style="{ backgroundColor: tcAtk.color }" class="text-white text-xs px-2.5 py-0.5 rounded-full font-bold">
+                                    {{ tcAtk.name }}
+                                </span>
+                                <span>屬性招式進攻倍率一覽：</span>
+                            </h3>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <!-- 2x 效果絕佳 -->
+                                <div class="bg-[#201518] border border-red-900/60 rounded-2xl p-4 space-y-2">
+                                    <div class="text-xs font-bold text-red-400 flex items-center gap-1.5 mb-2">
+                                        <span class="px-2 py-0.5 rounded bg-red-600 text-white font-black text-[11px]">2×</span> 效果絕佳！(剋制對手)
+                                    </div>
+                                    <div v-if="tcAttackResults.x2.length === 0" class="text-xs text-stone-500">無雙倍剋制屬性</div>
+                                    <div v-else class="flex flex-wrap gap-2">
+                                        <span v-for="t in tcAttackResults.x2" :key="t.id" :style="{ backgroundColor: t.color }" class="text-white text-xs px-3 py-1 rounded-full font-bold shadow-sm">
+                                            {{ t.name }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- 0.5x 效果不佳 -->
+                                <div class="bg-[#241a18] border border-orange-900/60 rounded-2xl p-4 space-y-2">
+                                    <div class="text-xs font-bold text-orange-400 flex items-center gap-1.5 mb-2">
+                                        <span class="px-2 py-0.5 rounded bg-orange-600 text-white font-black text-[11px]">½×</span> 效果不好... (被減半)
+                                    </div>
+                                    <div v-if="tcAttackResults.xHalf.length === 0" class="text-xs text-stone-500">無減半屬性</div>
+                                    <div v-else class="flex flex-wrap gap-2">
+                                        <span v-for="t in tcAttackResults.xHalf" :key="t.id" :style="{ backgroundColor: t.color }" class="text-white text-xs px-3 py-1 rounded-full font-bold shadow-sm">
+                                            {{ t.name }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- 0x 沒有效果 -->
+                                <div class="bg-[#141824] border border-blue-900/60 rounded-2xl p-4 space-y-2">
+                                    <div class="text-xs font-bold text-blue-400 flex items-center gap-1.5 mb-2">
+                                        <span class="px-2 py-0.5 rounded bg-blue-600 text-white font-black text-[11px]">0×</span> 沒有效果 (完全無效)
+                                    </div>
+                                    <div v-if="tcAttackResults.x0.length === 0" class="text-xs text-stone-500">無無效屬性</div>
+                                    <div v-else class="flex flex-wrap gap-2">
+                                        <span v-for="t in tcAttackResults.x0" :key="t.id" :style="{ backgroundColor: t.color }" class="text-white text-xs px-3 py-1 rounded-full font-bold shadow-sm">
+                                            {{ t.name }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 模式 3: 18x18 總矩陣表 -->
+                    <div v-else class="space-y-4">
+                        <div class="glass-card rounded-2xl p-4 border border-[#28303f] bg-[#161a23]/90 overflow-x-auto shadow-xl">
+                            <div class="min-w-[780px]">
+                                <div class="text-xs text-stone-400 mb-3 flex items-center justify-between">
+                                    <span>縱軸 (左)：<strong>攻擊方屬性</strong> ➜ 橫軸 (頂)：<strong>防守方屬性</strong></span>
+                                    <div class="flex items-center gap-3">
+                                        <span class="flex items-center gap-1"><span class="w-3.5 h-3.5 rounded bg-red-600 text-[10px] text-white flex items-center justify-center font-bold">2</span> 2× 剋制</span>
+                                        <span class="flex items-center gap-1"><span class="w-3.5 h-3.5 rounded bg-stone-700 text-[10px] text-stone-300 flex items-center justify-center font-bold">½</span> ½× 微弱</span>
+                                        <span class="flex items-center gap-1"><span class="w-3.5 h-3.5 rounded bg-stone-900 border border-stone-700 text-[10px] text-stone-500 flex items-center justify-center font-bold">0</span> 0× 無效</span>
+                                    </div>
+                                </div>
+
+                                <table class="w-full text-center border-collapse text-xs">
+                                    <thead>
+                                        <tr>
+                                            <th class="p-1.5 bg-[#12151c] border border-[#28303f] text-stone-400 font-bold text-[11px] w-14">攻 \ 防</th>
+                                            <th v-for="d in pokemonTypes" :key="'th-'+d.id" :style="{ color: d.color }" class="p-1 border border-[#28303f] font-bold text-[11px] bg-[#12151c]/80 min-w-[34px]">
+                                                {{ d.name }}
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="a in pokemonTypes" :key="'tr-'+a.id" class="hover:bg-stone-800/40 transition-colors">
+                                            <th :style="{ backgroundColor: a.color + '22', color: a.color }" class="p-1.5 border border-[#28303f] font-bold text-[11px] whitespace-nowrap">
+                                                {{ a.name }}
+                                            </th>
+                                            <td v-for="d in pokemonTypes" :key="'td-'+a.id+'-'+d.id" 
+                                                class="p-1 border border-[#28303f] font-mono text-[11px] transition-colors"
+                                                :class="{
+                                                    'bg-red-500/25 text-red-400 font-bold': getMatrixMult(a.id, d.id) === 2,
+                                                    'bg-stone-800/60 text-stone-400': getMatrixMult(a.id, d.id) === 0.5,
+                                                    'bg-black/80 text-stone-600 font-bold': getMatrixMult(a.id, d.id) === 0,
+                                                    'text-stone-500/30': getMatrixMult(a.id, d.id) === 1
+                                                }">
+                                                <span v-if="getMatrixMult(a.id, d.id) === 2">2×</span>
+                                                <span v-else-if="getMatrixMult(a.id, d.id) === 0.5">½</span>
+                                                <span v-else-if="getMatrixMult(a.id, d.id) === 0">0</span>
+                                                <span v-else>·</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </main>
 
                 <!-- 4. 攻略區 分頁 (Guides - 對接 cobblemon.js 的 #strategy-container) -->
                 <main v-else-if="activeNavTab === 'strategy' || activeNavTab === 'guides'" id="strategy-page" key="strategy" class="page-content max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 w-full space-y-6">
-                    <div class="border-b border-stone-200 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="border-b border-[#28303f] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
-                            <h1 class="text-2xl sm:text-3xl font-bold text-stone-900">攻略區</h1>
+                            <h1 class="text-2xl sm:text-3xl font-bold text-stone-100">攻略區</h1>
                             <p class="text-xs sm:text-sm text-stone-500 mt-1">新手起步、神獸捕捉、機制解說與進階玩法 (點擊卡片閱讀)</p>
                         </div>
                         <button class="edit-ui text-xs px-3 py-1.5 bg-purple-600 text-white rounded-lg font-bold" onclick="addNewSection('strategy-container','strategy')">+ 新增攻略文章</button>
@@ -800,9 +1109,9 @@
 
                 <!-- 5. 贊助伺服器 分頁 (Sponsor - 對接 cobblemon.js 的 #sponsor-ad-grid) -->
                 <main v-else-if="activeNavTab === 'sponsor'" id="sponsor-page" key="sponsor" class="page-content max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 w-full space-y-6">
-                    <div class="border-b border-stone-200 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="border-b border-[#28303f] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
-                            <h1 class="text-2xl sm:text-3xl font-bold text-stone-900">贊助伺服器</h1>
+                            <h1 class="text-2xl sm:text-3xl font-bold text-stone-100">贊助伺服器</h1>
                             <p class="text-xs sm:text-sm text-stone-500 mt-1">支持伺服器硬體運算與線路維護，共同打造更優質的遊玩環境</p>
                         </div>
                         <button class="edit-ui text-xs px-3 py-1.5 bg-amber-600 text-white rounded-lg font-bold" onclick="addAdCard()">+ 新增贊助方案</button>
@@ -1211,10 +1520,115 @@
 
                 const pdxTotalFiltered = computed(() => filteredPokedexAll.value.length);
 
+                // 屬性克制表 (Type Chart) 資料與計算引擎
+                const POKEMON_TYPES = [
+                    { id: 'normal',   name: '一般',   color: '#A8A878' },
+                    { id: 'fire',     name: '火',     color: '#F08030' },
+                    { id: 'water',    name: '水',     color: '#6890F0' },
+                    { id: 'grass',    name: '草',     color: '#78C850' },
+                    { id: 'electric', name: '電',     color: '#F8D030' },
+                    { id: 'ice',      name: '冰',     color: '#98D8D8' },
+                    { id: 'fighting', name: '格鬥',   color: '#C03028' },
+                    { id: 'poison',   name: '毒',     color: '#A040A0' },
+                    { id: 'ground',   name: '地面',   color: '#E0C068' },
+                    { id: 'flying',   name: '飛行',   color: '#A890F0' },
+                    { id: 'psychic',  name: '超能力', color: '#F85888' },
+                    { id: 'bug',      name: '蟲',     color: '#A8B820' },
+                    { id: 'rock',     name: '岩石',   color: '#B8A038' },
+                    { id: 'ghost',    name: '幽靈',   color: '#705898' },
+                    { id: 'dragon',   name: '龍',     color: '#7038F8' },
+                    { id: 'dark',     name: '惡',     color: '#705848' },
+                    { id: 'steel',    name: '鋼',     color: '#B8B8D0' },
+                    { id: 'fairy',    name: '妖精',   color: '#EE99AC' }
+                ];
+
+                const TYPE_CHART_MATRIX = {
+                    normal:   { rock: 0.5, ghost: 0, steel: 0.5 },
+                    fire:     { fire: 0.5, water: 0.5, grass: 2, ice: 2, bug: 2, rock: 0.5, dragon: 0.5, steel: 2 },
+                    water:    { fire: 2, water: 0.5, grass: 0.5, ground: 2, rock: 2, dragon: 0.5 },
+                    grass:    { fire: 0.5, water: 2, grass: 0.5, poison: 0.5, ground: 2, flying: 0.5, bug: 0.5, rock: 2, dragon: 0.5, steel: 0.5 },
+                    electric: { water: 2, electric: 0.5, grass: 0.5, ground: 0, flying: 2, dragon: 0.5 },
+                    ice:      { fire: 0.5, water: 0.5, grass: 2, ice: 0.5, ground: 2, flying: 2, dragon: 2, steel: 0.5 },
+                    fighting: { normal: 2, ice: 2, poison: 0.5, flying: 0.5, psychic: 0.5, bug: 0.5, rock: 2, ghost: 0, dark: 2, steel: 2, fairy: 0.5 },
+                    poison:   { grass: 2, poison: 0.5, ground: 0.5, rock: 0.5, ghost: 0.5, steel: 0, fairy: 2 },
+                    ground:   { fire: 2, electric: 2, grass: 0.5, poison: 2, flying: 0, bug: 0.5, rock: 2, steel: 2 },
+                    flying:   { electric: 0.5, grass: 2, fighting: 2, bug: 2, rock: 0.5, steel: 0.5 },
+                    psychic:  { fighting: 2, poison: 2, psychic: 0.5, dark: 0, steel: 0.5 },
+                    bug:      { fire: 0.5, grass: 2, fighting: 0.5, poison: 0.5, flying: 0.5, psychic: 2, ghost: 0.5, dark: 2, steel: 0.5, fairy: 0.5 },
+                    rock:     { fire: 2, ice: 2, fighting: 0.5, ground: 0.5, flying: 2, bug: 2, steel: 0.5 },
+                    ghost:    { normal: 0, psychic: 2, ghost: 2, dark: 0.5 },
+                    dragon:   { dragon: 2, steel: 0.5, fairy: 0 },
+                    dark:     { fighting: 0.5, psychic: 2, ghost: 2, dark: 0.5, fairy: 0.5 },
+                    steel:    { fire: 0.5, water: 0.5, electric: 0.5, ice: 2, rock: 2, steel: 0.5, fairy: 2 },
+                    fairy:    { fire: 0.5, fighting: 2, poison: 0.5, dragon: 2, dark: 2, steel: 0.5 }
+                };
+
+                const tcMode = ref('defend'); // 'defend' | 'attack' | 'matrix'
+                const pokemonTypes = POKEMON_TYPES;
+                const tcDef1 = ref(POKEMON_TYPES[2]); // 預設水屬性
+                const tcDef2 = ref(POKEMON_TYPES[8]); // 預設地面屬性 (水+地)
+                const tcAtk  = ref(POKEMON_TYPES[1]); // 預設火屬性進攻
+
+                const getMatrixMult = (atkId, defId) => {
+                    return TYPE_CHART_MATRIX[atkId]?.[defId] ?? 1;
+                };
+
+                const tcDefenseResults = computed(() => {
+                    const res = { x4: [], x2: [], x1: [], xHalf: [], xQuarter: [], x0: [] };
+                    const t1 = tcDef1.value?.id;
+                    const t2 = tcDef2.value?.id;
+                    if (!t1) return res;
+
+                    pokemonTypes.forEach(atk => {
+                        const m1 = getMatrixMult(atk.id, t1);
+                        const m2 = t2 ? getMatrixMult(atk.id, t2) : 1;
+                        const total = m1 * m2;
+
+                        if (total === 4) res.x4.push(atk);
+                        else if (total === 2) res.x2.push(atk);
+                        else if (total === 1) res.x1.push(atk);
+                        else if (total === 0.5) res.xHalf.push(atk);
+                        else if (total === 0.25) res.xQuarter.push(atk);
+                        else if (total === 0) res.x0.push(atk);
+                    });
+                    return res;
+                });
+
+                const tcAttackResults = computed(() => {
+                    const res = { x2: [], xHalf: [], x0: [] };
+                    const atkId = tcAtk.value?.id;
+                    if (!atkId) return res;
+
+                    pokemonTypes.forEach(def => {
+                        const m = getMatrixMult(atkId, def.id);
+                        if (m === 2) res.x2.push(def);
+                        else if (m === 0.5) res.xHalf.push(def);
+                        else if (m === 0) res.x0.push(def);
+                    });
+                    return res;
+                });
+
+                // 安全確保留攻略/指令集轉場結束後必定成功渲染
+                const handleTabEnter = () => {
+                    if (activeNavTab.value === 'strategy' || activeNavTab.value === 'guides') {
+                        if (typeof window.initStrategies === 'function') window.initStrategies();
+                    } else if (activeNavTab.value === 'commands') {
+                        if (typeof window.initCommands === 'function') window.initCommands();
+                    } else if (activeNavTab.value === 'sponsor') {
+                        if (typeof window.renderSponsorGrid === 'function') window.renderSponsorGrid();
+                    }
+                };
+
                 watch(activeNavTab, (newTab) => {
                     if (newTab === 'strategy' || newTab === 'guides') {
-                        setTimeout(() => { if (typeof window.initStrategies === 'function') window.initStrategies(); }, 80);
-                        setTimeout(() => { if (typeof window.initStrategies === 'function') window.initStrategies(); }, 250);
+                        // 輪詢三次以跨越 Vue 轉場時間差
+                        setTimeout(() => { if (typeof window.initStrategies === 'function') window.initStrategies(); }, 50);
+                        setTimeout(() => { if (typeof window.initStrategies === 'function') window.initStrategies(); }, 200);
+                        setTimeout(() => { if (typeof window.initStrategies === 'function') window.initStrategies(); }, 400);
+                    }
+                    if (newTab === 'commands') {
+                        setTimeout(() => { if (typeof window.initCommands === 'function') window.initCommands(); }, 50);
+                        setTimeout(() => { if (typeof window.initCommands === 'function') window.initCommands(); }, 350);
                     }
                     if (newTab === 'pokedex') {
                         loadPokedexData();
@@ -1259,7 +1673,16 @@
                     pdxDisplayLimit,
                     filteredPokedex,
                     pdxHasMore,
-                    pdxTotalFiltered
+                    pdxTotalFiltered,
+                    tcMode,
+                    pokemonTypes,
+                    tcDef1,
+                    tcDef2,
+                    tcAtk,
+                    getMatrixMult,
+                    tcDefenseResults,
+                    tcAttackResults,
+                    handleTabEnter
                 };
             }
         }).mount('#app');

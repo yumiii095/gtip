@@ -369,7 +369,7 @@ function initCommands() {
     container.innerHTML = '';
     COMMANDS_DATA.forEach(cat => {
         let itemsHtml = cat.isResidence
-            ? `<div class="mb-4 p-3 bg-orange-50 border border-orange-200 text-sm font-bold text-orange-800">🛠️ 工具：木鋤頭<br>🖱️ 左鍵點擊：第 1 點 / 右鍵點擊：第 2 點</div>`
+            ? `<div class="mb-4 p-3 bg-amber-950/40 border border-amber-600/40 text-sm font-bold text-amber-300 rounded-lg">🛠️ 工具：木鋤頭<br>🖱️ 左鍵點擊：第 1 點 / 右鍵點擊：第 2 點</div>`
             : '';
         cat.items.forEach(item => {
             itemsHtml += `<div class="cmd-box" data-cmd="${item.cmd.toLowerCase()}">
@@ -379,7 +379,7 @@ function initCommands() {
             </div>`;
         });
         container.innerHTML += `
-            <div class="bg-white border accordion-item relative">
+            <div class="accordion-item relative">
                 <button class="edit-ui admin-btn admin-btn-delete absolute top-2 right-2 z-10" onclick="this.parentElement.remove()">[x] 刪除章節</button>
                 <div class="accordion-header p-5 font-bold ${cat.color}" onclick="toggleAccordion(this)">${cat.title}</div>
                 <div class="accordion-content px-5">${itemsHtml}</div>
@@ -2105,12 +2105,35 @@ function showPage(pageId) {
     const targetPage = document.getElementById(pageId + '-page');
     if (targetPage) targetPage.classList.remove('hidden');
     window.scrollTo(0, 0);
-    document.getElementById('mobile-menu').classList.remove('open');
-    // 切換到贊助/廣告相關頁時重新渲染（保持 editing 狀態同步）
-    if (pageId === 'sponsor') { renderAdSidebar(); renderSponsorGrid(); }
-    // 切換到圖鑑分頁時觸發 JSON 載入(只會載一次)
-    if (pageId === 'pokedex' && typeof window.pdxLoad === 'function') { window.pdxLoad(); }
-    // 廣告詳情頁隱藏 header（導覽列）與 footer，其他頁面顯示
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (mobileMenu) mobileMenu.classList.remove('open');
+    
+    // 切換到贊助/廣告相關頁時重新渲染
+    if (pageId === 'sponsor') { 
+        renderAdSidebar(); 
+        renderSponsorGrid(); 
+    }
+    // 切換到圖鑑分頁時觸發 JSON 載入
+    if (pageId === 'pokedex' && typeof window.pdxLoad === 'function') { 
+        window.pdxLoad(); 
+    }
+    // 切換到攻略區時立即渲染，並設重試跨越轉場
+    if (pageId === 'strategy' || pageId === 'guides') {
+        if (typeof initStrategies === 'function') {
+            initStrategies();
+            setTimeout(initStrategies, 100);
+            setTimeout(initStrategies, 350);
+        }
+    }
+    // 切換到指令頁時渲染
+    if (pageId === 'commands') {
+        if (typeof initCommands === 'function') {
+            initCommands();
+            setTimeout(initCommands, 100);
+            setTimeout(initCommands, 350);
+        }
+    }
+    // 廣告詳情頁隱藏 header 與 footer
     const footer = document.querySelector('footer');
     if (footer) footer.style.display = (pageId === 'ad-detail') ? 'none' : '';
     const header = document.querySelector('header');
@@ -2130,7 +2153,7 @@ function _exposeInlineHandlers() {
         handleGlobalSearch, insertHRule, insertImageFromUrl, insertLink,
         insertNotice, insertTip, navigateToResult, openAdPage, openPublishModal,
         saveAdPageEdits, saveStratEdits, showPage, submitAdForm, toggleAccordion,
-        toggleDarkMode, toggleEditMode, toggleMobileMenu, updateVersionPreview
+        toggleDarkMode, toggleEditMode, toggleMobileMenu, updateVersionPreview, initStrategies, initCommands, renderSponsorGrid
     });
 }
 _exposeInlineHandlers();
