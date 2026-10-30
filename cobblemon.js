@@ -602,7 +602,7 @@ function saveStratEdits() {
 function navigateToStrat(id) {
     showPage('strategy');
     let attempts = 0;
-    const MAX_ATTEMPTS = 400; // 400 * 150ms ≈ 60 秒，涵蓋 cobblemon_data.json 較慢的載入情況
+    const MAX_ATTEMPTS = 50; // 資料體積已瘦身並具備本地快取秒開，通常 0~300ms 內即可完成定位
     const tryScroll = () => {
         const card = document.getElementById(id);
         if (card) {
@@ -2233,63 +2233,124 @@ window.addEventListener('scroll', () => {
    12. 頁面載入初始化
 ════════════════════════════════════════════════════ */
 
-async function _checkAndRefreshIfNeeded() {
-    try {
-        const res = await fetch('cobblemon_data.json?_=' + Date.now(), {
-            cache: 'no-store',
+// 輕量級 IndexedDB 快取模組，實現「0 秒秒開（Stale-While-Revalidate）」
+const _CACHE_KEY_DATA = 'cobblemon_data_v2';
+const _CACHE_VER_KEY  = 'cobblemon_data_version';
+
+const CobblemonStorage = {
+    _db: null,
+    async getDb() {
+        if (this._db) return this._db;
+        if (!window.indexedDB) return null;
+        return new Promise((resolve) => {
+            const req = indexedDB.open('CobblemonCacheDB', 1);
+            req.onupgradeneeded = e => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('data_store')) {
+                    db.createObjectStore('data_store');
+                }
+            };
+            req.onsuccess = e => { this._db = e.target.result; resolve(this._db); };
+            req.onerror = () => resolve(null);
         });
-        if (!res.ok) throw new Error('fetch failed ' + res.status);
-        const data = await res.json();
-
-        const serverVer = String(data.data_version || '');
-        const localVer  = localStorage.getItem('cobblemon_data_version') || '';
-
-        if (serverVer && serverVer !== localVer) {
-            localStorage.setItem('cobblemon_data_version', serverVer);
-            console.info('[Cobblemon] 版本更新', localVer || '(無)', '→', serverVer);
-            // 不強制 reload，由 window.onload 正常更新資料
+    },
+    async get(key) {
+        const db = await this.getDb();
+        if (!db) {
+            try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : null; } catch(e) { return null; }
         }
-
-        return data;
-
-    } catch (e) {
-        console.warn('[Cobblemon] 版本檢查失敗，略過強制重整：', e.message);
-        return null;
+        return new Promise((resolve) => {
+            try {
+                const tx = db.transaction('data_store', 'readonly');
+                const store = tx.objectStore('data_store');
+                const req = store.get(key);
+                req.onsuccess = () => resolve(req.result || null);
+                req.onerror = () => resolve(null);
+            } catch(e) { resolve(null); }
+        });
+    },
+    async set(key, value) {
+        const db = await this.getDb();
+        if (!db) {
+            try { localStorage.setItem(key, JSON.stringify(value)); } catch(e) {}
+            return;
+        }
+        return new Promise((resolve) => {
+            try {
+                const tx = db.transaction('data_store', 'readwrite');
+                const store = tx.objectStore('data_store');
+                store.put(value, key);
+                tx.oncomplete = () => resolve(true);
+                tx.onerror = () => resolve(false);
+            } catch(e) { resolve(false); }
+        });
     }
-}
+};
+window.CobblemonStorage = CobblemonStorage;
 
-window.onload = async function () {
+let _isUiInitialized = false;
 
-    let data = await _checkAndRefreshIfNeeded();
+function applyCobblemonData(data, isBackgroundUpdate = false) {
+    if (!data) return;
 
-    if (!data) {
-        try {
-            const res = await fetch('cobblemon_data.json?v=202607291533');
-            if (res.ok) data = await res.json();
-        } catch (e) {
-            console.error('[Cobblemon] JSON 載入失敗：', e);
-        }
-    }
+    COMMANDS_DATA          = data.commands     || [];
+    ALL_DATA               = data.search_index || [];
+    window.STRATEGIES_DATA = data.strategies   || [];
 
-    if (data) {
-        COMMANDS_DATA          = data.commands      || [];
-        ALL_DATA               = data.search_index  || [];
-        window.STRATEGIES_DATA = data.strategies    || [];
-
-        if (Array.isArray(data.ads) && data.ads.length > 0) {
-            window.ADS_DATA = data.ads;
-            // 同步寫入 localStorage，讓後續操作保持一致
-            try { localStorage.setItem('cobblemon_ads', JSON.stringify(window.ADS_DATA)); } catch(e) {}
-            // JSON 載入後立即重新渲染廣告區（首頁側欄 + 贊助頁）
-            renderAdSidebar();
-            renderSponsorGrid();
-        }
-
+    if (Array.isArray(data.ads) && data.ads.length > 0) {
+        window.ADS_DATA = data.ads;
+        try { localStorage.setItem('cobblemon_ads', JSON.stringify(window.ADS_DATA)); } catch(e) {}
+        renderAdSidebar();
+        renderSponsorGrid();
     }
 
     initFuse();
     initCommands();
     initStrategies();
-};
+    _isUiInitialized = true;
 
+    if (isBackgroundUpdate) {
+        console.info('[Cobblemon] ⚡ 背景更新完成，最新版本:', data.data_version);
+    }
+}
 
+// 核心：提前發起載入，不等待 window.onload
+async function _initDataLoader() {
+    const startTime = performance.now();
+
+    // 1. 先嘗試從本地 IndexedDB 讀取快取 (0.01 秒秒開)
+    const cachedData = await CobblemonStorage.get(_CACHE_KEY_DATA);
+    if (cachedData) {
+        console.info(`[Cobblemon] ⚡ 命中本地快取 (耗時 ${(performance.now() - startTime).toFixed(1)}ms)，立即渲染畫面！`);
+        applyCobblemonData(cachedData, false);
+    }
+
+    // 2. 平行發送 HTTP 請求取得最新資料 (支援瀏覽器正常 ETag/304 快取)
+    try {
+        const localVer = localStorage.getItem(_CACHE_VER_KEY) || '202607291533';
+        const res = await fetch(`cobblemon_data.json?v=${encodeURIComponent(localVer)}`);
+        if (res.ok) {
+            const serverData = await res.json();
+            const serverVer  = String(serverData.data_version || '');
+
+            // 若沒有快取，或版本號不同，或是第一次寫入，更新資料與本地儲存
+            if (!cachedData || (serverVer && serverVer !== localVer) || JSON.stringify(serverData.strategies?.length) !== JSON.stringify(cachedData.strategies?.length)) {
+                localStorage.setItem(_CACHE_VER_KEY, serverVer);
+                await CobblemonStorage.set(_CACHE_KEY_DATA, serverData);
+                applyCobblemonData(serverData, !!cachedData);
+            }
+        }
+    } catch (err) {
+        console.warn('[Cobblemon] 網路請求失敗，使用快取或備用資料：', err.message);
+        if (!_isUiInitialized && cachedData) {
+            applyCobblemonData(cachedData, false);
+        }
+    }
+}
+
+// 立即在 DOM 準備好時觸發（DOMContentLoaded，遠比 window.onload 早）
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _initDataLoader);
+} else {
+    _initDataLoader();
+}

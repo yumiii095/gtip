@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 預載入核心資料庫，大幅加快首頁展示速度 -->
+    <link rel="preload" href="cobblemon_data.json" as="fetch" crossorigin="anonymous">
     <title>CobblemonOasis攻略站</title>
     
     <!-- Tailwind CSS CDN -->
@@ -713,15 +715,57 @@
 
                 <!-- 2. 圖鑑 分頁 (Pokedex) -->
                 <main v-else-if="activeNavTab === 'pokedex'" id="pokedex-page" key="pokedex" class="page-content max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 w-full space-y-6">
-                    <div class="border-b border-stone-200 pb-4">
-                        <h1 class="text-2xl sm:text-3xl font-bold text-stone-900">圖鑑</h1>
-                        <p class="text-xs sm:text-sm text-stone-500 mt-1">Cobblemon 寶可夢屬性、特性、生成群系與捕捉指南</p>
+                    <div class="border-b border-stone-200 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <h1 class="text-2xl sm:text-3xl font-bold text-stone-900">圖鑑速查</h1>
+                            <p class="text-xs sm:text-sm text-stone-500 mt-1">Cobblemon 寶可夢全圖鑑、掉落物與群系資訊 (已收錄 {{ pdxList.length }} 隻)</p>
+                        </div>
+                        <!-- 圖鑑快速搜尋框 -->
+                        <div class="relative w-full sm:w-72">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs"></i>
+                            <input v-model="pdxQuery" 
+                                   type="text" 
+                                   placeholder="搜尋寶可夢名稱、編號或掉落物..." 
+                                   class="w-full pl-9 pr-4 py-2 bg-white border border-stone-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-stone-400 shadow-2xs">
+                        </div>
                     </div>
 
-                    <!-- 圖鑑展示容器 (外部圖片連結支援：./images/pokemon/...) -->
-                    <div class="glass-card rounded-2xl p-6 ins-shadow">
-                        <div class="text-center py-16 text-stone-400 text-xs sm:text-sm">
-                            圖鑑資料準備中（可透過外部 JSON 檔案或 API 載入，圖片採用外部檔案連接）
+                    <!-- 載入中狀態 -->
+                    <div v-if="pdxLoading" class="text-center py-20 text-stone-400 text-sm space-y-3">
+                        <div class="inline-block w-8 h-8 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                        <p>正在載入圖鑑資料庫 (poke.json)...</p>
+                    </div>
+
+                    <!-- 圖鑑展示容器 -->
+                    <div v-else>
+                        <div v-if="filteredPokedex.length === 0" class="glass-card rounded-2xl p-12 text-center text-stone-400 text-sm">
+                            沒有找到符合「{{ pdxQuery }}」的寶可夢
+                        </div>
+                        <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div v-for="item in filteredPokedex" :key="item.no" class="glass-card rounded-2xl p-4.5 border border-stone-200 hover:border-emerald-400 hover:shadow-md transition bg-white/80 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-stone-900 text-base flex items-center gap-2">
+                                        <span class="text-xs font-mono px-2 py-0.5 rounded-md bg-stone-100 text-stone-600 font-semibold">#{{ String(item.no).padStart(3, '0') }}</span>
+                                        {{ item.name }}
+                                    </span>
+                                </div>
+                                <div v-if="item.drops_raw" class="text-xs text-stone-600 bg-stone-50 rounded-xl p-2.5 border border-stone-100">
+                                    <div class="font-semibold text-stone-700 flex items-center gap-1 mb-1">
+                                        <span>🎁 掉落物：</span>
+                                    </div>
+                                    <div class="text-stone-600 break-words leading-relaxed">{{ item.drops_raw }}</div>
+                                </div>
+                                <div v-if="item.biome_bonus" class="text-[11px] text-emerald-700 bg-emerald-50/70 rounded-xl px-2.5 py-1.5 border border-emerald-100/60">
+                                    🌲 <strong>群系加成：</strong> {{ item.biome_bonus }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 載入更多按鈕 -->
+                        <div v-if="pdxHasMore" class="text-center pt-6">
+                            <button @click="pdxDisplayLimit += 60" class="px-6 py-2.5 bg-white border border-stone-300 hover:bg-stone-50 rounded-full text-xs font-bold text-stone-700 shadow-sm cursor-pointer transition">
+                                載入更多寶可夢 (目前顯示 {{ filteredPokedex.length }} / {{ pdxTotalFiltered }})
+                            </button>
                         </div>
                     </div>
                 </main>
@@ -944,7 +988,7 @@
     </div>
 
     <!-- 載入攻略與指令資料庫 (支援本地 file:/// 雙擊直接開啟) -->
-    <script src="cobblemon_data.js"></script>
+    <!-- 核心資料由 cobblemon.js 透過高速快取非同步載入 -->
     <!-- 載入 Cobblemon 前端互動與資料驅動核心腳本 -->
     <script src="cobblemon.js"></script>
 
@@ -1111,10 +1155,69 @@
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 };
 
+                // 圖鑑 (Pokedex) 資料狀態與載入邏輯
+                const pdxList = ref([]);
+                const pdxLoading = ref(false);
+                const pdxQuery = ref('');
+                const pdxDisplayLimit = ref(60);
+
+                const loadPokedexData = async () => {
+                    if (pdxList.value.length > 0 || pdxLoading.value) return;
+                    pdxLoading.value = true;
+                    try {
+                        let cached = null;
+                        if (window.CobblemonStorage) {
+                            cached = await window.CobblemonStorage.get('cobblemon_poke_data');
+                        }
+                        if (cached && Array.isArray(cached) && cached.length > 0) {
+                            pdxList.value = cached;
+                            pdxLoading.value = false;
+                        }
+                        const res = await fetch('poke.json');
+                        if (res.ok) {
+                            const data = await res.json();
+                            pdxList.value = data;
+                            if (window.CobblemonStorage) {
+                                await window.CobblemonStorage.set('cobblemon_poke_data', data);
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('[Pokedex] 載入失敗：', e);
+                    } finally {
+                        pdxLoading.value = false;
+                    }
+                };
+                window.pdxLoad = loadPokedexData;
+
+                const filteredPokedexAll = computed(() => {
+                    const q = pdxQuery.value.trim().toLowerCase();
+                    if (!q) return pdxList.value;
+                    return pdxList.value.filter(p => {
+                        const noStr = String(p.no || '');
+                        const nameStr = (p.name || '').toLowerCase();
+                        const dropsStr = (p.drops_raw || '').toLowerCase();
+                        const biomeStr = (p.biome_bonus || '').toLowerCase();
+                        return nameStr.includes(q) || noStr === q || noStr.padStart(3, '0') === q || dropsStr.includes(q) || biomeStr.includes(q);
+                    });
+                });
+
+                const filteredPokedex = computed(() => {
+                    return filteredPokedexAll.value.slice(0, pdxDisplayLimit.value);
+                });
+
+                const pdxHasMore = computed(() => {
+                    return filteredPokedex.value.length < filteredPokedexAll.value.length;
+                });
+
+                const pdxTotalFiltered = computed(() => filteredPokedexAll.value.length);
+
                 watch(activeNavTab, (newTab) => {
                     if (newTab === 'strategy' || newTab === 'guides') {
                         setTimeout(() => { if (typeof window.initStrategies === 'function') window.initStrategies(); }, 80);
                         setTimeout(() => { if (typeof window.initStrategies === 'function') window.initStrategies(); }, 250);
+                    }
+                    if (newTab === 'pokedex') {
+                        loadPokedexData();
                     }
                 });
 
@@ -1149,7 +1252,14 @@
                     expandEditorFilm,
                     collapseEditorFilm,
                     showBackToTop,
-                    scrollToTop
+                    scrollToTop,
+                    pdxList,
+                    pdxLoading,
+                    pdxQuery,
+                    pdxDisplayLimit,
+                    filteredPokedex,
+                    pdxHasMore,
+                    pdxTotalFiltered
                 };
             }
         }).mount('#app');
