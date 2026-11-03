@@ -24,13 +24,13 @@
                 extend: {
                     colors: {
                         ins: {
-                            bg: '#0f1117',
-                            card: '#161a23',
+                            bg: '#1e2430',
+                            card: '#283141',
                             primary: '#10b981',
                             secondary: '#94a3b8',
                             dark: '#f8fafc',
                             accent: '#34d399',
-                            tag: '#1f2533',
+                            tag: '#333e54',
                             green: '#059669'
                         }
                     },
@@ -53,8 +53,8 @@
         }
 
         body {
-            background-color: #0f1117;
-            color: #f1f5f9;
+            background-color: #1e2430;
+            color: #f8fafc;
             font-family: 'Inter', 'Noto Sans TC', sans-serif;
             min-height: 100vh;
         }
@@ -67,18 +67,18 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #0f1117; }
-        ::-webkit-scrollbar-thumb { background: #28303f; border-radius: 99px; }
+        ::-webkit-scrollbar-track { background: #1e2430; }
+        ::-webkit-scrollbar-thumb { background: #3e4c66; border-radius: 99px; }
         ::-webkit-scrollbar-thumb:hover { background: #3b4559; }
 
         .glass-header {
-            background: rgba(15, 17, 23, 0.94);
+            background: rgba(30, 36, 48, 0.94);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .glass-card {
-            background: rgba(22, 26, 35, 0.92);
+            background: rgba(40, 49, 65, 0.94);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             color: #f1f5f9;
@@ -327,47 +327,47 @@
         /* ==========================================================================
            3. cobblemon.js 元件樣式 (Search, Accordion, Strategy Cards, Modals)
            ========================================================================== */
-        .suggestion-box { background: #161a23; border: 1px solid #28303f; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5); max-height: 380px; overflow-y: auto; }
-        .suggestion-item { padding: 10px 14px; border-bottom: 1px solid #28303f; cursor: pointer; transition: background 0.15s; color: #f1f5f9; }
-        .suggestion-item:hover { background: #1f2533; }
+        .suggestion-box { background: #283141; border: 1px solid #3e4c66; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4); max-height: 380px; overflow-y: auto; }
+        .suggestion-item { padding: 10px 14px; border-bottom: 1px solid #3e4c66; cursor: pointer; transition: background 0.15s; color: #f8fafc; }
+        .suggestion-item:hover { background: #333e54; }
         .suggestion-item:last-child { border-bottom: none; }
         .fuzzy-hl { background: #065f46; color: #6ee7b7; padding: 0 2px; border-radius: 2px; }
 
         /* 指令清單盒 (cmd-box) */
         .cmd-box {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 10px 14px; border-bottom: 1px solid #28303f; gap: 8px;
+            padding: 10px 14px; border-bottom: 1px solid #3e4c66; gap: 8px;
             transition: background 0.15s;
         }
-        .cmd-box:hover { background: #1f2533; }
+        .cmd-box:hover { background: #333e54; }
         .cmd-text { font-family: monospace; font-weight: 700; color: #34d399; font-size: 13px; }
-        .cmd-desc { font-size: 13px; color: #94a3b8; margin-left: 8px; flex: 1; }
+        .cmd-desc { font-size: 13px; color: #cbd5e1; margin-left: 8px; flex: 1; }
         .copy-btn {
-            padding: 4px 10px; font-size: 11px; font-weight: 600; background: #1f2533;
-            color: #cbd5e1; border-radius: 6px; cursor: pointer; border: 1px solid #28303f; transition: all 0.2s;
+            padding: 4px 10px; font-size: 11px; font-weight: 600; background: #333e54;
+            color: #cbd5e1; border-radius: 6px; cursor: pointer; border: 1px solid #3e4c66; transition: all 0.2s;
         }
-        .copy-btn:hover { background: #334155; color: #ffffff; border-color: #475569; }
+        .copy-btn:hover { background: #475569; color: #ffffff; border-color: #64748b; }
         .copy-btn.copied { background: #065f46; color: #6ee7b7; border-color: #059669; }
-        .cmd-highlight { background: rgba(245, 158, 11, 0.2) !important; }
+        .cmd-highlight { background: rgba(245, 158, 11, 0.25) !important; }
 
         /* 折疊手風琴 (accordion-item) */
-        .accordion-item { border-radius: 12px; margin-bottom: 12px; overflow: hidden; border: 1px solid #28303f; background: #161a23; }
-        .accordion-header { cursor: pointer; font-weight: 700; user-select: none; transition: background 0.15s; color: #f1f5f9; }
-        .accordion-header:hover { background: #1f2533; }
-        .accordion-content { display: none; background: #161a23; }
+        .accordion-item { border-radius: 12px; margin-bottom: 12px; overflow: hidden; border: 1px solid #3e4c66; background: #283141; }
+        .accordion-header { cursor: pointer; font-weight: 700; user-select: none; transition: background 0.15s; color: #f8fafc; }
+        .accordion-header:hover { background: #333e54; }
+        .accordion-content { display: none; background: #283141; }
         .accordion-active .accordion-content { display: block; }
 
         /* 攻略卡片 (strat-card) */
         .strat-card {
-            background: #161a23; border: 1px solid #28303f; border-radius: 16px;
+            background: #283141; border: 1px solid #3e4c66; border-radius: 16px;
             padding: 20px; position: relative; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex; flex-direction: column; box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+            display: flex; flex-direction: column; box-shadow: 0 4px 14px rgba(0,0,0,0.25);
         }
-        .strat-card:hover { transform: translateY(-3px); box-shadow: 0 12px 24px -4px rgba(0,0,0,0.6); border-color: #10b981; }
+        .strat-card:hover { transform: translateY(-3px); box-shadow: 0 12px 24px -4px rgba(0,0,0,0.4); border-color: #34d399; background: #2e394c; }
         .strat-card-icon { font-size: 2rem; margin-bottom: 10px; }
-        .strat-card-title { font-size: 1.1rem; font-weight: 700; color: #f1f5f9; margin-bottom: 6px; }
+        .strat-card-title { font-size: 1.1rem; font-weight: 700; color: #f8fafc; margin-bottom: 6px; }
         .strat-card-preview { font-size: 0.85rem; color: #94a3b8; line-height: 1.5; flex: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-        .strat-card-arrow { position: absolute; bottom: 14px; right: 18px; font-size: 1.25rem; color: #10b981; font-weight: 700; }
+        .strat-card-arrow { position: absolute; bottom: 14px; right: 18px; font-size: 1.25rem; color: #34d399; font-weight: 700; }
 
         /* 攻略彈窗 (strat-modal - Office Word 風格) */
         #strat-modal {
@@ -665,7 +665,7 @@
                                        placeholder="搜尋指令、攻略、寶可夢... (Enter 送出)" 
                                        oninput="handleGlobalSearch(this, 'homeSuggestions')"
                                        onkeydown="if(event.key==='Enter') executeHomeSearch()"
-                                       class="w-full pl-11 pr-24 py-3 bg-[#141720] border border-[#28303f] rounded-2xl text-xs sm:text-sm text-stone-100 placeholder-stone-500 shadow-sm focus:outline-none focus:border-emerald-500 focus:bg-[#1a1f2b] transition">
+                                       class="w-full pl-11 pr-24 py-3 bg-[#1e2430] border border-[#3e4c66] rounded-2xl text-xs sm:text-sm text-stone-100 placeholder-stone-500 shadow-sm focus:outline-none focus:border-emerald-500 focus:bg-[#1a1f2b] transition">
                                 <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 text-sm"></i>
                                 <button onclick="executeHomeSearch()" 
                                         class="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-1.5 bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold rounded-xl transition cursor-pointer">
@@ -692,7 +692,7 @@
 
                 <!-- 1. 指令集 分頁 (Commands) -->
                 <main v-else-if="activeNavTab === 'commands'" id="commands-page" key="commands" class="page-content max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 w-full space-y-6">
-                    <div class="border-b border-[#28303f] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="border-b border-[#3e4c66] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
                             <h1 class="text-2xl sm:text-3xl font-bold text-stone-100">指令集</h1>
                             <p class="text-xs sm:text-sm text-stone-500 mt-1">伺服器常用指令、權限與操作語法速查</p>
@@ -707,7 +707,7 @@
                                type="text" 
                                placeholder="篩選指令或描述..." 
                                oninput="handleGlobalSearch(this, 'innerSuggestions')"
-                               class="w-full pl-9 pr-4 py-2.5 bg-[#141720] border border-[#28303f] rounded-xl text-xs sm:text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:border-emerald-500 shadow-2xs">
+                               class="w-full pl-9 pr-4 py-2.5 bg-[#1e2430] border border-[#3e4c66] rounded-xl text-xs sm:text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:border-emerald-500 shadow-2xs">
                         <div id="innerSuggestions" class="suggestion-box hidden absolute left-0 right-0 top-full mt-1 bg-white rounded-xl shadow-lg border border-stone-200 overflow-hidden z-50 text-left"></div>
                     </div>
 
@@ -717,7 +717,7 @@
 
                 <!-- 2. 圖鑑 分頁 (Pokedex) -->
                 <main v-else-if="activeNavTab === 'pokedex'" id="pokedex-page" key="pokedex" class="page-content max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 w-full space-y-6">
-                    <div class="border-b border-[#28303f] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="border-b border-[#3e4c66] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
                             <h1 class="text-2xl sm:text-3xl font-bold text-stone-100">圖鑑速查</h1>
                             <p class="text-xs sm:text-sm text-stone-500 mt-1">Cobblemon 寶可夢全圖鑑、掉落物與群系資訊 (已收錄 {{ pdxList.length }} 隻)</p>
@@ -728,7 +728,7 @@
                             <input v-model="pdxQuery" 
                                    type="text" 
                                    placeholder="搜尋寶可夢名稱、編號或掉落物..." 
-                                   class="w-full pl-9 pr-4 py-2 bg-[#141720] border border-[#28303f] rounded-xl text-xs sm:text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:border-emerald-500 shadow-2xs">
+                                   class="w-full pl-9 pr-4 py-2 bg-[#1e2430] border border-[#3e4c66] rounded-xl text-xs sm:text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:border-emerald-500 shadow-2xs">
                         </div>
                     </div>
 
@@ -744,10 +744,10 @@
                             沒有找到符合「{{ pdxQuery }}」的寶可夢
                         </div>
                         <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <div v-for="item in filteredPokedex" :key="item.no" class="rounded-2xl p-4.5 border border-[#28303f] hover:border-emerald-500 hover:shadow-lg transition bg-[#161a23] space-y-2">
+                            <div v-for="item in filteredPokedex" :key="item.no" class="rounded-2xl p-4.5 border border-[#3e4c66] hover:border-emerald-500 hover:shadow-lg transition bg-[#283141] space-y-2">
                                 <div class="flex items-center justify-between">
                                     <span class="font-bold text-stone-100 text-base flex items-center gap-2">
-                                        <span class="text-xs font-mono px-2 py-0.5 rounded-md bg-[#1f2533] text-emerald-400 font-semibold border border-[#28303f]">#{{ String(item.no).padStart(3, '0') }}</span>
+                                        <span class="text-xs font-mono px-2 py-0.5 rounded-md bg-[#333e54] text-emerald-400 font-semibold border border-[#3e4c66]">#{{ String(item.no).padStart(3, '0') }}</span>
                                         {{ item.name }}
                                     </span>
                                 </div>
@@ -765,7 +765,7 @@
 
                         <!-- 載入更多按鈕 -->
                         <div v-if="pdxHasMore" class="text-center pt-6">
-                            <button @click="pdxDisplayLimit += 60" class="px-6 py-2.5 bg-[#161a23] border border-[#28303f] hover:bg-[#1f2533] rounded-full text-xs font-bold text-stone-200 shadow-sm cursor-pointer transition">
+                            <button @click="pdxDisplayLimit += 60" class="px-6 py-2.5 bg-[#283141] border border-[#3e4c66] hover:bg-[#333e54] rounded-full text-xs font-bold text-stone-200 shadow-sm cursor-pointer transition">
                                 載入更多寶可夢 (目前顯示 {{ filteredPokedex.length }} / {{ pdxTotalFiltered }})
                             </button>
                         </div>
@@ -774,7 +774,7 @@
 
                 <!-- 3. 屬性克制表 分頁 (Type Chart - 完整互動式計算器 + 18x18 矩陣) -->
                 <main v-else-if="activeNavTab === 'type-chart'" id="type-chart-page" key="type-chart" class="page-content max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 w-full space-y-6 select-none">
-                    <div class="border-b border-[#28303f] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="border-b border-[#3e4c66] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
                             <h1 class="text-2xl sm:text-3xl font-bold text-stone-100 flex items-center gap-2">
                                 <span>⚡ 屬性克制表</span>
@@ -782,7 +782,7 @@
                             <p class="text-xs sm:text-sm text-stone-400 mt-1">寶可夢 18 種屬性攻防相剋、雙屬性防守弱點與打擊面即時計算</p>
                         </div>
                         <!-- 切換模式按鈕 -->
-                        <div class="flex items-center gap-1.5 bg-[#141720] p-1 rounded-xl border border-[#28303f]">
+                        <div class="flex items-center gap-1.5 bg-[#1e2430] p-1 rounded-xl border border-[#3e4c66]">
                             <button @click="tcMode = 'defend'" 
                                     :class="tcMode === 'defend' ? 'bg-emerald-600 text-white font-bold shadow-sm' : 'text-stone-400 hover:text-stone-200'"
                                     class="px-3 py-1.5 text-xs rounded-lg transition cursor-pointer">
@@ -803,7 +803,7 @@
 
                     <!-- 模式 1: 雙屬性防守弱點查詢器 -->
                     <div v-if="tcMode === 'defend'" class="space-y-6">
-                        <div class="glass-card rounded-2xl p-5 sm:p-6 border border-[#28303f] bg-[#161a23]/90 space-y-5">
+                        <div class="glass-card rounded-2xl p-5 sm:p-6 border border-[#3e4c66] bg-[#283141]/90 space-y-5">
                             <h3 class="text-sm font-bold text-stone-200 flex items-center gap-2">
                                 <span>🎯 點選要查詢的防守寶可夢屬性 (第一屬性必選，第二屬性可選)：</span>
                             </h3>
@@ -860,8 +860,8 @@
                         </div>
 
                         <!-- 計算結果面板 -->
-                        <div class="glass-card rounded-2xl p-5 sm:p-6 border border-[#28303f] bg-[#161a23]/90 space-y-5">
-                            <div class="border-b border-[#28303f] pb-3 flex items-center justify-between">
+                        <div class="glass-card rounded-2xl p-5 sm:p-6 border border-[#3e4c66] bg-[#283141]/90 space-y-5">
+                            <div class="border-b border-[#3e4c66] pb-3 flex items-center justify-between">
                                 <h3 class="text-sm sm:text-base font-bold text-stone-100 flex items-center gap-2">
                                     <span>🛡️ 防禦屬性組合受擊倍率分析：</span>
                                     <span :style="{ backgroundColor: tcDef1.color }" class="text-white text-xs px-2.5 py-0.5 rounded-full font-bold">
@@ -974,7 +974,7 @@
 
                     <!-- 模式 2: 單屬性進攻倍率 -->
                     <div v-else-if="tcMode === 'attack'" class="space-y-6">
-                        <div class="glass-card rounded-2xl p-5 sm:p-6 border border-[#28303f] bg-[#161a23]/90 space-y-4">
+                        <div class="glass-card rounded-2xl p-5 sm:p-6 border border-[#3e4c66] bg-[#283141]/90 space-y-4">
                             <h3 class="text-sm font-bold text-stone-200 flex items-center gap-2">
                                 <span>⚔️ 點選招式進攻屬性 (查看打擊面)：</span>
                                 <span v-if="tcAtk" :style="{ backgroundColor: tcAtk.color }" class="text-white text-xs px-2.5 py-0.5 rounded-full font-bold">
@@ -994,8 +994,8 @@
                         </div>
 
                         <!-- 進攻結果面板 -->
-                        <div v-if="tcAtk" class="glass-card rounded-2xl p-5 sm:p-6 border border-[#28303f] bg-[#161a23]/90 space-y-5">
-                            <h3 class="text-sm sm:text-base font-bold text-stone-100 flex items-center gap-2 border-b border-[#28303f] pb-3">
+                        <div v-if="tcAtk" class="glass-card rounded-2xl p-5 sm:p-6 border border-[#3e4c66] bg-[#283141]/90 space-y-5">
+                            <h3 class="text-sm sm:text-base font-bold text-stone-100 flex items-center gap-2 border-b border-[#3e4c66] pb-3">
                                 <span :style="{ backgroundColor: tcAtk.color }" class="text-white text-xs px-2.5 py-0.5 rounded-full font-bold">
                                     {{ tcAtk.name }}
                                 </span>
@@ -1047,7 +1047,7 @@
 
                     <!-- 模式 3: 18x18 總矩陣表 -->
                     <div v-else class="space-y-4">
-                        <div class="glass-card rounded-2xl p-4 border border-[#28303f] bg-[#161a23]/90 overflow-x-auto shadow-xl">
+                        <div class="glass-card rounded-2xl p-4 border border-[#3e4c66] bg-[#283141]/90 overflow-x-auto shadow-xl">
                             <div class="min-w-[780px]">
                                 <div class="text-xs text-stone-400 mb-3 flex items-center justify-between">
                                     <span>縱軸 (左)：<strong>攻擊方屬性</strong> ➜ 橫軸 (頂)：<strong>防守方屬性</strong></span>
@@ -1061,19 +1061,19 @@
                                 <table class="w-full text-center border-collapse text-xs">
                                     <thead>
                                         <tr>
-                                            <th class="p-1.5 bg-[#12151c] border border-[#28303f] text-stone-400 font-bold text-[11px] w-14">攻 \ 防</th>
-                                            <th v-for="d in pokemonTypes" :key="'th-'+d.id" :style="{ color: d.color }" class="p-1 border border-[#28303f] font-bold text-[11px] bg-[#12151c]/80 min-w-[34px]">
+                                            <th class="p-1.5 bg-[#12151c] border border-[#3e4c66] text-stone-400 font-bold text-[11px] w-14">攻 \ 防</th>
+                                            <th v-for="d in pokemonTypes" :key="'th-'+d.id" :style="{ color: d.color }" class="p-1 border border-[#3e4c66] font-bold text-[11px] bg-[#12151c]/80 min-w-[34px]">
                                                 {{ d.name }}
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr v-for="a in pokemonTypes" :key="'tr-'+a.id" class="hover:bg-stone-800/40 transition-colors">
-                                            <th :style="{ backgroundColor: a.color + '22', color: a.color }" class="p-1.5 border border-[#28303f] font-bold text-[11px] whitespace-nowrap">
+                                            <th :style="{ backgroundColor: a.color + '22', color: a.color }" class="p-1.5 border border-[#3e4c66] font-bold text-[11px] whitespace-nowrap">
                                                 {{ a.name }}
                                             </th>
                                             <td v-for="d in pokemonTypes" :key="'td-'+a.id+'-'+d.id" 
-                                                class="p-1 border border-[#28303f] font-mono text-[11px] transition-colors"
+                                                class="p-1 border border-[#3e4c66] font-mono text-[11px] transition-colors"
                                                 :class="{
                                                     'bg-red-500/25 text-red-400 font-bold': getMatrixMult(a.id, d.id) === 2,
                                                     'bg-stone-800/60 text-stone-400': getMatrixMult(a.id, d.id) === 0.5,
@@ -1095,7 +1095,7 @@
 
                 <!-- 4. 攻略區 分頁 (Guides - 對接 cobblemon.js 的 #strategy-container) -->
                 <main v-else-if="activeNavTab === 'strategy' || activeNavTab === 'guides'" id="strategy-page" key="strategy" class="page-content max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 w-full space-y-6">
-                    <div class="border-b border-[#28303f] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="border-b border-[#3e4c66] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
                             <h1 class="text-2xl sm:text-3xl font-bold text-stone-100">攻略區</h1>
                             <p class="text-xs sm:text-sm text-stone-500 mt-1">新手起步、神獸捕捉、機制解說與進階玩法 (點擊卡片閱讀)</p>
@@ -1109,7 +1109,7 @@
 
                 <!-- 5. 贊助伺服器 分頁 (Sponsor - 對接 cobblemon.js 的 #sponsor-ad-grid) -->
                 <main v-else-if="activeNavTab === 'sponsor'" id="sponsor-page" key="sponsor" class="page-content max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 w-full space-y-6">
-                    <div class="border-b border-[#28303f] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="border-b border-[#3e4c66] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
                             <h1 class="text-2xl sm:text-3xl font-bold text-stone-100">贊助伺服器</h1>
                             <p class="text-xs sm:text-sm text-stone-500 mt-1">支持伺服器硬體運算與線路維護，共同打造更優質的遊玩環境</p>

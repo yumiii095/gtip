@@ -378,11 +378,21 @@ function initCommands() {
                 <button class="copy-btn" contenteditable="false" onclick="copyCmd(this)">複製</button>
             </div>`;
         });
+        const colorMap = {
+            'text-blue-900': 'text-sky-300',
+            'text-blue-800': 'text-sky-300',
+            'text-purple-700': 'text-purple-300',
+            'text-purple-900': 'text-purple-300',
+            'text-green-700': 'text-emerald-300',
+            'text-green-800': 'text-emerald-300',
+            'text-orange-700': 'text-amber-300'
+        };
+        const headerColor = colorMap[cat.color] || 'text-emerald-300';
         container.innerHTML += `
             <div class="accordion-item relative">
                 <button class="edit-ui admin-btn admin-btn-delete absolute top-2 right-2 z-10" onclick="this.parentElement.remove()">[x] 刪除章節</button>
-                <div class="accordion-header p-5 font-bold ${cat.color}" onclick="toggleAccordion(this)">${cat.title}</div>
-                <div class="accordion-content px-5">${itemsHtml}</div>
+                <div class="accordion-header p-5 font-bold ${headerColor}" onclick="toggleAccordion(this)">${cat.title}</div>
+                <div class="accordion-content px-5 pb-4">${itemsHtml}</div>
             </div>`;
     });
 }
@@ -2357,7 +2367,7 @@ async function _initDataLoader() {
             const serverVer  = String(serverData.data_version || '');
 
             // 若沒有快取，或版本號不同，或是第一次寫入，更新資料與本地儲存
-            if (!cachedData || (serverVer && serverVer !== localVer) || JSON.stringify(serverData.strategies?.length) !== JSON.stringify(cachedData.strategies?.length)) {
+            if (!cachedData || (serverVer && serverVer !== localVer) || JSON.stringify(serverData.strategies?.length) !== JSON.stringify(cachedData.strategies?.length) || JSON.stringify(serverData.commands?.length) !== JSON.stringify(cachedData.commands?.length)) {
                 localStorage.setItem(_CACHE_VER_KEY, serverVer);
                 await CobblemonStorage.set(_CACHE_KEY_DATA, serverData);
                 applyCobblemonData(serverData, !!cachedData);
