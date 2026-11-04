@@ -3,8 +3,141 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>屬性相剋計算機 - Cobblemon 百科</title>
+  <title>寶可夢屬性相剋計算機 - Cobblemon 百科</title>
   <link rel="stylesheet" href="css/main.css">
+  <style>
+    /* Calculator Custom Layout */
+    .calc-container {
+      max-width: 860px;
+      margin: 0 auto;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Tabs matching Image 1 */
+    .calc-mode-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      background: #e2e8f0;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: 2rem;
+      border: 1px solid var(--border-color);
+    }
+    .calc-mode-tab {
+      padding: 0.85rem 1rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+      text-align: center;
+      background: #f1f5f9;
+      color: var(--text-muted);
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .calc-mode-tab.active {
+      background: #fef9c3;
+      color: #713f12;
+      box-shadow: inset 0 0 0 1px #facc15;
+    }
+
+    /* 3x6 Grid of Buttons matching Image 1 */
+    .types-grid-18 {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0.65rem;
+      margin: 1rem 0 1.25rem;
+    }
+    @media (max-width: 768px) {
+      .types-grid-18 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .type-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 0.4rem;
+      border-radius: var(--radius-md);
+      border: 2px solid transparent;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.95rem;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.1s ease, box-shadow 0.15s ease, filter 0.15s ease;
+      min-height: 72px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+      position: relative;
+    }
+    .type-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.06);
+    }
+    .type-btn.selected {
+      outline: 3px solid #0f172a;
+      outline-offset: 2px;
+      transform: scale(0.97);
+      filter: brightness(1.12);
+    }
+    .type-btn.selected::after {
+      content: "✓";
+      position: absolute;
+      top: 4px;
+      right: 6px;
+      font-size: 0.75rem;
+      font-weight: 900;
+      background: rgba(15, 23, 42, 0.85);
+      color: #fff;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .type-btn img {
+      width: 24px;
+      height: 24px;
+      margin-bottom: 4px;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25));
+    }
+
+    /* Colors */
+    .btn-type-一般 { background-color: #9fa19f; }
+    .btn-type-火 { background-color: #e66d28; }
+    .btn-type-水 { background-color: #4d90e6; }
+    .btn-type-電 { background-color: #e6c328; }
+    .btn-type-草 { background-color: #63be44; }
+    .btn-type-冰 { background-color: #6ecfc8; }
+    .btn-type-格鬥 { background-color: #b82e2e; }
+    .btn-type-毒 { background-color: #943894; }
+    .btn-type-地面 { background-color: #d4b259; }
+    .btn-type-飛行 { background-color: #8a85e6; }
+    .btn-type-超能力 { background-color: #ea4683; }
+    .btn-type-蟲 { background-color: #9da924; }
+    .btn-type-岩石 { background-color: #a89f38; }
+    .btn-type-幽靈 { background-color: #604b82; }
+    .btn-type-龍 { background-color: #5a3ce6; }
+    .btn-type-鋼 { background-color: #a2b0c2; }
+    .btn-type-惡 { background-color: #57473b; }
+    .btn-type-妖精 { background-color: #d679a6; }
+
+    /* Results styling */
+    .result-group-card {
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+    }
+  </style>
 </head>
 <body>
 
@@ -23,49 +156,93 @@
         <li><a href="guides.html">攻略專區</a></li>
         <li><a href="donate.html">贊助支持</a></li>
       </ul>
-      
     </div>
   </header>
 
   <!-- Main Content -->
   <main class="main-content">
-    <div class="page-header">
-      <h1 class="page-title">⚔️ 屬性相剋速查與計算機</h1>
-      <p class="page-desc">選擇防守方的單屬性或雙屬性組合，即時計算所有攻擊屬性的傷害倍率。</p>
+    <div class="page-header" style="text-align: center; max-width: 860px; margin: 0 auto 2rem;">
+      <h1 class="page-title">⚔️ 寶可夢屬性相剋計算機</h1>
+      <p class="page-desc">點擊防守方與攻擊方屬性色塊，即時計算 4x、2x、0.5x、0.25x 與 0x 傷害倍率。</p>
     </div>
 
-    <!-- Calculator Selector -->
-    <div class="card" style="margin-bottom: 2rem;">
-      <h2 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem;">防守方屬性配置</h2>
-      <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center;">
-        <div style="flex: 1; min-width: 180px;">
-          <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">第一屬性 (主要)</label>
-          <select id="calc-type-1" class="form-control"></select>
+    <!-- Main Calculator Component -->
+    <div class="calc-container">
+      
+      <!-- Top Tabs matching Image 1 -->
+      <div class="calc-mode-tabs">
+        <button id="tab-by-type" class="calc-mode-tab active">按屬性</button>
+        <button id="tab-by-pokemon" class="calc-mode-tab">按寶可夢</button>
+      </div>
+
+      <!-- Mode 1: By Type -->
+      <div id="mode-by-type">
+        <!-- Defense Section -->
+        <div>
+          <div style="font-size: 1.15rem; font-weight: 800; color: var(--text-main);">
+            防禦方屬性（選1或2個）
+          </div>
+          <div style="font-style: italic; color: var(--text-muted); font-size: 0.9rem; margin-top: 2px;">
+            防禦方屬性
+          </div>
+          <div id="def-selected-badge-bar" style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--primary-text); font-weight: 700;">
+            目前已選：<span id="def-selection-text">請在下方點選 1 或 2 個屬性</span>
+          </div>
+
+          <!-- 18 Buttons for Defense -->
+          <div id="def-types-grid" class="types-grid-18"></div>
         </div>
-        <div style="flex: 1; min-width: 180px;">
-          <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">第二屬性 (副屬性 / 可選)</label>
-          <select id="calc-type-2" class="form-control">
-            <option value="none">無 (純單屬性)</option>
-          </select>
+
+        <hr style="border: none; border-top: 1px solid var(--border-color); margin: 1.75rem 0;">
+
+        <!-- Attack Section -->
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap;">
+            <div>
+              <div style="font-size: 1.15rem; font-weight: 800; color: var(--text-main);">攻擊方屬性</div>
+              <div style="font-style: italic; color: var(--text-muted); font-size: 0.9rem; margin-top: 2px;">攻擊方屬性 (點擊可單獨測試，或查看下方全屬性列表)</div>
+            </div>
+            <button id="btn-show-all-atk" class="btn btn-secondary btn-sm" style="margin-top: 0.5rem;">
+              顯示全屬性一覽
+            </button>
+          </div>
+
+          <!-- 18 Buttons for Attack -->
+          <div id="atk-types-grid" class="types-grid-18"></div>
         </div>
       </div>
-    </div>
 
-    <!-- Calculation Results -->
-    <div style="margin-bottom: 3rem;">
-      <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;">受傷倍率分析結果</h2>
-      <div id="calc-results"></div>
-    </div>
+      <!-- Mode 2: By Pokemon -->
+      <div id="mode-by-pokemon" style="display: none;">
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; font-weight: 800; font-size: 1.05rem; margin-bottom: 0.5rem;">搜尋寶可夢帶入防禦屬性</label>
+          <input type="text" id="poke-search-input" class="card" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border-color); font-size: 1rem; border-radius: var(--radius-md);" placeholder="輸入寶可夢名稱 (例如: 妙蛙種子, 噴火龍, 皮卡丘, 耿鬼, 烈咬陸鯊)...">
+          <div id="poke-search-results" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem;"></div>
+        </div>
 
-    <!-- Full 18x18 Matrix -->
-    <div class="card">
-      <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">完整 18 屬性攻擊／防守對照矩陣</h2>
-      <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1rem;">綠色「2」代表效果絕佳；紅色「½」代表效果不佳；黑色「0」代表完全免疫無效。</p>
-      <div style="overflow-x: auto;">
-        <table id="matrix-table" style="width: 100%; border-collapse: collapse; min-width: 760px;"></table>
+        <div id="poke-selected-card" class="card" style="display: none; background: #f8fafc; margin-bottom: 1.5rem; align-items: center; gap: 1.5rem;">
+          <img id="poke-selected-img" style="width: 90px; height: 90px; object-fit: contain;">
+          <div>
+            <h3 id="poke-selected-name" style="font-size: 1.35rem; font-weight: 800; margin-bottom: 0.25rem;"></h3>
+            <div id="poke-selected-types" style="display: flex; gap: 6px;"></div>
+          </div>
+        </div>
       </div>
-    </div>
 
+      <!-- Live Calculation Results Area -->
+      <div style="border-top: 2px solid var(--border-color); padding-top: 1.75rem; margin-top: 2rem;">
+        <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--text-main); margin-bottom: 1rem;">
+          📊 剋制倍率分析結果
+        </h2>
+
+        <!-- Single Target Banner (When a specific attack is chosen) -->
+        <div id="single-atk-banner" style="display: none; margin-bottom: 1.5rem; padding: 1.25rem; border-radius: var(--radius-md); text-align: center; font-size: 1.25rem; font-weight: 800;"></div>
+
+        <!-- Full Multiplier Breakdown -->
+        <div id="multiplier-breakdown-grid"></div>
+      </div>
+
+    </div>
   </main>
 
   <!-- Site Footer -->
@@ -77,4 +254,3 @@
   <script src="js/type-chart.js"></script>
 </body>
 </html>
-

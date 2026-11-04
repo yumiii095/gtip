@@ -85,7 +85,27 @@ const Exporter = {
     // Also include type_chart.json
     try {
       const tcRes = await fetch('data/type_chart.json?t=' + Date.now());
-      if (tcRes.ok) {
+      if (tcRes.ok) zip.file('data/type_chart.json', await tcRes.text());
+    } catch (e) { console.warn('Could not bundle type_chart.json', e); }
+
+    try {
+      const ptRes = await fetch('data/pokemon_types.json?t=' + Date.now());
+      if (ptRes.ok) zip.file('data/pokemon_types.json', await ptRes.text());
+    } catch(e) {}
+
+    try {
+      const vjRes = await fetch('vercel.json?t=' + Date.now());
+      if (vjRes.ok) zip.file('vercel.json', await vjRes.text());
+    } catch(e) {}
+
+    const typeIcons = ['normal','fire','water','electric','grass','ice','fighting','poison','ground','flying','psychic','bug','rock','ghost','dragon','steel','dark','fairy'];
+    for (const ti of typeIcons) {
+      try {
+        const tiRes = await fetch('images/types/' + ti + '.svg?t=' + Date.now());
+        if (tiRes.ok) zip.file('images/types/' + ti + '.svg', await tiRes.text());
+      } catch(e) {}
+    }
+    if (false) {
         zip.file('data/type_chart.json', await tcRes.text());
       }
     } catch (e) {
@@ -116,4 +136,5 @@ const Exporter = {
     }
   }
 };
+
 

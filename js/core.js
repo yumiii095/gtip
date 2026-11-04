@@ -1,11 +1,10 @@
-/**
+﻿/**
  * Cobblemon Wiki - Core Utilities
  */
 
 const Core = {
   // Load JSON with localStorage override capability (useful for instant live preview from Admin)
   async loadJSON(key, defaultPath) {
-    // Check if there is an unsaved or cached draft in localStorage first
     const cached = localStorage.getItem('draft_' + key);
     if (cached) {
       try {
@@ -21,24 +20,20 @@ const Core = {
       return await res.json();
     } catch (err) {
       console.warn(`Could not fetch ${defaultPath}:`, err);
-      // Fallback empty structures if file not found
       return null;
     }
   },
 
-  // Save draft state to localStorage for live preview
   saveDraft(key, data) {
     localStorage.setItem('draft_' + key, JSON.stringify(data));
   },
 
-  // Clear drafts
   clearDrafts() {
     ['config', 'commands', 'pokemon', 'guides', 'donate'].forEach(k => {
       localStorage.removeItem('draft_' + k);
     });
   },
 
-  // Clipboard copy with notification toast
   copyText(text, successMsg = '已複製到剪貼簿！') {
     if (navigator.clipboard && window.isSecureContext) {
       navigator.clipboard.writeText(text).then(() => {
@@ -67,7 +62,6 @@ const Core = {
     document.body.removeChild(input);
   },
 
-  // Toast notification
   showToast(message) {
     let toast = document.getElementById('site-toast');
     if (!toast) {
@@ -84,7 +78,6 @@ const Core = {
     }, 2400);
   },
 
-  // Initialize common header and branding
   async setupCommonUI() {
     const config = await Core.loadJSON('config', 'data/config.json');
     if (config && config.serverName) {
@@ -93,11 +86,29 @@ const Core = {
       });
     }
 
+    // Clean URLs handling: On web/Vercel (http/https), strip .html from navigation links
+    const isWeb = window.location.protocol.startsWith('http');
+    if (isWeb) {
+      document.querySelectorAll('a[href]').forEach(a => {
+        const href = a.getAttribute('href');
+        if (href && href.endsWith('.html') && !href.startsWith('http') && !href.startsWith('//')) {
+          if (href === 'index.html') {
+            a.setAttribute('href', './');
+          } else {
+            a.setAttribute('href', href.replace(/\.html$/, ''));
+          }
+        }
+      });
+    }
+
     // Highlight active nav item
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const rawPath = window.location.pathname.split('/').pop() || '';
+    const currentRoute = rawPath.replace(/\.html$/, '');
+
     document.querySelectorAll('.nav-links a').forEach(link => {
-      const href = link.getAttribute('href');
-      if (href === currentPage || (currentPage === '' && href === 'index.html')) {
+      const href = link.getAttribute('href') || '';
+      const cleanHref = href.split('/').pop().replace(/\.html$/, '');
+      if (cleanHref === currentRoute || (currentRoute === '' && (cleanHref === '' || cleanHref === 'index'))) {
         link.classList.add('active');
       }
     });
