@@ -1,10 +1,11 @@
-/**
+﻿/**
  * Cobblemon Admin Dashboard Logic
  */
 
 const Admin = {
   data: {
     config: {},
+    announcements: [],
     commands: [],
     pokemon: [],
     guides: [],
@@ -16,12 +17,14 @@ const Admin = {
 
     // Load initial data
     this.data.config = await Core.loadJSON('config', 'data/config.json') || {};
+    this.data.announcements = await Core.loadJSON('announcements', 'data/announcements.json') || [];
     this.data.commands = await Core.loadJSON('commands', 'data/commands.json') || [];
     this.data.pokemon = await Core.loadJSON('pokemon', 'data/pokemon.json') || [];
     this.data.guides = await Core.loadJSON('guides', 'data/guides.json') || [];
     this.data.donate = await Core.loadJSON('donate', 'data/donate.json') || { packages: [] };
 
     this.renderConfigForm();
+    this.renderAnnouncementsList();
     this.renderCommandsList();
     this.renderPokemonList();
     this.renderGuidesList();
@@ -54,30 +57,6 @@ const Admin = {
     document.getElementById('cfg-tagline').value = c.tagline || '';
     document.getElementById('cfg-description').value = c.description || '';
 
-    // Image upload for banner
-    const bannerInput = document.getElementById('cfg-banner-file');
-    const bannerPath = document.getElementById('cfg-bannerImage');
-    const bannerPreview = document.getElementById('cfg-banner-preview');
-
-    if (c.bannerImage) {
-      bannerPath.value = c.bannerImage;
-      bannerPreview.src = c.bannerImage;
-      bannerPreview.style.display = 'block';
-    }
-
-    bannerInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const cleanName = 'banner_' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '');
-      const relPath = 'images/banners/' + cleanName;
-
-      Exporter.registerUploadedImage(relPath, file);
-      bannerPath.value = relPath;
-      bannerPreview.src = URL.createObjectURL(file);
-      bannerPreview.style.display = 'block';
-      this.syncConfig();
-    });
-
     ['cfg-serverName', 'cfg-serverIp', 'cfg-serverPort', 'cfg-version', 'cfg-discordUrl', 'cfg-tagline', 'cfg-description'].forEach(id => {
       document.getElementById(id).addEventListener('input', () => this.syncConfig());
     });
@@ -91,11 +70,92 @@ const Admin = {
     this.data.config.discordUrl = document.getElementById('cfg-discordUrl').value.trim();
     this.data.config.tagline = document.getElementById('cfg-tagline').value.trim();
     this.data.config.description = document.getElementById('cfg-description').value.trim();
-    this.data.config.bannerImage = document.getElementById('cfg-bannerImage').value.trim();
     Core.saveDraft('config', this.data.config);
   },
 
-  /* ================= 2. Commands Section ================= */
+  /* ================= 2. Announcements Section ================= */
+  renderAnnouncementsList() {
+    const container = document.getElementById('admin-announcements-list');
+    if (!container) return;
+    container.innerHTML = '';
+
+    if (this.data.announcements.length === 0) {
+      container.innerHTML = '<div style="color: var(--text-muted); padding: 1.5rem; text-align: center; border: 1px dashed var(--border-color); border-radius: var(--radius-md);">目前無任何公告，點擊右上角「＋ 新增公告」建立第一則動態。</div>';
+      return;
+    }
+
+    this.data.announcements.forEach((a, idx) => {
+      const item = document.createElement('div');
+      item.className = 'editable-item';
+      item.innerHTML = `
+        <div class="item-toolbar">
+          <span class="item-index">公告 #${idx + 1}</span>
+          <button type="button" class="btn btn-danger btn-sm" onclick="Admin.deleteAnnouncement(${idx})">刪除</button>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="flex: 2;">
+            <label class="form-label">公告標題</label>
+            <input type="text" class="form-control" value="${escapeAttr(a.title || '')}" oninput="Admin.updateAnnouncement(${idx}, 'title', this.value)" placeholder="例如: 伺服器賽季更新與福利發放">
+          </div>
+          <div class="form-group" style="max-width: 140px;">
+            <label class="form-label">分類標籤</label>
+            <select class="form-control" onchange="Admin.updateAnnouncement(${idx}, 'category', this.value)">
+              <option value="更新" ${a.category === '更新' ? 'selected' : ''}>更新</option>
+              <option value="活動" ${a.category === '活動' ? 'selected' : ''}>活動</option>
+              <option value="維護" ${a.category === '維護' ? 'selected' : ''}>維護</option>
+              <option value="重要" ${a.category === '重要' ? 'selected' : ''}>重要</option>
+              <option value="一般" ${a.category === '一般' ? 'selected' : ''}>一般</option>
+            </select>
+          </div>
+          <div class="form-group" style="max-width: 160px;">
+            <label class="form-label">發布日期</label>
+            <input type="date" class="form-control" value="${escapeAttr(a.date || '')}" oninput="Admin.updateAnnouncement(${idx}, 'date', this.value)">
+          </div>
+          <div class="form-group" style="max-width: 110px; display: flex; flex-direction: column; justify-content: flex-end;">
+            <label style="display: flex; align-items: center; gap: 4px; font-weight: 700; font-size: 0.85rem; margin-bottom: 0.75rem; cursor: pointer;">
+              <input type="checkbox" ${a.pinned ? 'checked' : ''} onchange="Admin.updateAnnouncement(${idx}, 'pinned', this.checked)"> 📌 置頂
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">公告內容</label>
+          <textarea class="form-control" style="min-height: 80px;" oninput="Admin.updateAnnouncement(${idx}, 'content', this.value)" placeholder="輸入公告內容說明...">${escapeAttr(a.content || '')}</textarea>
+        </div>
+      `;
+      container.appendChild(item);
+    });
+  },
+
+  addAnnouncement() {
+    const today = new Date().toISOString().slice(0, 10);
+    this.data.announcements.unshift({
+      title: '全新公告標題',
+      category: '更新',
+      date: today,
+      pinned: false,
+      content: '請在此輸入詳細公告說明內容。'
+    });
+    this.renderAnnouncementsList();
+    Core.saveDraft('announcements', this.data.announcements);
+    Core.showToast('已新增一則最新公告');
+  },
+
+  updateAnnouncement(idx, field, val) {
+    if (this.data.announcements[idx]) {
+      this.data.announcements[idx][field] = val;
+      Core.saveDraft('announcements', this.data.announcements);
+    }
+  },
+
+  deleteAnnouncement(idx) {
+    if (confirm('確定刪除這則公告嗎？')) {
+      this.data.announcements.splice(idx, 1);
+      this.renderAnnouncementsList();
+      Core.saveDraft('announcements', this.data.announcements);
+    }
+  },
+
+  /* ================= 3. Commands Section ================= */
   renderCommandsList() {
     const container = document.getElementById('admin-commands-list');
     container.innerHTML = '';
@@ -165,7 +225,7 @@ const Admin = {
     }
   },
 
-  /* ================= 3. Pokédex Section ================= */
+  /* ================= 4. Pokédex Section ================= */
   renderPokemonList() {
     const container = document.getElementById('admin-pokemon-list');
     container.innerHTML = '';
@@ -323,7 +383,7 @@ const Admin = {
     }
   },
 
-  /* ================= 4. Guides Section ================= */
+  /* ================= 5. Guides Section ================= */
   renderGuidesList() {
     const container = document.getElementById('admin-guides-list');
     container.innerHTML = '';
@@ -426,7 +486,7 @@ const Admin = {
     }
   },
 
-  /* ================= 5. Donate Section ================= */
+  /* ================= 6. Donate Section ================= */
   renderDonateList() {
     const container = document.getElementById('admin-donate-list');
     container.innerHTML = '';
@@ -517,7 +577,7 @@ const Admin = {
     }
   },
 
-  /* ================= 6. Export Actions ================= */
+  /* ================= 7. Export Actions ================= */
   setupExportActions() {
     const exportBtn = document.getElementById('btn-export-zip');
     if (exportBtn) {

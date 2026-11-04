@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
@@ -33,7 +33,7 @@
     <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
       <div>
         <h1 class="page-title">⚙️ 伺服器百科資料編輯中心</h1>
-        <p class="page-desc">編輯所有資料與上傳圖片，編輯完成後點擊「匯出全站」即可下載可直接上傳 GitHub 的檔案。</p>
+        <p class="page-desc">編輯所有資料與公告，編輯完成後點擊「匯出全站」即可下載可直接上傳 Vercel 或 GitHub 的檔案。</p>
       </div>
       <div>
         <button class="btn btn-primary" onclick="document.querySelector('[data-target=\'panel-export\']').click()">
@@ -50,6 +50,9 @@
         <button class="tab-btn active" data-target="panel-config">
           <span>⚙️</span> 基本設定
         </button>
+        <button class="tab-btn" data-target="panel-announcements">
+          <span>📢</span> 最新公告
+        </button>
         <button class="tab-btn" data-target="panel-commands">
           <span>⌨️</span> 指令庫管理
         </button>
@@ -63,7 +66,7 @@
           <span>💖</span> 贊助方案
         </button>
         <button class="tab-btn" data-target="panel-export" style="margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem; color: var(--primary-text);">
-          <span>📦</span> 打包匯出 (GitHub)
+          <span>📦</span> 打包匯出 (ZIP)
         </button>
       </aside>
 
@@ -109,19 +112,18 @@
           <label class="form-label">伺服器詳細簡介</label>
           <textarea id="cfg-description" class="form-control" style="min-height: 80px;"></textarea>
         </div>
-
-        <div class="form-group">
-          <label class="form-label">首頁橫幅圖片 (Banner)</label>
-          <div style="display: flex; gap: 1rem; align-items: center;">
-            <input type="file" id="cfg-banner-file" accept="image/*">
-            <input type="hidden" id="cfg-bannerImage">
-            <img id="cfg-banner-preview" style="max-height: 50px; border-radius: var(--radius-sm); display: none;">
-          </div>
-          <div class="form-hint">上傳圖片後將自動存入 images/banners/ 並在打包匯出時一併下載。</div>
-        </div>
       </section>
 
-      <!-- Panel 2: Commands -->
+      <!-- Panel 2: Announcements -->
+      <section id="panel-announcements" class="admin-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">伺服器最新公告管理</h2>
+          <button type="button" class="btn btn-primary btn-sm" onclick="Admin.addAnnouncement()">＋ 新增公告</button>
+        </div>
+        <div id="admin-announcements-list"></div>
+      </section>
+
+      <!-- Panel 3: Commands -->
       <section id="panel-commands" class="admin-panel">
         <div class="panel-header">
           <h2 class="panel-title">指令庫管理</h2>
@@ -130,7 +132,7 @@
         <div id="admin-commands-list"></div>
       </section>
 
-      <!-- Panel 3: Pokédex -->
+      <!-- Panel 4: Pokédex -->
       <section id="panel-pokemon" class="admin-panel">
         <div class="panel-header">
           <h2 class="panel-title">圖鑑庫管理</h2>
@@ -139,7 +141,7 @@
         <div id="admin-pokemon-list"></div>
       </section>
 
-      <!-- Panel 4: Guides -->
+      <!-- Panel 5: Guides -->
       <section id="panel-guides" class="admin-panel">
         <div class="panel-header">
           <h2 class="panel-title">攻略文章管理</h2>
@@ -148,7 +150,7 @@
         <div id="admin-guides-list"></div>
       </section>
 
-      <!-- Panel 5: Donate -->
+      <!-- Panel 6: Donate -->
       <section id="panel-donate" class="admin-panel">
         <div class="panel-header">
           <h2 class="panel-title">贊助專區設定</h2>
@@ -171,35 +173,21 @@
         <div id="admin-donate-list"></div>
       </section>
 
-      <!-- Panel 6: Export & GitHub Upload Guide -->
+      <!-- Panel 7: Export & Vercel / GitHub Upload Guide -->
       <section id="panel-export" class="admin-panel">
         <div class="panel-header">
-          <h2 class="panel-title">打包匯出全站檔案 (手動上傳 GitHub)</h2>
+          <h2 class="panel-title">打包匯出全站檔案</h2>
         </div>
 
         <div class="export-card">
           <div class="export-icon">📦</div>
           <h3 style="font-size: 1.35rem; font-weight: 800; color: #14532d; margin-bottom: 0.5rem;">一鍵打包全站為 ZIP</h3>
           <p style="font-size: 0.92rem; color: #166534; max-width: 520px; margin: 0 auto 1.5rem; line-height: 1.6;">
-            點擊下方按鈕，系統會將所有 <strong>HTML 頁面</strong>、<strong>CSS/JS 程式碼</strong>、最新修訂的 <strong>JSON 資料</strong> 以及所有你上傳的 <strong>圖片檔案</strong>，全部封裝成乾淨的 ZIP 壓縮檔。
+            點擊下方按鈕，系統會將所有 <strong>HTML 頁面</strong>、<strong>CSS/JS 程式碼</strong>、最新修訂的 <strong>公告與 JSON 資料</strong> 以及所有 <strong>圖片檔案</strong>，全部封裝成乾淨的 ZIP 壓縮檔。
           </p>
           <button id="btn-export-zip" class="btn btn-primary" style="padding: 0.75rem 2rem; font-size: 1rem;">
             🚀 立刻打包匯出 (cobblemon-wiki.zip)
           </button>
-        </div>
-
-        <div class="card" style="margin-top: 1.5rem;">
-          <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem;">📋 下載後的 GitHub 上傳步驟指引：</h3>
-          <ol style="padding-left: 1.25rem; font-size: 0.9rem; line-height: 1.8; color: var(--text-main);">
-            <li>下載 <code>cobblemon-wiki-xxxx.zip</code> 後將其<strong>解壓縮</strong>。</li>
-            <li><strong>方式 A（網頁版直接上傳）</strong>：打開你的 GitHub 倉庫頁面，直接將解壓後的所有資料夾與檔案拖曳進去並點擊 <code>Commit changes</code>。</li>
-            <li><strong>方式 B（Git 指令終端機）</strong>：解壓覆蓋你的本機儲存庫目錄後，執行：
-              <pre style="background: var(--bg-page); padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin: 0.35rem 0; font-family: var(--font-mono);">git add .
-git commit -m "更新伺服器百科資料與圖片"
-git push</pre>
-            </li>
-            <li>推送完成後，GitHub Pages 會在 1~2 分鐘內自動更新上線！</li>
-          </ol>
         </div>
       </section>
 

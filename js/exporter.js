@@ -1,10 +1,9 @@
 ﻿/**
  * Cobblemon Exporter Engine
- * Packages all HTML, CSS, JS, updated JSON, and uploaded images into a clean ZIP ready for GitHub.
+ * Packages all HTML, CSS, JS, updated JSON, and uploaded images into a clean ZIP ready for GitHub/Vercel.
  */
 
 const Exporter = {
-  // Store uploaded image blobs in memory: { "images/pokemon/001.png": blob, ... }
   uploadedFiles: {},
 
   registerUploadedImage(relativePath, fileBlob) {
@@ -21,7 +20,7 @@ const Exporter = {
 
     const zip = new JSZip();
 
-    // 1. Static HTML files to fetch & bundle
+    // 1. Static HTML files
     const htmlFiles = [
       'index.html',
       'commands.html',
@@ -51,42 +50,37 @@ const Exporter = {
       'js/lib/jszip.min.js'
     ];
 
-    // Helper to fetch file content
     async function addFileToZip(path) {
       try {
         const res = await fetch(path + '?t=' + Date.now());
         if (res.ok) {
           const text = await res.text();
           zip.file(path, text);
-        } else {
-          console.warn(`Could not bundle ${path}: HTTP ${res.status}`);
         }
-      } catch (err) {
-        console.warn(`Error bundling ${path}:`, err);
-      }
+      } catch (err) {}
     }
 
-    // Add HTML, CSS, JS
     for (const file of htmlFiles) await addFileToZip(file);
     for (const file of cssFiles) await addFileToZip(file);
     for (const file of jsFiles) await addFileToZip(file);
 
-    // 4. Add updated JSON data
+    // 4. JSON Data
     zip.file('data/config.json', JSON.stringify(currentData.config || {}, null, 2));
+    zip.file('data/announcements.json', JSON.stringify(currentData.announcements || [], null, 2));
     zip.file('data/commands.json', JSON.stringify(currentData.commands || [], null, 2));
     zip.file('data/pokemon.json', JSON.stringify(currentData.pokemon || [], null, 2));
-    try {
-      const pokeRes = await fetch('data/poke.json?t=' + Date.now());
-      if (pokeRes.ok) zip.file('data/poke.json', await pokeRes.text());
-    } catch(e) { console.warn('Could not bundle poke.json', e); }
     zip.file('data/guides.json', JSON.stringify(currentData.guides || [], null, 2));
     zip.file('data/donate.json', JSON.stringify(currentData.donate || { packages: [] }, null, 2));
 
-    // Also include type_chart.json
+    try {
+      const pokeRes = await fetch('data/poke.json?t=' + Date.now());
+      if (pokeRes.ok) zip.file('data/poke.json', await pokeRes.text());
+    } catch(e) {}
+
     try {
       const tcRes = await fetch('data/type_chart.json?t=' + Date.now());
       if (tcRes.ok) zip.file('data/type_chart.json', await tcRes.text());
-    } catch (e) { console.warn('Could not bundle type_chart.json', e); }
+    } catch (e) {}
 
     try {
       const ptRes = await fetch('data/pokemon_types.json?t=' + Date.now());
@@ -98,6 +92,7 @@ const Exporter = {
       if (vjRes.ok) zip.file('vercel.json', await vjRes.text());
     } catch(e) {}
 
+    // Type SVGs
     const typeIcons = ['normal','fire','water','electric','grass','ice','fighting','poison','ground','flying','psychic','bug','rock','ghost','dragon','steel','dark','fairy'];
     for (const ti of typeIcons) {
       try {
@@ -105,19 +100,22 @@ const Exporter = {
         if (tiRes.ok) zip.file('images/types/' + ti + '.svg', await tiRes.text());
       } catch(e) {}
     }
-    if (false) {
-        zip.file('data/type_chart.json', await tcRes.text());
-      }
-    } catch (e) {
-      console.warn('Could not bundle type_chart.json', e);
-    }
 
-    // 5. Add all uploaded image files
+    // Hero background image
+    try {
+      const bgRes = await fetch('images/banners/hero-bg.jpg?t=' + Date.now());
+      if (bgRes.ok) {
+        const bgBlob = await bgRes.blob();
+        zip.file('images/banners/hero-bg.jpg', bgBlob);
+      }
+    } catch(e) {}
+
+    // Uploaded Images
     for (const [path, blob] of Object.entries(this.uploadedFiles)) {
       zip.file(path, blob);
     }
 
-    // Generate zip and trigger download
+    // Trigger download
     try {
       const content = await zip.generateAsync({ type: 'blob' });
       const a = document.createElement('a');
@@ -129,12 +127,9 @@ const Exporter = {
       document.body.removeChild(a);
       URL.revokeObjectURL(a.href);
 
-      Core.showToast('✅ 全站已成功打包下載！解壓後即可上傳 GitHub');
+      Core.showToast('✅ 全站已成功打包下載！');
     } catch (err) {
-      console.error('ZIP generation error:', err);
       alert('打包失敗：' + err.message);
     }
   }
 };
-
-
