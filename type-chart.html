@@ -8,7 +8,7 @@
   <style>
     /* Calculator Custom Layout */
     .calc-container {
-      max-width: 860px;
+      max-width: 900px;
       margin: 0 auto;
       background: var(--bg-surface);
       border: 1px solid var(--border-color);
@@ -17,7 +17,7 @@
       box-shadow: var(--shadow-sm);
     }
 
-    /* Tabs matching Image 1 */
+    /* Tabs */
     .calc-mode-tabs {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -45,12 +45,73 @@
       box-shadow: inset 0 0 0 1px #facc15;
     }
 
-    /* 3x6 Grid of Buttons matching Image 1 */
+    /* Section Headers */
+    .calc-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .calc-section-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .calc-section-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Selected Chips Bar */
+    .selected-chips-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      background: var(--bg-page);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0.6rem 0.85rem;
+      margin: 0.5rem 0 0.85rem;
+      min-height: 48px;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: var(--radius-sm);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.88rem;
+    }
+    .chip-remove {
+      cursor: pointer;
+      font-size: 0.75rem;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+    .chip-remove:hover {
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    /* 3x6 Grid of Buttons */
     .types-grid-18 {
       display: grid;
       grid-template-columns: repeat(6, 1fr);
       gap: 0.65rem;
-      margin: 1rem 0 1.25rem;
+      margin: 0.5rem 0 1.25rem;
     }
     @media (max-width: 768px) {
       .types-grid-18 {
@@ -63,7 +124,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 0.75rem 0.4rem;
+      padding: 0.65rem 0.35rem;
       border-radius: var(--radius-md);
       border: 2px solid transparent;
       color: #ffffff;
@@ -72,7 +133,7 @@
       cursor: pointer;
       user-select: none;
       transition: transform 0.1s ease, box-shadow 0.15s ease, filter 0.15s ease;
-      min-height: 72px;
+      min-height: 68px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
       position: relative;
     }
@@ -130,7 +191,15 @@
     .btn-type-惡 { background-color: #57473b; }
     .btn-type-妖精 { background-color: #d679a6; }
 
-    /* Results styling */
+    /* Matchup Report Card */
+    .matchup-report-card {
+      background: #f8fafc;
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
     .result-group-card {
       border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
@@ -161,35 +230,34 @@
 
   <!-- Main Content -->
   <main class="main-content">
-    <div class="page-header" style="text-align: center; max-width: 860px; margin: 0 auto 2rem;">
+    <div class="page-header" style="text-align: center; max-width: 900px; margin: 0 auto 2rem;">
       <h1 class="page-title">⚔️ 寶可夢屬性相剋計算機</h1>
-      <p class="page-desc">點擊防守方與攻擊方屬性色塊，即時計算 4x、2x、0.5x、0.25x 與 0x 傷害倍率。</p>
+      <p class="page-desc">支援「攻擊方雙屬性」與「防守方雙屬性」對戰打擊分析，即時判定最佳技能推薦與 STAB 本系加成。</p>
     </div>
 
     <!-- Main Calculator Component -->
     <div class="calc-container">
       
-      <!-- Top Tabs matching Image 1 -->
+      <!-- Top Tabs -->
       <div class="calc-mode-tabs">
-        <button id="tab-by-type" class="calc-mode-tab active">按屬性</button>
-        <button id="tab-by-pokemon" class="calc-mode-tab">按寶可夢</button>
+        <button id="tab-by-type" class="calc-mode-tab active">按屬性點選</button>
+        <button id="tab-by-pokemon" class="calc-mode-tab">按寶可夢快速帶入</button>
       </div>
 
       <!-- Mode 1: By Type -->
       <div id="mode-by-type">
+        
         <!-- Defense Section -->
         <div>
-          <div style="font-size: 1.15rem; font-weight: 800; color: var(--text-main);">
-            防禦方屬性（選1或2個）
-          </div>
-          <div style="font-style: italic; color: var(--text-muted); font-size: 0.9rem; margin-top: 2px;">
-            防禦方屬性
-          </div>
-          <div id="def-selected-badge-bar" style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--primary-text); font-weight: 700;">
-            目前已選：<span id="def-selection-text">請在下方點選 1 或 2 個屬性</span>
+          <div class="calc-section-header">
+            <div>
+              <div class="calc-section-title">🛡️ 防禦方屬性（受擊方，可選 1 或 2 個）</div>
+              <div class="calc-section-subtitle">點擊色塊選取受擊寶可夢的屬性</div>
+            </div>
+            <button id="btn-reset-def" class="btn btn-secondary btn-sm">重置防禦屬性</button>
           </div>
 
-          <!-- 18 Buttons for Defense -->
+          <div class="selected-chips-bar" id="def-chips-bar"></div>
           <div id="def-types-grid" class="types-grid-18"></div>
         </div>
 
@@ -197,52 +265,92 @@
 
         <!-- Attack Section -->
         <div>
-          <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap;">
+          <div class="calc-section-header">
             <div>
-              <div style="font-size: 1.15rem; font-weight: 800; color: var(--text-main);">攻擊方屬性</div>
-              <div style="font-style: italic; color: var(--text-muted); font-size: 0.9rem; margin-top: 2px;">攻擊方屬性 (點擊可單獨測試，或查看下方全屬性列表)</div>
+              <div class="calc-section-title">⚔️ 攻擊方屬性（進攻方，可選 1 或 2 個）</div>
+              <div class="calc-section-subtitle">選 2 個屬性將啟動雙屬性打擊面 PK 與最佳技能推薦</div>
             </div>
-            <button id="btn-show-all-atk" class="btn btn-secondary btn-sm" style="margin-top: 0.5rem;">
-              顯示全屬性一覽
-            </button>
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.88rem; font-weight: 700; color: #92400e; background: #fef3c7; padding: 4px 10px; border-radius: var(--radius-sm); border: 1px solid #fde68a; cursor: pointer;">
+                <input type="checkbox" id="chk-stab" checked> ⚡ 計算本系加成 (STAB 1.5x)
+              </label>
+              <button id="btn-show-all-atk" class="btn btn-secondary btn-sm">全屬性一覽</button>
+            </div>
           </div>
 
-          <!-- 18 Buttons for Attack -->
+          <div class="selected-chips-bar" id="atk-chips-bar"></div>
           <div id="atk-types-grid" class="types-grid-18"></div>
         </div>
       </div>
 
       <!-- Mode 2: By Pokemon -->
       <div id="mode-by-pokemon" style="display: none;">
-        <div style="margin-bottom: 1.5rem;">
-          <label style="display: block; font-weight: 800; font-size: 1.05rem; margin-bottom: 0.5rem;">搜尋寶可夢帶入防禦屬性</label>
-          <input type="text" id="poke-search-input" class="card" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border-color); font-size: 1rem; border-radius: var(--radius-md);" placeholder="輸入寶可夢名稱 (例如: 妙蛙種子, 噴火龍, 皮卡丘, 耿鬼, 烈咬陸鯊)...">
-          <div id="poke-search-results" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem;"></div>
-        </div>
-
-        <div id="poke-selected-card" class="card" style="display: none; background: #f8fafc; margin-bottom: 1.5rem; align-items: center; gap: 1.5rem;">
-          <img id="poke-selected-img" style="width: 90px; height: 90px; object-fit: contain;">
-          <div>
-            <h3 id="poke-selected-name" style="font-size: 1.35rem; font-weight: 800; margin-bottom: 0.25rem;"></h3>
-            <div id="poke-selected-types" style="display: flex; gap: 6px;"></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+          
+          <!-- Defending Pokemon Picker -->
+          <div class="card" style="background: #f8fafc;">
+            <div style="font-weight: 800; font-size: 1rem; margin-bottom: 0.5rem;">🛡️ 敵方 (防禦方寶可夢)</div>
+            <input type="text" id="poke-def-input" class="form-control" placeholder="輸入敵方名稱 (例如: 妙蛙草, 噴火龍)...">
+            <div id="poke-def-results" style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem;"></div>
+            <div id="poke-def-preview" style="display: none; align-items: center; gap: 1rem; margin-top: 0.75rem; background: #fff; padding: 0.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+              <img id="poke-def-img" style="width: 60px; height: 60px; object-fit: contain;">
+              <div>
+                <div id="poke-def-name" style="font-weight: 800;"></div>
+                <div id="poke-def-types" style="display: flex; gap: 4px; margin-top: 2px;"></div>
+              </div>
+            </div>
           </div>
+
+          <!-- Attacking Pokemon Picker -->
+          <div class="card" style="background: #f8fafc;">
+            <div style="font-weight: 800; font-size: 1rem; margin-bottom: 0.5rem;">⚔️ 我方 (攻擊方寶可夢)</div>
+            <input type="text" id="poke-atk-input" class="form-control" placeholder="輸入我方名稱 (例如: 巨沼怪, 耿鬼)...">
+            <div id="poke-atk-results" style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem;"></div>
+            <div id="poke-atk-preview" style="display: none; align-items: center; gap: 1rem; margin-top: 0.75rem; background: #fff; padding: 0.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+              <img id="poke-atk-img" style="width: 60px; height: 60px; object-fit: contain;">
+              <div>
+                <div id="poke-atk-name" style="font-weight: 800;"></div>
+                <div id="poke-atk-types" style="display: flex; gap: 4px; margin-top: 2px;"></div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
       <!-- Live Calculation Results Area -->
-      <div style="border-top: 2px solid var(--border-color); padding-top: 1.75rem; margin-top: 2rem;">
+      <div style="border-top: 2px solid var(--border-color); padding-top: 1.75rem; margin-top: 1.5rem;">
         <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--text-main); margin-bottom: 1rem;">
-          📊 剋制倍率分析結果
+          📊 戰鬥打擊分析報告
         </h2>
 
-        <!-- Single Target Banner (When a specific attack is chosen) -->
-        <div id="single-atk-banner" style="display: none; margin-bottom: 1.5rem; padding: 1.25rem; border-radius: var(--radius-md); text-align: center; font-size: 1.25rem; font-weight: 800;"></div>
+        <!-- Matchup Report Card (When 1 or 2 attack types are selected) -->
+        <div id="matchup-report-container"></div>
 
-        <!-- Full Multiplier Breakdown -->
-        <div id="multiplier-breakdown-grid"></div>
+        <!-- Full Multiplier Breakdown for Defense Types -->
+        <div id="multiplier-breakdown-section">
+          <div style="font-weight: 800; font-size: 1.05rem; color: var(--text-main); margin-bottom: 0.75rem;">
+            受擊方完整弱點與抗性分佈：
+          </div>
+          <div id="multiplier-breakdown-grid"></div>
+        </div>
       </div>
 
     </div>
+
+    <!-- 18x18 Comparison Matrix Table (對照圖表) -->
+    <div class="card" style="max-width: 900px; margin: 2.5rem auto 0; padding: 1.75rem;">
+      <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem;">
+        📋 完整 18 屬性相剋對照矩陣
+      </h2>
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1rem;">
+        橫列（左側）為「攻擊方屬性」，直行（上方）為「防守方屬性」。綠色「2」代表效果絕佳；紅色「½」代表效果不佳；黑色「0」代表完全免疫無效。
+      </p>
+      <div style="overflow-x: auto;">
+        <table id="matrix-table" style="width: 100%; border-collapse: collapse; min-width: 760px;"></table>
+      </div>
+    </div>
+
   </main>
 
   <!-- Site Footer -->
