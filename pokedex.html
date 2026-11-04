@@ -1,0 +1,145 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cobblemon 寶可夢與掉落物圖鑑</title>
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    /* Large Pokedex Card Styles */
+    .poke-card-large {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+      position: relative;
+    }
+    .poke-card-large:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: #cbd5e1;
+    }
+    .poke-img-container {
+      width: 100%;
+      height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0.75rem 0 1rem;
+    }
+    .poke-img-container img {
+      max-width: 140px;
+      max-height: 140px;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.08));
+    }
+    .drop-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      margin: 3px 0;
+      width: 100%;
+    }
+    .drop-tag-chance {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--primary-text);
+      background: var(--primary-light);
+      padding: 1px 6px;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="index.html" class="brand-link">
+        <span class="server-name-target">Cobblemon 伺服器</span>
+        <span class="brand-badge">WIKI</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">首頁</a></li>
+        <li><a href="commands.html">指令查詢</a></li>
+        <li><a href="pokedex.html">寶可夢圖鑑</a></li>
+        <li><a href="type-chart.html">屬性相剋</a></li>
+        <li><a href="guides.html">攻略專區</a></li>
+        <li><a href="donate.html">贊助支持</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">📖 Cobblemon 精靈與掉落物圖鑑</h1>
+      <p class="page-desc">支援寶可夢名稱、全國編號與「掉落物品」即時關鍵字查詢（例如搜尋：烈焰粉、終界珍珠、西瓜種子）。</p>
+    </div>
+
+    <!-- Search & Filter Controls -->
+    <div style="display: flex; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap; align-items: center;">
+      <div style="flex: 2; min-width: 280px;">
+        <input type="text" id="pokedex-search" class="card" style="width: 100%; padding: 0.75rem 1.25rem; border: 1px solid var(--border-color); font-size: 1rem; border-radius: var(--radius-md);" placeholder="🔍 搜尋寶可夢名稱、編號 或 掉落物 (例如: 烈焰粉, 皮卡丘, 025)...">
+      </div>
+      <div>
+        <select id="drop-filter" class="card" style="padding: 0.75rem 1rem; border: 1px solid var(--border-color); font-size: 0.95rem; border-radius: var(--radius-md); background: #ffffff;">
+          <option value="all">所有寶可夢</option>
+          <option value="has_drops">僅顯示有掉落物</option>
+          <option value="no_drops">僅顯示無掉落物</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Info Status Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+      <div id="poke-count-info">載入中...</div>
+    </div>
+
+    <!-- Pokédex Large Grid -->
+    <div id="pokedex-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 1.5rem;"></div>
+
+    <!-- Load More Action -->
+    <div id="load-more-container" style="text-align: center; margin-top: 2.5rem; display: none;">
+      <button id="btn-load-more" class="btn btn-secondary" style="padding: 0.75rem 2.5rem; font-size: 1rem;">
+        載入更多寶可夢...
+      </button>
+    </div>
+
+    <!-- Empty State -->
+    <div id="pokedex-empty" class="empty-state" style="display: none;">
+      <div class="empty-icon">🐾</div>
+      <div class="empty-title">查無符合條件的寶可夢或掉落物</div>
+      <div class="empty-desc">請嘗試其他關鍵字（例如搜尋寶可夢名稱、編號或欲掉落的物品名稱）。</div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div id="pokemon-modal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 200; align-items: center; justify-content: center; padding: 1.5rem;">
+      <div class="card" style="max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative;">
+        <button id="modal-close" style="position: absolute; top: 1rem; right: 1rem; background: var(--bg-subtle); border: 1px solid var(--border-color); border-radius: 50%; width: 32px; height: 32px; font-weight: bold; cursor: pointer;">✕</button>
+        <div id="modal-body" style="padding-top: 0.5rem;"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <p>© Cobblemon Community. Minecraft is copyright Mojang AB.</p>
+  </footer>
+
+  <script src="js/core.js"></script>
+  <script src="js/pokedex.js"></script>
+</body>
+</html>

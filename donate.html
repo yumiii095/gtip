@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>贊助支持 - Cobblemon 百科</title>
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="index.html" class="brand-link">
+        <span class="server-name-target">Cobblemon 伺服器</span>
+        <span class="brand-badge">WIKI</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">首頁</a></li>
+        <li><a href="commands.html">指令查詢</a></li>
+        <li><a href="pokedex.html">寶可夢圖鑑</a></li>
+        <li><a href="type-chart.html">屬性相剋</a></li>
+        <li><a href="guides.html">攻略專區</a></li>
+        <li><a href="donate.html">贊助支持</a></li>
+      </ul>
+      
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">💖 贊助支持伺服器</h1>
+      <p class="page-desc">感謝所有支持伺服器硬體營運與長期維護的冒險者們。</p>
+    </div>
+
+    <!-- EULA & Disclaimer Banner -->
+    <div class="card" style="background: #f8fafc; border-left: 4px solid var(--accent-blue); margin-bottom: 2rem;">
+      <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 0.35rem;">⚠️ 贊助須知與免責聲明</div>
+      <p id="donate-disclaimer" style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 0.5rem;"></p>
+      <div id="donate-contact" style="font-size: 0.85rem; font-weight: 600; color: var(--primary-text);"></div>
+    </div>
+
+    <!-- Packages Container -->
+    <div id="donate-packages" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;"></div>
+
+    <!-- Empty State -->
+    <div id="donate-empty" class="empty-state" style="display: none;">
+      <div class="empty-icon">💖</div>
+      <div class="empty-title">目前尚未設定贊助方案</div>
+      <div class="empty-desc">管理員可至後台設定各項支持回饋階級、價格與特權清單。</div>
+      </div>
+
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <p>© Cobblemon Community. Minecraft is copyright Mojang AB.</p>
+  </footer>
+
+  <script src="js/core.js"></script>
+  <script src="js/donate.js"></script>
+</body>
+</html>
+

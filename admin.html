@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>後台管理與全站匯出中心 - Cobblemon 百科</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="index.html" class="brand-link">
+        <span class="server-name-target">Cobblemon 伺服器</span>
+        <span class="brand-badge">管理後台</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">返回前台首頁</a></li>
+        <li><a href="commands.html">前台指令</a></li>
+        <li><a href="pokedex.html">前台圖鑑</a></li>
+        <li><a href="guides.html">前台攻略</a></li>
+      </ul>
+      <div class="header-actions">
+        <button id="btn-clear-drafts" class="btn btn-secondary btn-sm" title="清除所有本地暫存草稿">🔄 還原資料</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 class="page-title">⚙️ 伺服器百科資料編輯中心</h1>
+        <p class="page-desc">編輯所有資料與上傳圖片，編輯完成後點擊「匯出全站」即可下載可直接上傳 GitHub 的檔案。</p>
+      </div>
+      <div>
+        <button class="btn btn-primary" onclick="document.querySelector('[data-target=\'panel-export\']').click()">
+          📦 前往打包匯出全站
+        </button>
+      </div>
+    </div>
+
+    <!-- Admin Layout -->
+    <div class="admin-layout">
+      
+      <!-- Sidebar Navigation Tabs -->
+      <aside class="admin-sidebar">
+        <button class="tab-btn active" data-target="panel-config">
+          <span>⚙️</span> 基本設定
+        </button>
+        <button class="tab-btn" data-target="panel-commands">
+          <span>⌨️</span> 指令庫管理
+        </button>
+        <button class="tab-btn" data-target="panel-pokemon">
+          <span>🐾</span> 圖鑑庫管理
+        </button>
+        <button class="tab-btn" data-target="panel-guides">
+          <span>🧭</span> 攻略文章
+        </button>
+        <button class="tab-btn" data-target="panel-donate">
+          <span>💖</span> 贊助方案
+        </button>
+        <button class="tab-btn" data-target="panel-export" style="margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem; color: var(--primary-text);">
+          <span>📦</span> 打包匯出 (GitHub)
+        </button>
+      </aside>
+
+      <!-- Panel 1: Site Config -->
+      <section id="panel-config" class="admin-panel active">
+        <div class="panel-header">
+          <h2 class="panel-title">伺服器基本參數設定</h2>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">伺服器名稱</label>
+            <input type="text" id="cfg-serverName" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">遊戲版本</label>
+            <input type="text" id="cfg-version" class="form-control" placeholder="例如: 1.20.1 / Cobblemon 1.5">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">連線 IP 網址</label>
+            <input type="text" id="cfg-serverIp" class="form-control" placeholder="例如: play.your-server.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">伺服器 Port (預設 25565)</label>
+            <input type="text" id="cfg-serverPort" class="form-control" value="25565">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Discord 社群邀請連結</label>
+          <input type="text" id="cfg-discordUrl" class="form-control" placeholder="https://discord.gg/...">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">首頁標語 (Tagline)</label>
+          <input type="text" id="cfg-tagline" class="form-control" placeholder="在全新的方塊世界中，踏上專屬於你的寶可夢冒險旅程！">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">伺服器詳細簡介</label>
+          <textarea id="cfg-description" class="form-control" style="min-height: 80px;"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">首頁橫幅圖片 (Banner)</label>
+          <div style="display: flex; gap: 1rem; align-items: center;">
+            <input type="file" id="cfg-banner-file" accept="image/*">
+            <input type="hidden" id="cfg-bannerImage">
+            <img id="cfg-banner-preview" style="max-height: 50px; border-radius: var(--radius-sm); display: none;">
+          </div>
+          <div class="form-hint">上傳圖片後將自動存入 images/banners/ 並在打包匯出時一併下載。</div>
+        </div>
+      </section>
+
+      <!-- Panel 2: Commands -->
+      <section id="panel-commands" class="admin-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">指令庫管理</h2>
+          <button type="button" class="btn btn-primary btn-sm" onclick="Admin.addCommand()">＋ 新增指令</button>
+        </div>
+        <div id="admin-commands-list"></div>
+      </section>
+
+      <!-- Panel 3: Pokédex -->
+      <section id="panel-pokemon" class="admin-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">圖鑑庫管理</h2>
+          <button type="button" class="btn btn-primary btn-sm" onclick="Admin.addPokemon()">＋ 新增寶可夢</button>
+        </div>
+        <div id="admin-pokemon-list"></div>
+      </section>
+
+      <!-- Panel 4: Guides -->
+      <section id="panel-guides" class="admin-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">攻略文章管理</h2>
+          <button type="button" class="btn btn-primary btn-sm" onclick="Admin.addGuide()">＋ 新增攻略文章</button>
+        </div>
+        <div id="admin-guides-list"></div>
+      </section>
+
+      <!-- Panel 5: Donate -->
+      <section id="panel-donate" class="admin-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">贊助專區設定</h2>
+          <button type="button" class="btn btn-primary btn-sm" onclick="Admin.addPackage()">＋ 新增贊助方案</button>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">贊助免責與 EULA 聲明文字</label>
+          <textarea id="donate-cfg-disclaimer" class="form-control" style="min-height: 70px;"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">聯繫與回報說明</label>
+          <input type="text" id="donate-cfg-contact" class="form-control">
+        </div>
+
+        <div style="font-weight: 700; margin: 1.5rem 0 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+          贊助方案清單
+        </div>
+        <div id="admin-donate-list"></div>
+      </section>
+
+      <!-- Panel 6: Export & GitHub Upload Guide -->
+      <section id="panel-export" class="admin-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">打包匯出全站檔案 (手動上傳 GitHub)</h2>
+        </div>
+
+        <div class="export-card">
+          <div class="export-icon">📦</div>
+          <h3 style="font-size: 1.35rem; font-weight: 800; color: #14532d; margin-bottom: 0.5rem;">一鍵打包全站為 ZIP</h3>
+          <p style="font-size: 0.92rem; color: #166534; max-width: 520px; margin: 0 auto 1.5rem; line-height: 1.6;">
+            點擊下方按鈕，系統會將所有 <strong>HTML 頁面</strong>、<strong>CSS/JS 程式碼</strong>、最新修訂的 <strong>JSON 資料</strong> 以及所有你上傳的 <strong>圖片檔案</strong>，全部封裝成乾淨的 ZIP 壓縮檔。
+          </p>
+          <button id="btn-export-zip" class="btn btn-primary" style="padding: 0.75rem 2rem; font-size: 1rem;">
+            🚀 立刻打包匯出 (cobblemon-wiki.zip)
+          </button>
+        </div>
+
+        <div class="card" style="margin-top: 1.5rem;">
+          <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem;">📋 下載後的 GitHub 上傳步驟指引：</h3>
+          <ol style="padding-left: 1.25rem; font-size: 0.9rem; line-height: 1.8; color: var(--text-main);">
+            <li>下載 <code>cobblemon-wiki-xxxx.zip</code> 後將其<strong>解壓縮</strong>。</li>
+            <li><strong>方式 A（網頁版直接上傳）</strong>：打開你的 GitHub 倉庫頁面，直接將解壓後的所有資料夾與檔案拖曳進去並點擊 <code>Commit changes</code>。</li>
+            <li><strong>方式 B（Git 指令終端機）</strong>：解壓覆蓋你的本機儲存庫目錄後，執行：
+              <pre style="background: var(--bg-page); padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin: 0.35rem 0; font-family: var(--font-mono);">git add .
+git commit -m "更新伺服器百科資料與圖片"
+git push</pre>
+            </li>
+            <li>推送完成後，GitHub Pages 會在 1~2 分鐘內自動更新上線！</li>
+          </ol>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <p>© Cobblemon Community. Minecraft is copyright Mojang AB.</p>
+  </footer>
+
+  <script src="js/lib/jszip.min.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/exporter.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
