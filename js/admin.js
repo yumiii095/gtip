@@ -440,7 +440,23 @@ const Admin = {
       return;
     }
 
+    const categoryOptions = ['常用', '領地', '個人', '傳送', '經濟', 'VIP專屬'];
+    const permissionOptions = ['所有玩家', 'VIP專屬', 'Master VIP專屬'];
+
     this.data.commands.forEach((c, idx) => {
+      const currentCat = c.category || '常用';
+      const currentPerm = (c.permission === '玩家' || !c.permission) ? '所有玩家' : c.permission;
+
+      let catSelectHtml = categoryOptions.map(opt => `<option value="${opt}" ${currentCat === opt ? 'selected' : ''}>${opt}</option>`).join('');
+      if (!categoryOptions.includes(currentCat)) {
+        catSelectHtml += `<option value="${escapeAttr(currentCat)}" selected>${escapeAttr(currentCat)} (舊有自訂)</option>`;
+      }
+
+      let permSelectHtml = permissionOptions.map(opt => `<option value="${opt}" ${currentPerm === opt ? 'selected' : ''}>${opt}</option>`).join('');
+      if (!permissionOptions.includes(currentPerm)) {
+        permSelectHtml += `<option value="${escapeAttr(currentPerm)}" selected>${escapeAttr(currentPerm)} (舊有自訂)</option>`;
+      }
+
       const item = document.createElement('div');
       item.className = 'editable-item';
       item.innerHTML = `
@@ -453,13 +469,17 @@ const Admin = {
             <label class="form-label">指令名稱</label>
             <input type="text" class="form-control" value="${escapeAttr(c.name || '')}" oninput="Admin.updateCommand(${idx}, 'name', this.value)" placeholder="例如: /pc">
           </div>
-          <div class="form-group" style="flex: 1;">
+          <div class="form-group" style="flex: 1; min-width: 140px;">
             <label class="form-label">分類名稱</label>
-            <input type="text" class="form-control" value="${escapeAttr(c.category || '常用')}" oninput="Admin.updateCommand(${idx}, 'category', this.value)" placeholder="例如: 常用 / 領地 / 寶可夢 / 經濟">
+            <select class="form-control" onchange="Admin.updateCommand(${idx}, 'category', this.value)">
+              ${catSelectHtml}
+            </select>
           </div>
-          <div class="form-group" style="max-width: 140px;">
+          <div class="form-group" style="flex: 1; min-width: 160px;">
             <label class="form-label">使用權限</label>
-            <input type="text" class="form-control" value="${escapeAttr(c.permission || '玩家')}" oninput="Admin.updateCommand(${idx}, 'permission', this.value)">
+            <select class="form-control" onchange="Admin.updateCommand(${idx}, 'permission', this.value)">
+              ${permSelectHtml}
+            </select>
           </div>
         </div>
         <div class="form-group">
@@ -479,7 +499,7 @@ const Admin = {
     this.data.commands.push({
       name: '/newcmd',
       category: '常用',
-      permission: '玩家',
+      permission: '所有玩家',
       syntax: '/newcmd',
       description: '指令說明'
     });
