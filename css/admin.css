@@ -202,12 +202,49 @@ textarea.form-control {
   margin-bottom: 0.75rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px dashed var(--border-color);
+  transition: background-color 0.12s ease;
+}
+
+.item-toolbar[onclick]:hover {
+  opacity: 0.92;
 }
 
 .item-index {
   font-weight: 700;
   font-size: 0.85rem;
   color: var(--text-muted);
+}
+
+/* Drag and Drop Styling */
+.editable-item.dragging {
+  opacity: 0.45;
+  background: #f8fafc;
+  border: 1.5px dashed var(--primary);
+}
+
+.editable-item.drag-over {
+  border-top: 3px solid var(--primary) !important;
+  transform: translateY(-2px);
+}
+
+.cmd-drag-handle {
+  cursor: grab;
+  user-select: none;
+  font-size: 1.25rem;
+  color: var(--text-light);
+  padding: 0 4px;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.15s ease, transform 0.1s ease;
+}
+
+.cmd-drag-handle:hover {
+  color: var(--text-main);
+  transform: scale(1.15);
+}
+
+.cmd-drag-handle:active {
+  cursor: grabbing;
 }
 
 /* Action Bar */

@@ -258,6 +258,8 @@ const Admin = {
   pokePage: 1,
   pokePageSize: 20,
   pokeSearchQuery: '',
+  expandedCommandIndices: new Set(),
+  draggedCmdIndex: null,
 
   async init() {
     this.setupTabs();
@@ -444,6 +446,7 @@ const Admin = {
     const permissionOptions = ['所有玩家', 'VIP專屬', 'Master VIP專屬'];
 
     this.data.commands.forEach((c, idx) => {
+      const isExpanded = this.expandedCommandIndices.has(idx);
       const currentCat = c.category || '常用';
       const currentPerm = (c.permission === '玩家' || !c.permission) ? '所有玩家' : c.permission;
 
@@ -457,67 +460,237 @@ const Admin = {
         permSelectHtml += `<option value="${escapeAttr(currentPerm)}" selected>${escapeAttr(currentPerm)} (舊有自訂)</option>`;
       }
 
+      // Permission badge display
+      let permBadgeHtml = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 2px 7px; border-radius: var(--radius-sm);">👥 ${escapeAttr(currentPerm)}</span>`;
+      if (currentPerm === 'VIP專屬') {
+        permBadgeHtml = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #fef3c7; color: #b45309; border: 1px solid #fde68a; padding: 2px 7px; border-radius: var(--radius-sm); font-weight: 700;">⭐ VIP專屬</span>`;
+      } else if (currentPerm === 'Master VIP專屬') {
+        permBadgeHtml = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; padding: 2px 7px; border-radius: var(--radius-sm); font-weight: 800;">👑 Master VIP專屬</span>`;
+      }
+
       const item = document.createElement('div');
       item.className = 'editable-item';
+      item.id = `cmd-item-${idx}`;
+      item.style.padding = '0.9rem 1.15rem';
+      item.style.marginBottom = '0.85rem';
+      item.style.transition = 'all 0.15s ease';
+      item.dataset.index = idx;
+
+      // Drag and Drop Event Handlers
+      item.addEventListener('dragstart', (e) => {
+        Admin.draggedCmdIndex = idx;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', String(idx));
+        item.classList.add('dragging');
+      });
+
+      item.addEventListener('dragend', () => {
+        item.classList.remove('dragging');
+        document.querySelectorAll('.editable-item.drag-over').forEach(el => el.classList.remove('drag-over'));
+      });
+
+      item.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        if (Admin.draggedCmdIndex !== null && Admin.draggedCmdIndex !== idx) {
+          item.classList.add('drag-over');
+        }
+      });
+
+      item.addEventListener('dragleave', () => {
+        item.classList.remove('drag-over');
+      });
+
+      item.addEventListener('drop', (e) => {
+        e.preventDefault();
+        item.classList.remove('drag-over');
+        const fromIdx = Admin.draggedCmdIndex;
+        const toIdx = idx;
+        if (fromIdx !== null && fromIdx !== undefined && fromIdx !== toIdx) {
+          Admin.reorderCommand(fromIdx, toIdx);
+        }
+      });
+
       item.innerHTML = `
-        <div class="item-toolbar">
-          <span class="item-index">指令 #${idx + 1}</span>
-          <button type="button" class="btn btn-danger btn-sm" onclick="Admin.deleteCommand(${idx})">刪除</button>
-        </div>
-        <div class="form-row">
-          <div class="form-group" style="flex: 1.5;">
-            <label class="form-label">指令名稱</label>
-            <input type="text" class="form-control" value="${escapeAttr(c.name || '')}" oninput="Admin.updateCommand(${idx}, 'name', this.value)" placeholder="例如: /pc">
+        <!-- Summary Header Bar (Click to toggle single expand) -->
+        <div class="item-toolbar" style="margin-bottom: ${isExpanded ? '0.85rem' : '0'}; padding-bottom: ${isExpanded ? '0.65rem' : '0'}; border-bottom: ${isExpanded ? '1px dashed var(--border-color)' : 'none'}; cursor: pointer; user-select: none;" onclick="Admin.toggleCommand(${idx}, event)">
+          <div style="display: flex; align-items: center; gap: 0.65rem; flex: 1; flex-wrap: wrap;">
+            <!-- Drag Handle: only activates draggable on the card while hovering/grabbing -->
+            <span class="cmd-drag-handle" title="按住上下拖曳排序" onmouseenter="this.closest('.editable-item').draggable=true" onmouseleave="this.closest('.editable-item').draggable=false" onclick="event.stopPropagation()">⠿</span>
+            <span class="item-index">#${idx + 1}</span>
+            <code id="cmd-name-preview-${idx}" style="font-family: var(--font-mono); font-weight: 800; font-size: 1.05rem; color: var(--primary-text); background: var(--primary-light); padding: 2px 8px; border-radius: var(--radius-sm);">${escapeAttr(c.name || '/未命名')}</code>
+            <span id="cmd-cat-badge-${idx}" style="font-size: 0.75rem; background: var(--bg-subtle); color: var(--text-muted); padding: 2px 7px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-weight: 600;">${escapeAttr(currentCat)}</span>
+            ${permBadgeHtml}
+            <span id="cmd-desc-preview-${idx}" style="color: var(--text-muted); font-size: 0.88rem; margin-left: 0.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 320px;">${escapeAttr(c.description || '（尚未填寫說明）')}</span>
           </div>
-          <div class="form-group" style="flex: 1; min-width: 140px;">
-            <label class="form-label">分類名稱</label>
-            <select class="form-control" onchange="Admin.updateCommand(${idx}, 'category', this.value)">
-              ${catSelectHtml}
-            </select>
-          </div>
-          <div class="form-group" style="flex: 1; min-width: 160px;">
-            <label class="form-label">使用權限</label>
-            <select class="form-control" onchange="Admin.updateCommand(${idx}, 'permission', this.value)">
-              ${permSelectHtml}
-            </select>
+          <div style="display: flex; gap: 0.35rem; align-items: center;" onclick="event.stopPropagation()">
+            <!-- Quick Move Up/Down buttons -->
+            <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 6px;" title="向上移動" onclick="Admin.moveCommand(${idx}, -1, event)" ${idx === 0 ? 'disabled' : ''}>⬆️</button>
+            <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 6px;" title="向下移動" onclick="Admin.moveCommand(${idx}, 1, event)" ${idx === this.data.commands.length - 1 ? 'disabled' : ''}>⬇️</button>
+            <button type="button" id="cmd-toggle-btn-${idx}" class="btn btn-secondary btn-sm" onclick="Admin.toggleCommand(${idx}, event)">
+              ${isExpanded ? '▲ 收折' : '✏️ 編輯'}
+            </button>
+            <button type="button" class="btn btn-danger btn-sm" onclick="Admin.deleteCommand(${idx})">🗑️ 刪除</button>
           </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">完整語法</label>
-          <input type="text" class="form-control" value="${escapeAttr(c.syntax || '')}" oninput="Admin.updateCommand(${idx}, 'syntax', this.value)" placeholder="例如: /trade <玩家名稱>">
-        </div>
-        <div class="form-group">
-          <label class="form-label">功能說明</label>
-          <input type="text" class="form-control" value="${escapeAttr(c.description || '')}" oninput="Admin.updateCommand(${idx}, 'description', this.value)" placeholder="詳細說明此指令的用途與效果">
+
+        <!-- Collapsible Edit Body -->
+        <div id="cmd-body-${idx}" style="display: ${isExpanded ? 'block' : 'none'};">
+          <div class="form-row">
+            <div class="form-group" style="flex: 1.5;">
+              <label class="form-label">指令名稱</label>
+              <input type="text" class="form-control" value="${escapeAttr(c.name || '')}" oninput="Admin.updateCommand(${idx}, 'name', this.value)" placeholder="例如: /pc">
+            </div>
+            <div class="form-group" style="flex: 1; min-width: 140px;">
+              <label class="form-label">分類名稱</label>
+              <select class="form-control" onchange="Admin.updateCommand(${idx}, 'category', this.value)">
+                ${catSelectHtml}
+              </select>
+            </div>
+            <div class="form-group" style="flex: 1; min-width: 160px;">
+              <label class="form-label">使用權限</label>
+              <select class="form-control" onchange="Admin.updateCommand(${idx}, 'permission', this.value)">
+                ${permSelectHtml}
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">完整語法</label>
+            <input type="text" class="form-control" value="${escapeAttr(c.syntax || '')}" oninput="Admin.updateCommand(${idx}, 'syntax', this.value)" placeholder="例如: /trade <玩家名稱>">
+          </div>
+          <div class="form-group">
+            <label class="form-label">功能說明</label>
+            <input type="text" class="form-control" value="${escapeAttr(c.description || '')}" oninput="Admin.updateCommand(${idx}, 'description', this.value)" placeholder="詳細說明此指令的用途與效果">
+          </div>
+          <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px dashed var(--border-color);">
+            <button type="button" class="btn btn-primary btn-sm" onclick="Admin.collapseCommand(${idx}, event)">
+              ✅ 編輯完成並收折
+            </button>
+          </div>
         </div>
       `;
       container.appendChild(item);
     });
   },
 
+  toggleCommand(idx, event) {
+    if (event) event.stopPropagation();
+    if (this.expandedCommandIndices.has(idx)) {
+      // Collapse this one
+      this.expandedCommandIndices.delete(idx);
+    } else {
+      // Accordion mode: Collapse all other items, only expand the newly clicked command
+      this.expandedCommandIndices.clear();
+      this.expandedCommandIndices.add(idx);
+    }
+    this.renderCommandsList();
+  },
+
+  collapseCommand(idx, event) {
+    if (event) event.stopPropagation();
+    this.expandedCommandIndices.delete(idx);
+    this.renderCommandsList();
+  },
+
+  collapseAllCommands() {
+    this.expandedCommandIndices.clear();
+    this.renderCommandsList();
+  },
+
+  expandAllCommands() {
+    if (this.data.commands) {
+      this.data.commands.forEach((_, i) => this.expandedCommandIndices.add(i));
+    }
+    this.renderCommandsList();
+  },
+
+  reorderCommand(fromIdx, toIdx) {
+    if (fromIdx < 0 || fromIdx >= this.data.commands.length || toIdx < 0 || toIdx >= this.data.commands.length) return;
+    const [moved] = this.data.commands.splice(fromIdx, 1);
+    this.data.commands.splice(toIdx, 0, moved);
+
+    // Keep the moved item expanded if it was expanded
+    if (this.expandedCommandIndices.has(fromIdx)) {
+      this.expandedCommandIndices.clear();
+      this.expandedCommandIndices.add(toIdx);
+    } else {
+      this.expandedCommandIndices.clear();
+    }
+
+    Core.saveDraft('commands', this.data.commands);
+    this.renderCommandsList();
+    Core.showToast(`已移動指令順序至 #${toIdx + 1}`);
+  },
+
+  moveCommand(idx, direction, event) {
+    if (event) event.stopPropagation();
+    const toIdx = idx + direction;
+    if (toIdx < 0 || toIdx >= this.data.commands.length) return;
+    this.reorderCommand(idx, toIdx);
+  },
+
   addCommand() {
-    this.data.commands.push({
+    // New command is inserted at the very beginning (top of list)
+    this.data.commands.unshift({
       name: '/newcmd',
       category: '常用',
       permission: '所有玩家',
       syntax: '/newcmd',
       description: '指令說明'
     });
+
+    // Accordion mode: collapse all others, expand ONLY the new item at index 0
+    this.expandedCommandIndices.clear();
+    this.expandedCommandIndices.add(0);
+
     this.renderCommandsList();
     Core.saveDraft('commands', this.data.commands);
-    Core.showToast('已新增一個指令');
+    Core.showToast('已新增指令於最上方');
+
+    // Auto-focus on command name
+    setTimeout(() => {
+      const firstInput = document.querySelector('#cmd-item-0 input');
+      if (firstInput) {
+        firstInput.focus();
+        firstInput.select();
+      }
+    }, 50);
   },
 
   updateCommand(idx, field, val) {
     if (this.data.commands[idx]) {
       this.data.commands[idx][field] = val;
       Core.saveDraft('commands', this.data.commands);
+
+      // Real-time update in summary header bar
+      if (field === 'name') {
+        const namePreview = document.getElementById(`cmd-name-preview-${idx}`);
+        if (namePreview) namePreview.textContent = val || '/未命名';
+      } else if (field === 'category') {
+        const catBadge = document.getElementById(`cmd-cat-badge-${idx}`);
+        if (catBadge) catBadge.textContent = val || '常用';
+      } else if (field === 'permission') {
+        const permBadge = document.getElementById(`cmd-perm-badge-${idx}`);
+        if (permBadge) {
+          if (val === 'VIP專屬') {
+            permBadge.outerHTML = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #fef3c7; color: #b45309; border: 1px solid #fde68a; padding: 2px 7px; border-radius: var(--radius-sm); font-weight: 700;">⭐ VIP專屬</span>`;
+          } else if (val === 'Master VIP專屬') {
+            permBadge.outerHTML = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; padding: 2px 7px; border-radius: var(--radius-sm); font-weight: 800;">👑 Master VIP專屬</span>`;
+          } else {
+            permBadge.outerHTML = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 2px 7px; border-radius: var(--radius-sm);">👥 ${escapeAttr(val || '所有玩家')}</span>`;
+          }
+        }
+      } else if (field === 'description') {
+        const descPreview = document.getElementById(`cmd-desc-preview-${idx}`);
+        if (descPreview) descPreview.textContent = val || '（尚未填寫說明）';
+      }
     }
   },
 
   deleteCommand(idx) {
     if (confirm('確定刪除這筆指令嗎？')) {
       this.data.commands.splice(idx, 1);
+      this.expandedCommandIndices.delete(idx);
       this.renderCommandsList();
       Core.saveDraft('commands', this.data.commands);
     }

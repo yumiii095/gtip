@@ -121,7 +121,9 @@
       <section id="panel-commands" class="admin-panel">
         <div class="panel-header">
           <h2 class="panel-title">指令庫管理</h2>
-          <div style="display: flex; gap: 0.5rem;">
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="Admin.collapseAllCommands()">▲ 全部收折</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="Admin.expandAllCommands()">▼ 全部展開</button>
             <button type="button" class="btn btn-primary btn-sm" onclick="Admin.addCommand()">＋ 新增指令</button>
             <button type="button" class="btn btn-success btn-sm" onclick="Admin.saveCurrent()">💾 儲存寫入檔案</button>
           </div>
