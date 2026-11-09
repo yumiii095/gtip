@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Cobblemon Type Calculator & Matrix Table
  * Supports Dual-Type Attacker with Best Coverage & STAB Bonus
  */
@@ -80,9 +80,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const pokeAtkName = document.getElementById('poke-atk-name');
   const pokeAtkTypes = document.getElementById('poke-atk-types');
 
-  // State
-  let defTypes = ['草'];
-  let atkTypes = ['火', '飛行']; // default dual-type attacker
+  // State - 預設無選擇
+  let defTypes = [];
+  let atkTypes = [];
   let useStab = chkStab ? chkStab.checked : true;
 
   let matrix = BUILTIN_TYPE_MATRIX;
@@ -139,9 +139,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       btn.addEventListener('click', () => {
         if (defTypes.includes(t.name)) {
-          if (defTypes.length > 1) {
-            defTypes = defTypes.filter(x => x !== t.name);
-          }
+          defTypes = defTypes.filter(x => x !== t.name);
         } else {
           if (defTypes.length >= 2) {
             defTypes.shift();
@@ -212,7 +210,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderAtkButtons();
     if (atkChipsBar) {
       if (atkTypes.length === 0) {
-        atkChipsBar.innerHTML = '<span style="color: var(--text-muted); font-size: 0.88rem;">（目前顯示全屬性一覽，可點選 1 或 2 個進攻屬性啟用雙屬性 PK 分析）</span>';
+        atkChipsBar.innerHTML = '<span style="color: var(--text-muted); font-size: 0.88rem;">（未選擇進攻屬性；可點選 1 或 2 個進攻屬性啟用雙屬性 PK 與招式推薦）</span>';
       } else {
         atkChipsBar.innerHTML = '<span style="font-size: 0.88rem; font-weight: 700; color: var(--text-muted);">已選進攻：</span>' +
           atkTypes.map(t => {
@@ -230,11 +228,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   window.removeDefType = function(t) {
-    if (defTypes.length > 1) {
-      defTypes = defTypes.filter(x => x !== t);
-      updateDefUI();
-      calculateAndRender();
-    }
+    defTypes = defTypes.filter(x => x !== t);
+    updateDefUI();
+    calculateAndRender();
   };
 
   window.removeAtkType = function(t) {
@@ -245,7 +241,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (btnResetDef) {
     btnResetDef.addEventListener('click', () => {
-      defTypes = ['一般'];
+      defTypes = [];
       updateDefUI();
       calculateAndRender();
     });
@@ -261,12 +257,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Calculate effectiveness factor for one attack type against current defTypes
   function getFactor(atkName) {
+    if (defTypes.length === 0) return 1;
     const t1 = defTypes[0];
     const t2 = defTypes[1] || null;
     let m1 = 1;
     let m2 = 1;
 
-    if (matrix[atkName] && matrix[atkName][t1] !== undefined) {
+    if (t1 && matrix[atkName] && matrix[atkName][t1] !== undefined) {
       m1 = matrix[atkName][t1];
     }
     if (t2 && matrix[atkName] && matrix[atkName][t2] !== undefined) {
@@ -284,7 +281,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   function renderMatchupReport() {
     if (!matchupContainer) return;
 
-    if (atkTypes.length === 0) {
+    if (atkTypes.length === 0 || defTypes.length === 0) {
       matchupContainer.innerHTML = '';
       return;
     }
@@ -412,6 +409,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Render Full Breakdown Grid for Defending Types
   function renderBreakdownGrid() {
     if (!breakdownGrid) return;
+
+    if (defTypes.length === 0) {
+      breakdownGrid.innerHTML = `
+        <div style="background: #f8fafc; border: 1.5px dashed var(--border-color); border-radius: var(--radius-md); padding: 2.75rem 1.5rem; text-align: center; color: var(--text-muted);">
+          <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🛡️</div>
+          <div style="font-weight: 800; font-size: 1.1rem; color: var(--text-main); margin-bottom: 0.35rem;">尚未選擇防禦屬性</div>
+          <div style="font-size: 0.9rem; max-width: 480px; margin: 0 auto; line-height: 1.6;">請在上方點選 1 或 2 個防禦屬性（例如：草、火 / 飛行），系統將立即為您計算該屬性組合的 4x、2x 弱點與抵抗倍率！</div>
+        </div>
+      `;
+      return;
+    }
+
     const mults = {};
     TYPE_DEFINITIONS.forEach(atk => {
       mults[atk.name] = getFactor(atk.name);
