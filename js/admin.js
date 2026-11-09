@@ -342,7 +342,7 @@ const Admin = {
     };
 
     this.data.config = {
-      serverName: getVal('cfg-serverName') || 'Cobblemon 伺服器',
+      serverName: getVal('cfg-serverName') || 'CobblemonOasis 綠洲',
       tagline: getVal('cfg-tagline'),
       description: getVal('cfg-description')
     };

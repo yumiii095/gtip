@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Cobblemon Wiki - Core Utilities
  */
 
@@ -101,7 +101,9 @@ const Core = {
     const config = await Core.loadJSON('config', 'data/config.json');
     if (config && config.serverName) {
       document.querySelectorAll('.server-name-target').forEach(el => {
-        el.textContent = config.serverName;
+        if (el.textContent !== config.serverName) {
+          el.textContent = config.serverName;
+        }
       });
     }
 
@@ -128,7 +130,9 @@ const Core = {
       const href = link.getAttribute('href') || '';
       const cleanHref = href.split('/').pop().replace(/\.html$/, '');
       if (cleanHref === currentRoute || (currentRoute === '' && (cleanHref === '' || cleanHref === 'index'))) {
-        link.classList.add('active');
+        if (!link.classList.contains('active')) {
+          link.classList.add('active');
+        }
       }
     });
   }
