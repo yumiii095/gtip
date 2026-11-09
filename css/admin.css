@@ -591,9 +591,29 @@ textarea.form-control {
   color: var(--text-main);
   margin: 1.25rem 0 0.4rem;
 }
+.visual-editor ul,
+.visual-editor ol {
+  margin: 0.75rem 0 1.25rem 0;
+  padding-left: 1.75rem;
+  line-height: 1.8;
+}
 .visual-editor ul {
-  margin: 0.75rem 0 1rem 1.5rem;
-  line-height: 1.7;
+  list-style-type: disc;
+}
+.visual-editor ol {
+  list-style-type: decimal;
+}
+.visual-editor li {
+  margin-bottom: 0.45rem;
+  padding-left: 0.25rem;
+  line-height: 1.8;
+}
+.visual-editor ul ul,
+.visual-editor ol ul,
+.visual-editor ul ol,
+.visual-editor ol ol {
+  margin: 0.35rem 0 0.5rem 0;
+  padding-left: 1.5rem;
 }
 .visual-editor img {
   max-width: 100%;
@@ -602,6 +622,16 @@ textarea.form-control {
   box-shadow: 0 4px 12px rgba(0,0,0,0.06);
   margin: 0.75rem 0;
   display: block;
+}
+.visual-editor hr {
+  border: none;
+  border-top: 2px dashed #cbd5e1;
+  margin: 1.5rem 0;
+  height: 0;
+}
+.visual-editor del, .visual-editor s, .visual-editor strike {
+  text-decoration: line-through;
+  opacity: 0.75;
 }
 
 .guide-preview-pane {
@@ -701,9 +731,29 @@ textarea.form-control {
   color: var(--text-main);
   margin: 1.25rem 0 0.5rem;
 }
+.mock-guide-body ul,
+.mock-guide-body ol {
+  margin: 0.75rem 0 1.25rem 0;
+  padding-left: 1.75rem;
+  line-height: 1.8;
+}
 .mock-guide-body ul {
-  margin: 0.75rem 0 1rem 1.5rem;
-  line-height: 1.7;
+  list-style-type: disc;
+}
+.mock-guide-body ol {
+  list-style-type: decimal;
+}
+.mock-guide-body li {
+  margin-bottom: 0.45rem;
+  padding-left: 0.25rem;
+  line-height: 1.8;
+}
+.mock-guide-body ul ul,
+.mock-guide-body ol ul,
+.mock-guide-body ul ol,
+.mock-guide-body ol ol {
+  margin: 0.35rem 0 0.5rem 0;
+  padding-left: 1.5rem;
 }
 .mock-guide-body img {
   max-width: 100%;
@@ -712,6 +762,16 @@ textarea.form-control {
   box-shadow: 0 4px 16px rgba(0,0,0,0.06);
   margin: 1.25rem 0;
   display: block;
+}
+.mock-guide-body hr {
+  border: none;
+  border-top: 2px dashed #cbd5e1;
+  margin: 1.75rem 0;
+  height: 0;
+}
+.mock-guide-body del, .mock-guide-body s, .mock-guide-body strike {
+  text-decoration: line-through;
+  opacity: 0.75;
 }
 
 

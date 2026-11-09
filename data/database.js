@@ -5,24 +5,118 @@ window.INITIAL_DATABASE = {
   "tagline": "在全新的方塊世界中，踏上專屬於你的寶可夢冒險旅程！",
   "description": "這是一個提供純淨、流暢且充滿社群活力的 Cobblemon 伺服器，期待與你一同建立家園與冒險。"
 },
-  announcements: [
+  announcements: [],
+  commands: [
   {
-    "title": "新公告標題",
-    "category": "公告",
-    "date": "2026-11-09",
-    "pinned": false,
-    "content": "請在此輸入公告詳細內容說明。"
+    "name": "/pokeheal toggle",
+    "category": "個人",
+    "permission": "Master VIP專屬",
+    "syntax": "/pokeheal toggle",
+    "description": "切換開啟／關閉「戰後自動治療」開關（預設關閉）"
   },
   {
-    "title": "新公告標題0123",
-    "category": "重要",
-    "date": "2026-11-09",
-    "pinned": true,
-    "content": "請在此輸入公告詳細內容說明。"
+    "name": "/pokeheal",
+    "category": "個人",
+    "permission": "VIP專屬",
+    "syntax": "/pokeheal",
+    "description": "查看 VIP 治療指令使用幫助與規則說明"
+  },
+  {
+    "name": "/pokeheal team",
+    "category": "個人",
+    "permission": "VIP專屬",
+    "syntax": "/pokeheal team",
+    "description": "治療整個隊伍的寶可夢（消耗藥品＋1 遺跡硬幣）"
+  },
+  {
+    "name": "/pokeheal 1~6",
+    "category": "個人",
+    "permission": "VIP專屬",
+    "syntax": "/pokeheal 1~6",
+    "description": "治療隊伍中第 1~6 號位的寶可夢（消耗藥品＋1 遺跡硬幣）"
+  },
+  {
+    "name": "/repair",
+    "category": "個人",
+    "permission": "VIP專屬",
+    "syntax": "/repair",
+    "description": "修補目前主手手持物品（消耗日／月額度）"
+  },
+  {
+    "name": "/fly",
+    "category": "個人",
+    "permission": "VIP專屬",
+    "syntax": "/fly",
+    "description": "開啟／關閉飛行（切換分流或重生後需重新輸入開啟）"
+  },
+  {
+    "name": "/ultra resume",
+    "category": "個人",
+    "permission": "所有玩家",
+    "syntax": "/ultra resume",
+    "description": "恢復之前在究極空間登記暫停的巢穴挑戰"
+  },
+  {
+    "name": "/ultra leave",
+    "category": "個人",
+    "permission": "所有玩家",
+    "syntax": "/ultra leave",
+    "description": "究極空間巢穴背包滿時，整理背包後結算並離場"
+  },
+  {
+    "name": "/warp evs",
+    "category": "傳送",
+    "permission": "所有玩家",
+    "syntax": "/warp evs",
+    "description": "傳送至「EVS 努力值訓練場」（每次 2 枚遺跡硬幣）"
+  },
+  {
+    "name": "/lbl progress",
+    "category": "個人",
+    "permission": "所有玩家",
+    "syntax": "/lbl progress",
+    "description": "查詢幸運方塊累計開啟次數與保底進度"
+  },
+  {
+    "name": "/bingo",
+    "category": "個人",
+    "permission": "所有玩家",
+    "syntax": "/bingo",
+    "description": "打開 Bingo（冰菓）活動任務棋盤"
+  },
+  {
+    "name": "/daycare",
+    "category": "個人",
+    "permission": "所有玩家",
+    "syntax": "/daycare",
+    "description": "快速開啟培育屋（孵蛋）操作介面"
+  },
+  {
+    "name": "/cosmetic",
+    "category": "個人",
+    "permission": "所有玩家",
+    "syntax": "/cosmetic",
+    "description": "快速開啟個人衣櫥／時裝介面"
+  },
+  {
+    "name": "/onlinereward",
+    "category": "個人",
+    "permission": "所有玩家",
+    "syntax": "/onlinereward",
+    "description": "領取在線獎勵（閃光幸運方塊會寄送至信箱）"
   }
 ],
-  commands: [],
-  guides: [],
+  guides: [
+  {
+    "title": "Daycare 培育屋與孵蛋新規則指南",
+    "category": "新手教學",
+    "author": "管理員",
+    "updatedAt": "2026-11-09",
+    "summary": "詳解 Daycare 培育屋核心法則！包含天然 6V 繁殖禁令、王冠特訓不遺傳判定，以及全新上線的疊蛋系統與欄位擴充說明。",
+    "content": "<h2>培育屋核心</h2><h3><span style=\"font-size: 1rem;\">1. 天然 6V 強制禁止繁殖</span></h3><div><ul><li>任一親代寶可夢只要「個體值（IV）六項皆為 31」，即強制無法放入培育屋繁殖（此規則包含百變怪）。</li><li>繁育時請保留至少一項非 31 的個體進行配種。</li></ul></div><div><br></div><h3>2. 極限特訓（王冠）數值不遺傳</h3><div><ul><li>透過金色／銀色王冠進行「極限特訓」拉滿的個體值屬於後天數值，系統判定為人工數值，完全不計入遺傳計算。</li><li>繁殖時只會遺傳寶可夢最初的天然野生個體值。</li></ul></div><div><br></div><div><hr id=\"null\"></div><div><br></div><h3>每欄「多重疊蛋」</h3><div><br></div><div>現在每個培育欄位不再只能存放一顆蛋，支援孵化與待領取的疊蛋功能：</div><div><br></div><div>【疊蛋容量上限】：</div><div><ul><li>普通玩家／Super VIP：每欄可堆疊 2 枚蛋。</li><li>Hyper VIP：每欄可堆疊 3 枚蛋。</li><li>Master VIP：每欄可堆疊 4 枚蛋。</li></ul></div><div>【運作方式】：每顆蛋獨立計時孵化並按順序領取。當欄位滿額後會暫停產蛋，待玩家領取騰出空間後自動繼續生產。</div><div><br></div><div><hr id=\"null\"></div><h3>培育欄位上限與擴充費用</h3><div><br></div><div>輸入指令 【/daycare】 即可打開介面進行欄位管理：</div><div><br></div><div>* 普通玩家 / Super VIP：預設免費 1 格，額外可購 2 格（總上限 3 格）。</div><div>* Hyper VIP：預設免費 1 格，額外可購 4 格（總上限 5 格）。</div><div>* Master VIP：預設免費 1 格，額外可購 5 格（總上限 6 格）。</div><div>* 【解鎖費用】：擴充價格依序為 1萬 ➔ 3萬 ➔ 6萬 ➔ 10萬 ➔ 15萬 遊戲幣（購買後為永久解鎖，降檔不會回收已購欄位）。</div>",
+    "coverImage": ""
+  }
+],
   donate: {
   "disclaimer": "本站中出現的廣告或推薦連結僅供參考。本站與該廣告主無實質法律代理關係。本站不負責驗證第三方服務的安全性或有效性，請玩家購買前務必自行查證或以伺服器公告為準。",
   "contactNote": "贊助後請於 Discord 建立開單頻道（Ticket）回報您的交易資訊以領取回饋。",

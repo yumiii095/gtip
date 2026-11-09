@@ -225,6 +225,12 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
+.command-card {
+  padding: 0.75rem 1.15rem !important;
+  margin-bottom: 0.5rem !important;
+  border-radius: var(--radius-md) !important;
+}
+
 .card-title {
   font-size: 1.15rem;
   font-weight: 700;
@@ -355,4 +361,90 @@ body {
     overflow-x: auto;
     padding-bottom: 0.25rem;
   }
+}
+
+/* Guide Reader Article Content Styles */
+#reader-content {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--text-main);
+}
+
+#reader-content h1,
+#reader-content h2,
+#reader-content h3,
+#reader-content h4 {
+  color: var(--text-main);
+  line-height: 1.4;
+}
+
+#reader-content h2 {
+  font-size: 1.45rem;
+  font-weight: 800;
+  margin: 1.75rem 0 0.75rem;
+  border-bottom: 2px solid var(--primary-light);
+  padding-bottom: 0.4rem;
+}
+
+#reader-content h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 1.35rem 0 0.5rem;
+}
+
+#reader-content p,
+#reader-content div {
+  margin-bottom: 0.75rem;
+  line-height: 1.8;
+}
+
+#reader-content ul,
+#reader-content ol {
+  margin: 0.75rem 0 1.25rem 0;
+  padding-left: 1.75rem;
+  line-height: 1.8;
+}
+
+#reader-content ul {
+  list-style-type: disc;
+}
+
+#reader-content ol {
+  list-style-type: decimal;
+}
+
+#reader-content li {
+  margin-bottom: 0.45rem;
+  padding-left: 0.25rem;
+  line-height: 1.8;
+}
+
+#reader-content ul ul,
+#reader-content ol ul,
+#reader-content ul ol,
+#reader-content ol ol {
+  margin: 0.35rem 0 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+#reader-content img {
+  max-width: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  margin: 1.25rem 0;
+  display: block;
+}
+
+#reader-content hr {
+  border: none;
+  border-top: 2px dashed var(--border-color);
+  margin: 1.75rem 0;
+  height: 0;
+}
+#reader-content del,
+#reader-content s,
+#reader-content strike {
+  text-decoration: line-through;
+  opacity: 0.75;
 }

@@ -82,6 +82,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       const trimmed = block.trim();
       if (!trimmed) return '';
 
+      // Horizontal Rule: --- or *** or ___
+      if (trimmed === '---' || trimmed === '***' || trimmed === '___') {
+        return '<hr style="margin: 1.75rem 0; border: none; border-top: 2px dashed var(--border-color);">';
+      }
+
       // Check for image markdown: ![alt](url)
       const imgMatch = trimmed.match(/^!\[(.*?)\]\((.*?)\)$/);
       if (imgMatch) {
@@ -105,7 +110,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       const lines = trimmed.split('\n');
       if (lines.length > 0 && lines.every(l => l.trim().startsWith('- '))) {
         const listItems = lines.map(l => `<li style="margin-bottom: 0.35rem;">${formatInline(l.trim().slice(2))}</li>`).join('');
-        return `<ul style="margin: 0.75rem 0 1rem 1.5rem; line-height: 1.7; color: var(--text-main);">${listItems}</ul>`;
+        return `<ul style="margin: 0.75rem 0 1rem 1.75rem; line-height: 1.8; color: var(--text-main);">${listItems}</ul>`;
+      }
+
+      // Ordered List: multiple lines starting with 1. 2. etc.
+      if (lines.length > 0 && lines.every(l => /^\d+\.\s/.test(l.trim()))) {
+        const listItems = lines.map(l => `<li style="margin-bottom: 0.35rem;">${formatInline(l.trim().replace(/^\d+\.\s*/, ''))}</li>`).join('');
+        return `<ol style="margin: 0.75rem 0 1rem 1.75rem; line-height: 1.8; color: var(--text-main);">${listItems}</ol>`;
       }
 
       // Regular paragraph (retains inline breaks)
@@ -120,6 +131,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     res = res.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     // Markdown italic: *text*
     res = res.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    // Markdown strikethrough: ~~text~~
+    res = res.replace(/~~(.*?)~~/g, '<del>$1</del>');
     return res;
   }
 

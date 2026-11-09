@@ -1,16 +1,1 @@
-[
-  {
-    "title": "新公告標題",
-    "category": "公告",
-    "date": "2026-11-09",
-    "pinned": false,
-    "content": "請在此輸入公告詳細內容說明。"
-  },
-  {
-    "title": "新公告標題0123",
-    "category": "重要",
-    "date": "2026-11-09",
-    "pinned": true,
-    "content": "請在此輸入公告詳細內容說明。"
-  }
-]
+[]

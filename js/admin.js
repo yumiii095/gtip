@@ -274,6 +274,11 @@ const Admin = {
     this.data.config = await Core.loadJSON('config', 'data/config.json') || {};
     this.data.announcements = await Core.loadJSON('announcements', 'data/announcements.json') || [];
     this.data.commands = await Core.loadJSON('commands', 'data/commands.json') || [];
+    if (Array.isArray(this.data.commands)) {
+      this.data.commands.forEach(c => {
+        if (c.category === '常用' || !c.category) c.category = '個人';
+      });
+    }
 
     // Load Pokédex data (supports poke.json with 1,000+ Cobblemon entries)
     let pList = await Core.loadJSON('poke', 'data/poke.json');
@@ -442,12 +447,15 @@ const Admin = {
       return;
     }
 
-    const categoryOptions = ['常用', '領地', '個人', '傳送', '經濟', 'VIP專屬'];
+    const categoryOptions = ['個人', '領地', '傳送', '經濟', 'VIP專屬'];
     const permissionOptions = ['所有玩家', 'VIP專屬', 'Master VIP專屬'];
 
     this.data.commands.forEach((c, idx) => {
+      if (c.category === '常用' || !c.category) {
+        c.category = '個人';
+      }
       const isExpanded = this.expandedCommandIndices.has(idx);
-      const currentCat = c.category || '常用';
+      const currentCat = c.category;
       const currentPerm = (c.permission === '玩家' || !c.permission) ? '所有玩家' : c.permission;
 
       let catSelectHtml = categoryOptions.map(opt => `<option value="${opt}" ${currentCat === opt ? 'selected' : ''}>${opt}</option>`).join('');
@@ -460,12 +468,12 @@ const Admin = {
         permSelectHtml += `<option value="${escapeAttr(currentPerm)}" selected>${escapeAttr(currentPerm)} (舊有自訂)</option>`;
       }
 
-      // Permission badge display
-      let permBadgeHtml = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 2px 7px; border-radius: var(--radius-sm);">👥 ${escapeAttr(currentPerm)}</span>`;
+      // Permission badge display (VIP專屬 不帶圖示)
+      let permBadgeHtml = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 2px 7px; border-radius: var(--radius-sm);">${escapeAttr(currentPerm)}</span>`;
       if (currentPerm === 'VIP專屬') {
-        permBadgeHtml = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #fef3c7; color: #b45309; border: 1px solid #fde68a; padding: 2px 7px; border-radius: var(--radius-sm); font-weight: 700;">⭐ VIP專屬</span>`;
+        permBadgeHtml = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #fef3c7; color: #b45309; border: 1px solid #fde68a; padding: 2px 7px; border-radius: var(--radius-sm); font-weight: 700;">VIP專屬</span>`;
       } else if (currentPerm === 'Master VIP專屬') {
-        permBadgeHtml = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; padding: 2px 7px; border-radius: var(--radius-sm); font-weight: 800;">👑 Master VIP專屬</span>`;
+        permBadgeHtml = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; padding: 2px 7px; border-radius: var(--radius-sm); font-weight: 800;">Master VIP專屬</span>`;
       }
 
       const item = document.createElement('div');
@@ -555,10 +563,6 @@ const Admin = {
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">完整語法</label>
-            <input type="text" class="form-control" value="${escapeAttr(c.syntax || '')}" oninput="Admin.updateCommand(${idx}, 'syntax', this.value)" placeholder="例如: /trade <玩家名稱>">
-          </div>
-          <div class="form-group">
             <label class="form-label">功能說明</label>
             <input type="text" class="form-control" value="${escapeAttr(c.description || '')}" oninput="Admin.updateCommand(${idx}, 'description', this.value)" placeholder="詳細說明此指令的用途與效果">
           </div>
@@ -633,7 +637,7 @@ const Admin = {
     // New command is inserted at the very beginning (top of list)
     this.data.commands.unshift({
       name: '/newcmd',
-      category: '常用',
+      category: '個人',
       permission: '所有玩家',
       syntax: '/newcmd',
       description: '指令說明'
@@ -660,6 +664,9 @@ const Admin = {
   updateCommand(idx, field, val) {
     if (this.data.commands[idx]) {
       this.data.commands[idx][field] = val;
+      if (field === 'name') {
+        this.data.commands[idx].syntax = val;
+      }
       Core.saveDraft('commands', this.data.commands);
 
       // Real-time update in summary header bar
@@ -668,16 +675,16 @@ const Admin = {
         if (namePreview) namePreview.textContent = val || '/未命名';
       } else if (field === 'category') {
         const catBadge = document.getElementById(`cmd-cat-badge-${idx}`);
-        if (catBadge) catBadge.textContent = val || '常用';
+        if (catBadge) catBadge.textContent = val || '個人';
       } else if (field === 'permission') {
         const permBadge = document.getElementById(`cmd-perm-badge-${idx}`);
         if (permBadge) {
           if (val === 'VIP專屬') {
-            permBadge.outerHTML = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #fef3c7; color: #b45309; border: 1px solid #fde68a; padding: 2px 7px; border-radius: var(--radius-sm); font-weight: 700;">⭐ VIP專屬</span>`;
+            permBadge.outerHTML = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #fef3c7; color: #b45309; border: 1px solid #fde68a; padding: 2px 7px; border-radius: var(--radius-sm); font-weight: 700;">VIP專屬</span>`;
           } else if (val === 'Master VIP專屬') {
-            permBadge.outerHTML = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; padding: 2px 7px; border-radius: var(--radius-sm); font-weight: 800;">👑 Master VIP專屬</span>`;
+            permBadge.outerHTML = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; padding: 2px 7px; border-radius: var(--radius-sm); font-weight: 800;">Master VIP專屬</span>`;
           } else {
-            permBadge.outerHTML = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 2px 7px; border-radius: var(--radius-sm);">👥 ${escapeAttr(val || '所有玩家')}</span>`;
+            permBadge.outerHTML = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 2px 7px; border-radius: var(--radius-sm);">${escapeAttr(val || '所有玩家')}</span>`;
           }
         }
       } else if (field === 'description') {
@@ -1157,6 +1164,18 @@ const Admin = {
       case 'italic':
         document.execCommand('italic', false, null);
         break;
+      case 'strikethrough':
+        document.execCommand('strikeThrough', false, null);
+        break;
+      case 'hr': {
+        document.execCommand('insertHorizontalRule', false, null);
+        if (editor.lastElementChild && editor.lastElementChild.tagName === 'HR') {
+          const p = document.createElement('p');
+          p.innerHTML = '<br>';
+          editor.appendChild(p);
+        }
+        break;
+      }
       case 'h2':
         document.execCommand('formatBlock', false, '<h2>');
         break;
@@ -1165,6 +1184,15 @@ const Admin = {
         break;
       case 'list':
         document.execCommand('insertUnorderedList', false, null);
+        break;
+      case 'numlist':
+        document.execCommand('insertOrderedList', false, null);
+        break;
+      case 'outdent':
+        document.execCommand('outdent', false, null);
+        break;
+      case 'indent':
+        document.execCommand('indent', false, null);
         break;
     }
   },
@@ -1263,6 +1291,7 @@ const Admin = {
     if (/<[a-z][\s\S]*>/i.test(text)) return text;
     return text.split(/\n\n+/).map(p => {
       const t = p.trim();
+      if (t === '---' || t === '***' || t === '___') return '<hr>';
       const img = t.match(/^!\[(.*?)\]\((.*?)\)$/);
       if (img) return `<p><img src="${img[2]}" alt="${img[1]}" style="max-width: 100%; border-radius: 8px;"></p>`;
       if (t.startsWith('## ')) return `<h2>${t.slice(3)}</h2>`;
@@ -1270,7 +1299,10 @@ const Admin = {
       if (t.split('\n').every(l => l.trim().startsWith('- '))) {
         return `<ul>${t.split('\n').map(l => `<li>${l.trim().slice(2)}</li>`).join('')}</ul>`;
       }
-      return `<p>${t.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/\n/g, '<br>')}</p>`;
+      if (t.split('\n').every(l => /^\d+\.\s/.test(l.trim()))) {
+        return `<ol>${t.split('\n').map(l => `<li>${l.trim().replace(/^\d+\.\s*/, '')}</li>`).join('')}</ol>`;
+      }
+      return `<p>${t.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/~~(.*?)~~/g, '<del>$1</del>').replace(/\n/g, '<br>')}</p>`;
     }).join('');
   },
 
