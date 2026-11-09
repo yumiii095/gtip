@@ -1,5 +1,6 @@
 ﻿/**
  * Cobblemon Admin Dashboard Logic
+ * High-performance, offline-first admin controller
  */
 
 const Admin = {
@@ -12,17 +13,29 @@ const Admin = {
     donate: { packages: [] }
   },
 
+  pokePage: 1,
+  pokePageSize: 20,
+  pokeSearchQuery: '',
+
   async init() {
     this.setupTabs();
 
-    // Load initial data
+    // 1. Load initial data (supports local file:// via INITIAL_DATABASE)
     this.data.config = await Core.loadJSON('config', 'data/config.json') || {};
     this.data.announcements = await Core.loadJSON('announcements', 'data/announcements.json') || [];
     this.data.commands = await Core.loadJSON('commands', 'data/commands.json') || [];
-    this.data.pokemon = await Core.loadJSON('pokemon', 'data/pokemon.json') || [];
+
+    // Load Pokédex data (supports poke.json with 1,000+ Cobblemon entries)
+    let pList = await Core.loadJSON('poke', 'data/poke.json');
+    if (!pList || pList.length === 0) {
+      pList = await Core.loadJSON('pokemon', 'data/pokemon.json') || [];
+    }
+    this.data.pokemon = pList;
+
     this.data.guides = await Core.loadJSON('guides', 'data/guides.json') || [];
     this.data.donate = await Core.loadJSON('donate', 'data/donate.json') || { packages: [] };
 
+    // 2. Render all panels
     this.renderConfigForm();
     this.renderAnnouncementsList();
     this.renderCommandsList();
@@ -48,28 +61,41 @@ const Admin = {
 
   /* ================= 1. Config Section ================= */
   renderConfigForm() {
-    const c = this.data.config;
-    document.getElementById('cfg-serverName').value = c.serverName || '';
-    document.getElementById('cfg-serverIp').value = c.serverIp || '';
-    document.getElementById('cfg-serverPort').value = c.serverPort || '25565';
-    document.getElementById('cfg-version').value = c.version || '';
-    document.getElementById('cfg-discordUrl').value = c.discordUrl || '';
-    document.getElementById('cfg-tagline').value = c.tagline || '';
-    document.getElementById('cfg-description').value = c.description || '';
+    const c = this.data.config || {};
+    const setVal = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.value = val || '';
+    };
+
+    setVal('cfg-serverName', c.serverName);
+    setVal('cfg-serverIp', c.serverIp);
+    setVal('cfg-serverPort', c.serverPort || '25565');
+    setVal('cfg-version', c.version);
+    setVal('cfg-discordUrl', c.discordUrl);
+    setVal('cfg-tagline', c.tagline);
+    setVal('cfg-description', c.description);
 
     ['cfg-serverName', 'cfg-serverIp', 'cfg-serverPort', 'cfg-version', 'cfg-discordUrl', 'cfg-tagline', 'cfg-description'].forEach(id => {
-      document.getElementById(id).addEventListener('input', () => this.syncConfig());
+      const el = document.getElementById(id);
+      if (el) {
+        el.oninput = () => this.syncConfig();
+      }
     });
   },
 
   syncConfig() {
-    this.data.config.serverName = document.getElementById('cfg-serverName').value.trim();
-    this.data.config.serverIp = document.getElementById('cfg-serverIp').value.trim();
-    this.data.config.serverPort = document.getElementById('cfg-serverPort').value.trim();
-    this.data.config.version = document.getElementById('cfg-version').value.trim();
-    this.data.config.discordUrl = document.getElementById('cfg-discordUrl').value.trim();
-    this.data.config.tagline = document.getElementById('cfg-tagline').value.trim();
-    this.data.config.description = document.getElementById('cfg-description').value.trim();
+    const getVal = id => {
+      const el = document.getElementById(id);
+      return el ? el.value.trim() : '';
+    };
+
+    this.data.config.serverName = getVal('cfg-serverName');
+    this.data.config.serverIp = getVal('cfg-serverIp');
+    this.data.config.serverPort = getVal('cfg-serverPort');
+    this.data.config.version = getVal('cfg-version');
+    this.data.config.discordUrl = getVal('cfg-discordUrl');
+    this.data.config.tagline = getVal('cfg-tagline');
+    this.data.config.description = getVal('cfg-description');
     Core.saveDraft('config', this.data.config);
   },
 
@@ -79,8 +105,8 @@ const Admin = {
     if (!container) return;
     container.innerHTML = '';
 
-    if (this.data.announcements.length === 0) {
-      container.innerHTML = '<div style="color: var(--text-muted); padding: 1.5rem; text-align: center; border: 1px dashed var(--border-color); border-radius: var(--radius-md);">目前無任何公告，點擊右上角「＋ 新增公告」建立第一則動態。</div>';
+    if (!this.data.announcements || this.data.announcements.length === 0) {
+      container.innerHTML = '<div style="color: var(--text-muted); padding: 1.5rem; text-align: center; border: 1px dashed var(--border-color); border-radius: var(--radius-md);">目前無任何公告，點擊上方「＋ 新增公告」建立第一則動態。</div>';
       return;
     }
 
@@ -100,10 +126,10 @@ const Admin = {
           <div class="form-group" style="max-width: 140px;">
             <label class="form-label">分類標籤</label>
             <select class="form-control" onchange="Admin.updateAnnouncement(${idx}, 'category', this.value)">
+              <option value="重要" ${a.category === '重要' ? 'selected' : ''}>重要</option>
               <option value="更新" ${a.category === '更新' ? 'selected' : ''}>更新</option>
               <option value="活動" ${a.category === '活動' ? 'selected' : ''}>活動</option>
               <option value="維護" ${a.category === '維護' ? 'selected' : ''}>維護</option>
-              <option value="重要" ${a.category === '重要' ? 'selected' : ''}>重要</option>
               <option value="一般" ${a.category === '一般' ? 'selected' : ''}>一般</option>
             </select>
           </div>
@@ -158,7 +184,13 @@ const Admin = {
   /* ================= 3. Commands Section ================= */
   renderCommandsList() {
     const container = document.getElementById('admin-commands-list');
+    if (!container) return;
     container.innerHTML = '';
+
+    if (!this.data.commands || this.data.commands.length === 0) {
+      container.innerHTML = '<div style="color: var(--text-muted); padding: 1.5rem; text-align: center; border: 1px dashed var(--border-color); border-radius: var(--radius-md);">目前無任何指令，點擊上方「＋ 新增指令」建立第一筆。</div>';
+      return;
+    }
 
     this.data.commands.forEach((cmd, idx) => {
       const item = document.createElement('div');
@@ -175,7 +207,7 @@ const Admin = {
           </div>
           <div class="form-group">
             <label class="form-label">分類</label>
-            <input type="text" class="form-control" value="${escapeAttr(cmd.category || '寶可夢')}" oninput="Admin.updateCommand(${idx}, 'category', this.value)" placeholder="例如: 寶可夢 / 領地 / 常用">
+            <input type="text" class="form-control" value="${escapeAttr(cmd.category || '寶可夢')}" oninput="Admin.updateCommand(${idx}, 'category', this.value)" placeholder="例如: 寶可夢 / 常用 / 領地">
           </div>
           <div class="form-group">
             <label class="form-label">權限標籤</label>
@@ -200,14 +232,14 @@ const Admin = {
   addCommand() {
     this.data.commands.push({
       name: '/newcmd',
-      category: '一般',
+      category: '常用',
       permission: '玩家',
       syntax: '/newcmd',
       description: '指令說明'
     });
     this.renderCommandsList();
     Core.saveDraft('commands', this.data.commands);
-    Core.showToast('已新增一筆指令，請填寫欄位');
+    Core.showToast('已新增一筆指令');
   },
 
   updateCommand(idx, field, val) {
@@ -225,168 +257,149 @@ const Admin = {
     }
   },
 
-  /* ================= 4. Pokédex Section ================= */
+  /* ================= 4. Pokédex Section (High Performance) ================= */
   renderPokemonList() {
     const container = document.getElementById('admin-pokemon-list');
-    container.innerHTML = '';
+    if (!container) return;
 
-    const availableTypes = ["一般", "格鬥", "飛行", "毒", "地面", "岩石", "蟲", "幽靈", "鋼", "火", "水", "草", "電", "超能力", "冰", "龍", "惡", "妖精"];
+    const list = this.data.pokemon || [];
+    const q = this.pokeSearchQuery.trim().toLowerCase();
 
-    this.data.pokemon.forEach((p, idx) => {
-      const item = document.createElement('div');
-      item.className = 'editable-item';
+    const filtered = list.filter((p, i) => {
+      if (!q) return true;
+      const noStr = String(p.no || p.id || i + 1);
+      const nameStr = (p.name || '').toLowerCase();
+      const dropsStr = (p.drops_raw || '').toLowerCase();
+      return noStr.includes(q) || nameStr.includes(q) || dropsStr.includes(q);
+    });
 
-      const typesHTML = availableTypes.map(t => {
-        const checked = (p.types || []).includes(t) ? 'checked' : '';
-        return `
-          <label style="display: inline-flex; align-items: center; gap: 3px; font-size: 0.8rem; margin-right: 8px;">
-            <input type="checkbox" ${checked} onchange="Admin.togglePokeType(${idx}, '${t}', this.checked)"> ${t}
-          </label>
+    const total = filtered.length;
+    const start = (this.pokePage - 1) * this.pokePageSize;
+    const end = Math.min(start + this.pokePageSize, total);
+    const visible = filtered.slice(start, end);
+
+    let html = `
+      <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem; flex-wrap: wrap;">
+        <input type="text" id="admin-poke-search" class="form-control" style="flex: 1; min-width: 240px;" placeholder="🔍 搜尋寶可夢名稱、編號或掉落物..." value="${escapeAttr(this.pokeSearchQuery)}">
+        <span style="font-size: 0.9rem; font-weight: 700; color: var(--text-muted);">共 ${total} 隻寶可夢 (第 ${this.pokePage} / ${Math.max(1, Math.ceil(total / this.pokePageSize))} 頁)</span>
+      </div>
+    `;
+
+    if (visible.length === 0) {
+      html += '<div style="color: var(--text-muted); padding: 1.5rem; text-align: center; border: 1px dashed var(--border-color); border-radius: var(--radius-md);">查無符合的寶可夢。</div>';
+    } else {
+      visible.forEach(p => {
+        const rawIdx = list.indexOf(p);
+        const pNo = p.no || p.id || (rawIdx + 1);
+        const artworkUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pNo}.png`;
+
+        html += `
+          <div class="editable-item" style="display: grid; grid-template-columns: 80px 1fr auto; gap: 1rem; align-items: center;">
+            <div style="text-align: center;">
+              <img src="${artworkUrl}" style="width: 60px; height: 60px; object-fit: contain;" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pNo}.png'">
+              <div style="font-family: var(--font-mono); font-weight: 800; font-size: 0.8rem; color: var(--primary-text);">#${String(pNo).padStart(3, '0')}</div>
+            </div>
+            <div>
+              <div class="form-row">
+                <div class="form-group" style="max-width: 160px; margin-bottom: 0.5rem;">
+                  <label class="form-label">名稱</label>
+                  <input type="text" class="form-control" value="${escapeAttr(p.name || '')}" oninput="Admin.updatePokemonField(${rawIdx}, 'name', this.value)">
+                </div>
+                <div class="form-group" style="flex: 1; margin-bottom: 0.5rem;">
+                  <label class="form-label">掉落物列表說明 (drops_raw)</label>
+                  <input type="text" class="form-control" value="${escapeAttr(p.drops_raw || '')}" oninput="Admin.updatePokemonField(${rawIdx}, 'drops_raw', this.value)" placeholder="例如: 西瓜種子 0-1, 奇蹟種子 5%">
+                </div>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">群系加成說明 (biome_bonus)</label>
+                <input type="text" class="form-control" value="${escapeAttr(p.biome_bonus || '')}" oninput="Admin.updatePokemonField(${rawIdx}, 'biome_bonus', this.value)" placeholder="例如: 櫻花林夜間額外刷新">
+              </div>
+            </div>
+            <div>
+              <button type="button" class="btn btn-danger btn-sm" onclick="Admin.deletePokemon(${rawIdx})">刪除</button>
+            </div>
+          </div>
         `;
-      }).join('');
+      });
 
-      item.innerHTML = `
-        <div class="item-toolbar">
-          <span class="item-index">寶可夢 #${p.id || (idx + 1)}</span>
-          <button type="button" class="btn btn-danger btn-sm" onclick="Admin.deletePokemon(${idx})">刪除</button>
-        </div>
-        <div class="form-row">
-          <div class="form-group" style="max-width: 120px;">
-            <label class="form-label">全國編號</label>
-            <input type="number" class="form-control" value="${p.id || (idx + 1)}" oninput="Admin.updatePokemon(${idx}, 'id', parseInt(this.value, 10))">
-          </div>
-          <div class="form-group">
-            <label class="form-label">中文名稱</label>
-            <input type="text" class="form-control" value="${escapeAttr(p.name || '')}" oninput="Admin.updatePokemon(${idx}, 'name', this.value)" placeholder="例如: 妙蛙種子">
-          </div>
-          <div class="form-group">
-            <label class="form-label">英文名稱</label>
-            <input type="text" class="form-control" value="${escapeAttr(p.nameEn || '')}" oninput="Admin.updatePokemon(${idx}, 'nameEn', this.value)" placeholder="例如: Bulbasaur">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">屬性標籤（可多選）</label>
-          <div style="background: var(--bg-page); padding: 0.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); display: flex; flex-wrap: wrap;">
-            ${typesHTML}
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">HP</label>
-            <input type="number" class="form-control" value="${p.hp || 50}" oninput="Admin.updatePokemon(${idx}, 'hp', parseInt(this.value, 10))">
-          </div>
-          <div class="form-group">
-            <label class="form-label">物攻</label>
-            <input type="number" class="form-control" value="${p.atk || 50}" oninput="Admin.updatePokemon(${idx}, 'atk', parseInt(this.value, 10))">
-          </div>
-          <div class="form-group">
-            <label class="form-label">物防</label>
-            <input type="number" class="form-control" value="${p.def || 50}" oninput="Admin.updatePokemon(${idx}, 'def', parseInt(this.value, 10))">
-          </div>
-          <div class="form-group">
-            <label class="form-label">特攻</label>
-            <input type="number" class="form-control" value="${p.spa || 50}" oninput="Admin.updatePokemon(${idx}, 'spa', parseInt(this.value, 10))">
-          </div>
-          <div class="form-group">
-            <label class="form-label">特防</label>
-            <input type="number" class="form-control" value="${p.spd || 50}" oninput="Admin.updatePokemon(${idx}, 'spd', parseInt(this.value, 10))">
-          </div>
-          <div class="form-group">
-            <label class="form-label">速度</label>
-            <input type="number" class="form-control" value="${p.spe || 50}" oninput="Admin.updatePokemon(${idx}, 'spe', parseInt(this.value, 10))">
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">棲息環境 / 生成條件</label>
-            <input type="text" class="form-control" value="${escapeAttr(p.habitat || '')}" oninput="Admin.updatePokemon(${idx}, 'habitat', this.value)" placeholder="例如: 森林群系、平原、白天生成">
-          </div>
-          <div class="form-group">
-            <label class="form-label">進化方式</label>
-            <input type="text" class="form-control" value="${escapeAttr(p.evolution || '')}" oninput="Admin.updatePokemon(${idx}, 'evolution', this.value)" placeholder="例如: 16級進化為妙蛙草">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">寶可夢圖片 (上傳後自動歸檔至 images/pokemon/)</label>
-          <div style="display: flex; align-items: center; gap: 1rem;">
-            <input type="file" accept="image/*" onchange="Admin.handlePokemonImageUpload(${idx}, this.files[0])">
-            <span class="image-path-tag">${p.image || '未設定圖片'}</span>
-          </div>
+      // Pagination controls
+      const maxPages = Math.ceil(total / this.pokePageSize);
+      html += `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color);">
+          <button class="btn btn-secondary btn-sm" ${this.pokePage <= 1 ? 'disabled' : ''} onclick="Admin.prevPokePage()">← 上一頁</button>
+          <span style="font-size: 0.85rem; color: var(--text-muted);">顯示 ${start + 1} - ${end} 隻</span>
+          <button class="btn btn-secondary btn-sm" ${this.pokePage >= maxPages ? 'disabled' : ''} onclick="Admin.nextPokePage()">下一頁 →</button>
         </div>
       `;
-      container.appendChild(item);
-    });
+    }
+
+    container.innerHTML = html;
+
+    const sInput = document.getElementById('admin-poke-search');
+    if (sInput) {
+      sInput.addEventListener('input', (e) => {
+        this.pokeSearchQuery = e.target.value;
+        this.pokePage = 1;
+        this.renderPokemonList();
+      });
+      // Restore cursor position if re-rendering
+      sInput.focus();
+      sInput.setSelectionRange(sInput.value.length, sInput.value.length);
+    }
+  },
+
+  prevPokePage() {
+    if (this.pokePage > 1) {
+      this.pokePage--;
+      this.renderPokemonList();
+    }
+  },
+
+  nextPokePage() {
+    this.pokePage++;
+    this.renderPokemonList();
+  },
+
+  updatePokemonField(rawIdx, field, val) {
+    if (this.data.pokemon[rawIdx]) {
+      this.data.pokemon[rawIdx][field] = val;
+      Core.saveDraft('poke', this.data.pokemon);
+    }
   },
 
   addPokemon() {
-    const nextId = (this.data.pokemon.length > 0) ? (Math.max(...this.data.pokemon.map(p => p.id || 0)) + 1) : 1;
-    this.data.pokemon.push({
-      id: nextId,
-      name: '',
-      nameEn: '',
-      types: ['一般'],
-      hp: 50,
-      atk: 50,
-      def: 50,
-      spa: 50,
-      spd: 50,
-      spe: 50,
-      habitat: '',
-      evolution: '',
-      image: ''
+    const nextNo = (this.data.pokemon.length > 0) ? (Math.max(...this.data.pokemon.map(p => p.no || p.id || 0)) + 1) : 1;
+    this.data.pokemon.unshift({
+      no: nextNo,
+      name: '新寶可夢',
+      drops: [],
+      drops_raw: '特殊掉落物 5%',
+      biome_bonus: ''
     });
+    this.pokePage = 1;
     this.renderPokemonList();
-    Core.saveDraft('pokemon', this.data.pokemon);
-    Core.showToast('已新增一隻寶可夢，請填寫各項參數');
+    Core.saveDraft('poke', this.data.pokemon);
+    Core.showToast(`已新增 #${nextNo} 號寶可夢`);
   },
 
-  updatePokemon(idx, field, val) {
-    if (this.data.pokemon[idx]) {
-      this.data.pokemon[idx][field] = val;
-      Core.saveDraft('pokemon', this.data.pokemon);
-    }
-  },
-
-  togglePokeType(idx, type, checked) {
-    if (!this.data.pokemon[idx]) return;
-    let list = this.data.pokemon[idx].types || [];
-    if (checked && !list.includes(type)) {
-      list.push(type);
-    } else if (!checked) {
-      list = list.filter(t => t !== type);
-    }
-    this.data.pokemon[idx].types = list;
-    Core.saveDraft('pokemon', this.data.pokemon);
-  },
-
-  handlePokemonImageUpload(idx, file) {
-    if (!file || !this.data.pokemon[idx]) return;
-    const cleanName = 'poke_' + (this.data.pokemon[idx].id || (idx + 1)) + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '');
-    const relPath = 'images/pokemon/' + cleanName;
-
-    Exporter.registerUploadedImage(relPath, file);
-    this.data.pokemon[idx].image = relPath;
-    Core.saveDraft('pokemon', this.data.pokemon);
-    this.renderPokemonList();
-    Core.showToast(`圖片已設定並記錄路徑: ${relPath}`);
-  },
-
-  deletePokemon(idx) {
-    if (confirm('確定刪除此隻寶可夢資料嗎？')) {
-      this.data.pokemon.splice(idx, 1);
+  deletePokemon(rawIdx) {
+    if (confirm('確定刪除這隻寶可夢嗎？')) {
+      this.data.pokemon.splice(rawIdx, 1);
       this.renderPokemonList();
-      Core.saveDraft('pokemon', this.data.pokemon);
+      Core.saveDraft('poke', this.data.pokemon);
     }
   },
 
   /* ================= 5. Guides Section ================= */
   renderGuidesList() {
     const container = document.getElementById('admin-guides-list');
+    if (!container) return;
     container.innerHTML = '';
+
+    if (!this.data.guides || this.data.guides.length === 0) {
+      container.innerHTML = '<div style="color: var(--text-muted); padding: 1.5rem; text-align: center; border: 1px dashed var(--border-color); border-radius: var(--radius-md);">目前無任何攻略，點擊上方「＋ 新增攻略文章」建立第一篇。</div>';
+      return;
+    }
 
     this.data.guides.forEach((g, idx) => {
       const item = document.createElement('div');
@@ -403,7 +416,7 @@ const Admin = {
           </div>
           <div class="form-group">
             <label class="form-label">文章分類</label>
-            <input type="text" class="form-control" value="${escapeAttr(g.category || '新手教學')}" oninput="Admin.updateGuide(${idx}, 'category', this.value)" placeholder="例如: 新手教學 / 繁殖培育 / 伺服器特色">
+            <input type="text" class="form-control" value="${escapeAttr(g.category || '新手教學')}" oninput="Admin.updateGuide(${idx}, 'category', this.value)">
           </div>
           <div class="form-group">
             <label class="form-label">作者名稱</label>
@@ -412,20 +425,11 @@ const Admin = {
         </div>
         <div class="form-group">
           <label class="form-label">簡介摘要（卡片展示用）</label>
-          <input type="text" class="form-control" value="${escapeAttr(g.summary || '')}" oninput="Admin.updateGuide(${idx}, 'summary', this.value)" placeholder="一句話概括這篇攻略的核心重點...">
+          <input type="text" class="form-control" value="${escapeAttr(g.summary || '')}" oninput="Admin.updateGuide(${idx}, 'summary', this.value)">
         </div>
         <div class="form-group">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-            <label class="form-label" style="margin-bottom: 0;">內文 (支援插入圖片)</label>
-            <div>
-              <label class="btn btn-secondary btn-sm" style="cursor: pointer;">
-                📷 上傳並插入圖片至內文
-                <input type="file" accept="image/*" style="display: none;" onchange="Admin.insertGuideImage(${idx}, this.files[0])">
-              </label>
-            </div>
-          </div>
-          <textarea id="guide-textarea-${idx}" class="form-control" style="min-height: 160px;" oninput="Admin.updateGuide(${idx}, 'content', this.value)" placeholder="輸入攻略段落，段落之間請空一行...">${escapeAttr(g.content || '')}</textarea>
-          <div class="form-hint">提示：每段文字以空行隔開。若點擊上方按鈕插入圖片，系統會自動在游標處產生 ![圖片說明](images/guides/...) 語法。</div>
+          <label class="form-label">內文 (支援插入圖片)</label>
+          <textarea class="form-control" style="min-height: 140px;" oninput="Admin.updateGuide(${idx}, 'content', this.value)">${escapeAttr(g.content || '')}</textarea>
         </div>
       `;
       container.appendChild(item);
@@ -436,11 +440,11 @@ const Admin = {
     const today = new Date().toISOString().slice(0, 10);
     this.data.guides.push({
       title: '新攻略標題',
-      category: '新手指南',
+      category: '新手教學',
       author: '管理員',
       updatedAt: today,
-      summary: '',
-      content: '',
+      summary: '攻略大綱簡述...',
+      content: '請在此輸入攻略內文說明。',
       coverImage: ''
     });
     this.renderGuidesList();
@@ -455,29 +459,6 @@ const Admin = {
     }
   },
 
-  insertGuideImage(idx, file) {
-    if (!file || !this.data.guides[idx]) return;
-    const cleanName = 'guide_' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '');
-    const relPath = 'images/guides/' + cleanName;
-
-    Exporter.registerUploadedImage(relPath, file);
-
-    const textarea = document.getElementById(`guide-textarea-${idx}`);
-    const markdownImg = `\n\n![${file.name}](${relPath})\n\n`;
-
-    if (textarea) {
-      const pos = textarea.selectionStart || textarea.value.length;
-      const original = textarea.value;
-      textarea.value = original.slice(0, pos) + markdownImg + original.slice(pos);
-      this.data.guides[idx].content = textarea.value;
-    } else {
-      this.data.guides[idx].content = (this.data.guides[idx].content || '') + markdownImg;
-    }
-
-    Core.saveDraft('guides', this.data.guides);
-    Core.showToast(`已插入圖片語法，並已排入 images/guides 資料夾`);
-  },
-
   deleteGuide(idx) {
     if (confirm('確定刪除此篇攻略嗎？')) {
       this.data.guides.splice(idx, 1);
@@ -489,24 +470,35 @@ const Admin = {
   /* ================= 6. Donate Section ================= */
   renderDonateList() {
     const container = document.getElementById('admin-donate-list');
+    if (!container) return;
     container.innerHTML = '';
 
     const discInput = document.getElementById('donate-cfg-disclaimer');
     const contactInput = document.getElementById('donate-cfg-contact');
 
-    discInput.value = this.data.donate.disclaimer || '';
-    contactInput.value = this.data.donate.contactNote || '';
+    if (discInput) discInput.value = this.data.donate.disclaimer || '';
+    if (contactInput) contactInput.value = this.data.donate.contactNote || '';
 
-    discInput.oninput = () => {
-      this.data.donate.disclaimer = discInput.value.trim();
-      Core.saveDraft('donate', this.data.donate);
-    };
-    contactInput.oninput = () => {
-      this.data.donate.contactNote = contactInput.value.trim();
-      Core.saveDraft('donate', this.data.donate);
-    };
+    if (discInput) {
+      discInput.oninput = () => {
+        this.data.donate.disclaimer = discInput.value.trim();
+        Core.saveDraft('donate', this.data.donate);
+      };
+    }
+    if (contactInput) {
+      contactInput.oninput = () => {
+        this.data.donate.contactNote = contactInput.value.trim();
+        Core.saveDraft('donate', this.data.donate);
+      };
+    }
 
-    (this.data.donate.packages || []).forEach((pkg, idx) => {
+    const packages = this.data.donate.packages || [];
+    if (packages.length === 0) {
+      container.innerHTML = '<div style="color: var(--text-muted); padding: 1.5rem; text-align: center; border: 1px dashed var(--border-color); border-radius: var(--radius-md);">目前無任何方案，點擊上方「＋ 新增贊助方案」建立第一筆。</div>';
+      return;
+    }
+
+    packages.forEach((pkg, idx) => {
       const item = document.createElement('div');
       item.className = 'editable-item';
       item.innerHTML = `
@@ -530,11 +522,11 @@ const Admin = {
         </div>
         <div class="form-group">
           <label class="form-label">簡述說明</label>
-          <input type="text" class="form-control" value="${escapeAttr(pkg.description || '')}" oninput="Admin.updatePackage(${idx}, 'description', this.value)" placeholder="例如: 適合剛加入伺服器、希望加快起步的冒險者">
+          <input type="text" class="form-control" value="${escapeAttr(pkg.description || '')}" oninput="Admin.updatePackage(${idx}, 'description', this.value)">
         </div>
         <div class="form-group">
           <label class="form-label">特權清單 (每行一項)</label>
-          <textarea class="form-control" style="min-height: 80px;" oninput="Admin.updatePackagePerks(${idx}, this.value)" placeholder="彩色聊天稱號&#10;每日領取專屬精靈球禮包&#10;自訂傳送點 +2 個">${escapeAttr((pkg.perks || []).join('\n'))}</textarea>
+          <textarea class="form-control" style="min-height: 80px;" oninput="Admin.updatePackagePerks(${idx}, this.value)">${escapeAttr((pkg.perks || []).join('\n'))}</textarea>
         </div>
       `;
       container.appendChild(item);

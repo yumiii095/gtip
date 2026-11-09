@@ -3,8 +3,9 @@
  */
 
 const Core = {
-  // Load JSON with localStorage override capability (useful for instant live preview from Admin)
+  // Load JSON with localStorage draft override & offline INITIAL_DATABASE fallback
   async loadJSON(key, defaultPath) {
+    // 1. Check for local user-edited drafts in localStorage first
     const cached = localStorage.getItem('draft_' + key);
     if (cached) {
       try {
@@ -14,14 +15,28 @@ const Core = {
       }
     }
 
+    // 2. If running on file:// or if fetch is blocked, prioritize window.INITIAL_DATABASE
+    const isFileProtocol = window.location.protocol === 'file:';
+    if (isFileProtocol && window.INITIAL_DATABASE && window.INITIAL_DATABASE[key]) {
+      return window.INITIAL_DATABASE[key];
+    }
+
+    // 3. Attempt fetch (for Web / HTTP / HTTPS / Vercel)
     try {
       const res = await fetch(defaultPath + '?t=' + Date.now());
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return await res.json();
+      if (res.ok) {
+        return await res.json();
+      }
     } catch (err) {
-      console.warn(`Could not fetch ${defaultPath}:`, err);
-      return null;
+      // Fetch failed (e.g. offline or CORS on file://)
     }
+
+    // 4. Reliable Fallback to INITIAL_DATABASE
+    if (window.INITIAL_DATABASE && window.INITIAL_DATABASE[key]) {
+      return window.INITIAL_DATABASE[key];
+    }
+
+    return null;
   },
 
   saveDraft(key, data) {
@@ -29,7 +44,7 @@ const Core = {
   },
 
   clearDrafts() {
-    ['config', 'commands', 'pokemon', 'guides', 'donate'].forEach(k => {
+    ['config', 'announcements', 'commands', 'pokemon', 'poke', 'guides', 'donate'].forEach(k => {
       localStorage.removeItem('draft_' + k);
     });
   },

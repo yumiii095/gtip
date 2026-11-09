@@ -73,6 +73,11 @@ const Exporter = {
     zip.file('data/donate.json', JSON.stringify(currentData.donate || { packages: [] }, null, 2));
 
     try {
+      const dbRes = await fetch('data/database.js?t=' + Date.now());
+      if (dbRes.ok) zip.file('data/database.js', await dbRes.text());
+    } catch(e) {}
+
+    try {
       const pokeRes = await fetch('data/poke.json?t=' + Date.now());
       if (pokeRes.ok) zip.file('data/poke.json', await pokeRes.text());
     } catch(e) {}
@@ -133,3 +138,4 @@ const Exporter = {
     }
   }
 };
+
