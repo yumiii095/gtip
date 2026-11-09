@@ -181,7 +181,7 @@ const Admin = {
     }
   },
 
-  /* ================= 3. Commands Section (Dropdown & Clean) ================= */
+  /* ================= 3. Commands Section ================= */
   renderCommandsList() {
     const container = document.getElementById('admin-commands-list');
     if (!container) return;
@@ -192,35 +192,36 @@ const Admin = {
       return;
     }
 
-    const categories = ['常用', '領地', '個人', '傳送', '經濟'];
-
     this.data.commands.forEach((cmd, idx) => {
       const item = document.createElement('div');
       item.className = 'editable-item';
-
-      const catOptions = categories.map(c => `
-        <option value="${c}" ${(cmd.category === c) ? 'selected' : ''}>${c}</option>
-      `).join('');
-
       item.innerHTML = `
         <div class="item-toolbar">
           <span class="item-index">指令 #${idx + 1}</span>
           <button type="button" class="btn btn-danger btn-sm" onclick="Admin.deleteCommand(${idx})">刪除</button>
         </div>
         <div class="form-row">
-          <div class="form-group" style="flex: 1; max-width: 220px;">
+          <div class="form-group">
             <label class="form-label">指令名稱</label>
-            <input type="text" class="form-control" value="${escapeAttr(cmd.name || '')}" oninput="Admin.updateCommand(${idx}, 'name', this.value)" placeholder="例如: /spawn">
+            <input type="text" class="form-control" value="${escapeAttr(cmd.name || '')}" oninput="Admin.updateCommand(${idx}, 'name', this.value)" placeholder="例如: /pc">
           </div>
-          <div class="form-group" style="flex: 1; max-width: 180px;">
+          <div class="form-group">
             <label class="form-label">分類</label>
-            <select class="form-control" onchange="Admin.updateCommand(${idx}, 'category', this.value)">
-              ${catOptions}
-            </select>
+            <input type="text" class="form-control" value="${escapeAttr(cmd.category || '寶可夢')}" oninput="Admin.updateCommand(${idx}, 'category', this.value)" placeholder="例如: 寶可夢 / 常用 / 領地">
           </div>
+          <div class="form-group">
+            <label class="form-label">權限標籤</label>
+            <input type="text" class="form-control" value="${escapeAttr(cmd.permission || '玩家')}" oninput="Admin.updateCommand(${idx}, 'permission', this.value)" placeholder="例如: 玩家 / VIP / 管理員">
+          </div>
+        </div>
+        <div class="form-row">
           <div class="form-group" style="flex: 2;">
+            <label class="form-label">完整語法說明</label>
+            <input type="text" class="form-control" value="${escapeAttr(cmd.syntax || '')}" oninput="Admin.updateCommand(${idx}, 'syntax', this.value)" placeholder="例如: /pc [頁數]">
+          </div>
+          <div class="form-group" style="flex: 3;">
             <label class="form-label">功能說明</label>
-            <input type="text" class="form-control" value="${escapeAttr(cmd.description || '')}" oninput="Admin.updateCommand(${idx}, 'description', this.value)" placeholder="例如: 立刻傳送回伺服器主城重生點">
+            <input type="text" class="form-control" value="${escapeAttr(cmd.description || '')}" oninput="Admin.updateCommand(${idx}, 'description', this.value)" placeholder="例如: 隨時隨地打開個人寶可夢電腦儲存箱">
           </div>
         </div>
       `;
@@ -231,8 +232,10 @@ const Admin = {
   addCommand() {
     this.data.commands.push({
       name: '/newcmd',
-      category: '常用',
-      description: '指令功能說明'
+      category: '一般',
+      permission: '玩家',
+      syntax: '/newcmd',
+      description: '指令說明'
     });
     this.renderCommandsList();
     Core.saveDraft('commands', this.data.commands);
@@ -595,4 +598,5 @@ function escapeAttr(str) {
 document.addEventListener('DOMContentLoaded', () => {
   Admin.init();
 });
+
 

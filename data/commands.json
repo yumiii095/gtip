@@ -1,77 +1,44 @@
 ﻿[
   {
-    "name": "/spawn",
-    "category": "傳送",
-    "description": "立刻傳送回伺服器主城重生點"
-  },
-  {
-    "name": "/tpa",
-    "category": "傳送",
-    "description": "向指定玩家發送傳送請求"
-  },
-  {
-    "name": "/tpahere",
-    "category": "傳送",
-    "description": "請求指定玩家傳送到你所在的位置"
-  },
-  {
-    "name": "/sethome",
-    "category": "個人",
-    "description": "設定當前位置為個人家園傳送點"
-  },
-  {
-    "name": "/home",
-    "category": "個人",
-    "description": "快速傳送回已設定的個人家園"
-  },
-  {
     "name": "/pc",
-    "category": "常用",
+    "category": "寶可夢",
+    "permission": "玩家",
+    "syntax": "/pc",
     "description": "隨時隨地開啟個人寶可夢電腦儲存箱"
   },
   {
     "name": "/pokeheal",
-    "category": "常用",
+    "category": "寶可夢",
+    "permission": "玩家",
+    "syntax": "/pokeheal",
     "description": "治療同行所有寶可夢的體力與狀態（有冷卻時間）"
   },
   {
     "name": "/trade",
-    "category": "常用",
+    "category": "寶可夢",
+    "permission": "玩家",
+    "syntax": "/trade <玩家名稱>",
     "description": "向目標玩家發起安全的寶可夢線上交換"
   },
   {
     "name": "/battle",
-    "category": "常用",
+    "category": "寶可夢",
+    "permission": "玩家",
+    "syntax": "/battle <玩家名稱>",
     "description": "向目標玩家發起 PVP 寶可夢對戰"
+  },
+  {
+    "name": "/spawn",
+    "category": "常用",
+    "permission": "玩家",
+    "syntax": "/spawn",
+    "description": "立刻傳送回伺服器主城重生點"
   },
   {
     "name": "/res create",
     "category": "領地",
+    "permission": "玩家",
+    "syntax": "/res create <領地名稱>",
     "description": "選定範圍後創建個人專屬保護領地"
-  },
-  {
-    "name": "/res tp",
-    "category": "領地",
-    "description": "傳送到指定已建立的領地"
-  },
-  {
-    "name": "/res set",
-    "category": "領地",
-    "description": "設定領地內各項權限開關（如移動、容器、建造等）"
-  },
-  {
-    "name": "/money",
-    "category": "經濟",
-    "description": "查看目前持有的金幣與遊戲餘額"
-  },
-  {
-    "name": "/pay",
-    "category": "經濟",
-    "description": "轉帳指定金額給其他玩家"
-  },
-  {
-    "name": "/shop",
-    "category": "經濟",
-    "description": "開啟伺服器官方點數商店或收購市集"
   }
 ]
