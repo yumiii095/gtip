@@ -1,8 +1,250 @@
-﻿/**
+/**
  * Cobblemon Admin Dashboard Logic
- * High-performance, offline-first admin controller
+ * High-performance, offline-first admin controller with Direct Local File System Access API
  */
 
+/* ================= File System Access API Module ================= */
+const FS = {
+  dirHandle: null,
+  isSupported: ('showDirectoryPicker' in window),
+
+  async init() {
+    this.bindUI();
+
+    if (!this.isSupported) {
+      this.updateStatus(false, '瀏覽器不支援本機寫入（建議使用 Chrome / Edge）');
+      return;
+    }
+
+    try {
+      const storedHandle = await this.getStoredHandle();
+      if (storedHandle) {
+        this.dirHandle = storedHandle;
+        const perm = await this.dirHandle.queryPermission({ mode: 'readwrite' });
+        if (perm === 'granted') {
+          this.updateStatus(true);
+        } else {
+          this.updateStatus(false, '已記住專案資料夾，點擊按鈕授權連線');
+        }
+      } else {
+        this.updateStatus(false, '未連結本機專案資料夾');
+      }
+    } catch (e) {
+      console.warn('FS init error:', e);
+      this.updateStatus(false, '未連結本機專案資料夾');
+    }
+  },
+
+  bindUI() {
+    const connectBtn = document.getElementById('btn-fs-connect');
+    if (connectBtn) {
+      connectBtn.addEventListener('click', () => this.connect());
+    }
+
+    const syncBtn = document.getElementById('btn-fs-sync-all');
+    if (syncBtn) {
+      syncBtn.addEventListener('click', () => Admin.saveCurrent());
+    }
+  },
+
+  async openIDB() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open('CobblemonAdminDB', 1);
+      req.onupgradeneeded = () => {
+        if (!req.result.objectStoreNames.contains('handles')) {
+          req.result.createObjectStore('handles');
+        }
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  },
+
+  async storeHandle(handle) {
+    try {
+      const db = await this.openIDB();
+      const tx = db.transaction('handles', 'readwrite');
+      tx.objectStore('handles').put(handle, 'projectDir');
+    } catch (e) {
+      console.warn('Store handle error:', e);
+    }
+  },
+
+  async getStoredHandle() {
+    try {
+      const db = await this.openIDB();
+      return new Promise((resolve) => {
+        const tx = db.transaction('handles', 'readonly');
+        const req = tx.objectStore('handles').get('projectDir');
+        req.onsuccess = () => resolve(req.result || null);
+        req.onerror = () => resolve(null);
+      });
+    } catch (e) {
+      return null;
+    }
+  },
+
+  async connect() {
+    if (!this.isSupported) {
+      alert('您的瀏覽器不支援本機檔案直接寫入 API（建議使用 Google Chrome 或 Microsoft Edge）。您仍可透過「打包匯出 ZIP」下載檔案。');
+      return false;
+    }
+    try {
+      if (this.dirHandle) {
+        const perm = await this.dirHandle.requestPermission({ mode: 'readwrite' });
+        if (perm === 'granted') {
+          this.updateStatus(true);
+          Core.showToast(`✅ 已連線至資料夾: ${this.dirHandle.name}`);
+          return true;
+        }
+      }
+      this.dirHandle = await window.showDirectoryPicker({
+        mode: 'readwrite'
+      });
+      await this.storeHandle(this.dirHandle);
+      this.updateStatus(true);
+      Core.showToast(`✅ 已成功連結專案資料夾: ${this.dirHandle.name}`);
+      return true;
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        console.error('Pick directory error:', err);
+        alert('選取資料夾時發生錯誤: ' + err.message);
+      }
+      return false;
+    }
+  },
+
+  updateStatus(isConnected, note = '') {
+    const badge = document.getElementById('fs-status-badge');
+    const btn = document.getElementById('btn-fs-connect');
+    const syncBtn = document.getElementById('btn-fs-sync-all');
+
+    if (isConnected && this.dirHandle) {
+      if (badge) {
+        badge.className = 'fs-badge fs-connected';
+        badge.innerHTML = `🟢 已連結本機: <strong>${escapeAttr(this.dirHandle.name)}</strong>`;
+      }
+      if (btn) {
+        btn.textContent = '🔄 切換資料夾';
+      }
+      if (syncBtn) {
+        syncBtn.style.display = 'inline-flex';
+      }
+    } else {
+      if (badge) {
+        badge.className = 'fs-badge fs-disconnected';
+        badge.textContent = `⚪ ${note || '未連結專案資料夾 (修改僅暫存於瀏覽器)'}`;
+      }
+      if (btn) {
+        btn.textContent = '📁 連結本機專案資料夾';
+      }
+      if (syncBtn) {
+        syncBtn.style.display = 'none';
+      }
+    }
+  },
+
+  async writeFile(pathParts, content) {
+    if (!this.dirHandle) return false;
+    try {
+      let current = this.dirHandle;
+      for (let i = 0; i < pathParts.length - 1; i++) {
+        current = await current.getDirectoryHandle(pathParts[i], { create: true });
+      }
+      const filename = pathParts[pathParts.length - 1];
+      const fileHandle = await current.getFileHandle(filename, { create: true });
+      const writable = await fileHandle.createWritable();
+      await writable.write(content);
+      await writable.close();
+      return true;
+    } catch (err) {
+      console.error('Write file error:', pathParts, err);
+      return false;
+    }
+  },
+
+  async saveGuideImage(file) {
+    if (!this.dirHandle) {
+      const want = confirm('尚未連結本機專案資料夾！\n\n是否立即選取您的網站資料夾（例如 Desktop/gtip）？\n連結後圖片將會自動存入 images/guides 資料夾！');
+      if (want) {
+        const ok = await this.connect();
+        if (!ok) return null;
+      } else {
+        return null;
+      }
+    }
+
+    try {
+      const extMatch = file.name ? file.name.split('.').pop().toLowerCase() : 'png';
+      const ext = ['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(extMatch) ? extMatch : 'png';
+      const filename = `guide_${Date.now()}.${ext}`;
+      const pathParts = ['images', 'guides', filename];
+
+      const ok = await this.writeFile(pathParts, file);
+      if (ok) {
+        return `images/guides/${filename}`;
+      }
+      return null;
+    } catch (err) {
+      console.error('Save guide image error:', err);
+      alert('儲存圖片至本機時失敗: ' + err.message);
+      return null;
+    }
+  },
+
+  async syncAll(data) {
+    if (!this.dirHandle) {
+      const want = confirm('尚未連結本機專案資料夾！\n\n點擊「確定」選取您的專案資料夾 (Desktop/gtip)，即可直接將變更寫入硬碟檔案。');
+      if (want) {
+        const ok = await this.connect();
+        if (!ok) return false;
+      } else {
+        return false;
+      }
+    }
+
+    try {
+      Core.showToast('⏳ 正在同步寫入檔案至硬碟...');
+
+      // 1. config.json
+      await this.writeFile(['data', 'config.json'], JSON.stringify(data.config || {}, null, 2));
+      // 2. announcements.json
+      await this.writeFile(['data', 'announcements.json'], JSON.stringify(data.announcements || [], null, 2));
+      // 3. commands.json
+      await this.writeFile(['data', 'commands.json'], JSON.stringify(data.commands || [], null, 2));
+      // 4. guides.json
+      await this.writeFile(['data', 'guides.json'], JSON.stringify(data.guides || [], null, 2));
+      // 5. donate.json
+      await this.writeFile(['data', 'donate.json'], JSON.stringify(data.donate || {}, null, 2));
+
+      // 6. poke.json
+      if (data.pokemon && data.pokemon.length > 0) {
+        await this.writeFile(['data', 'poke.json'], JSON.stringify(data.pokemon, null, 2));
+      }
+
+      // 7. database.js (Offline bundled cache)
+      const dbContent = '// Auto-generated offline database cache\n' +
+        'window.INITIAL_DATABASE = {\n' +
+        '  config: ' + JSON.stringify(data.config || {}, null, 2) + ',\n' +
+        '  announcements: ' + JSON.stringify(data.announcements || [], null, 2) + ',\n' +
+        '  commands: ' + JSON.stringify(data.commands || [], null, 2) + ',\n' +
+        '  guides: ' + JSON.stringify(data.guides || [], null, 2) + ',\n' +
+        '  donate: ' + JSON.stringify(data.donate || {}, null, 2) + ',\n' +
+        '  poke: ' + JSON.stringify(data.pokemon || []) + '\n' +
+        '};\n';
+      await this.writeFile(['data', 'database.js'], dbContent);
+
+      Core.showToast('🎉 資料已成功同步寫入本機硬碟檔案！');
+      return true;
+    } catch (err) {
+      console.error('syncAll error:', err);
+      alert('寫入檔案時發生錯誤: ' + err.message);
+      return false;
+    }
+  }
+};
+
+/* ================= Main Admin Controller ================= */
 const Admin = {
   data: {
     config: {},
@@ -20,7 +262,13 @@ const Admin = {
   async init() {
     this.setupTabs();
 
-    // 1. Load initial data (supports local file:// via INITIAL_DATABASE)
+    // Clear stale drafts from previous mock data session
+    if (localStorage.getItem('admin_draft_cleaned_v2') !== 'done') {
+      Core.clearDrafts();
+      localStorage.setItem('admin_draft_cleaned_v2', 'done');
+    }
+
+    // 1. Load initial data
     this.data.config = await Core.loadJSON('config', 'data/config.json') || {};
     this.data.announcements = await Core.loadJSON('announcements', 'data/announcements.json') || [];
     this.data.commands = await Core.loadJSON('commands', 'data/commands.json') || [];
@@ -43,6 +291,9 @@ const Admin = {
     this.renderGuidesList();
     this.renderDonateList();
     this.setupExportActions();
+
+    // 3. Initialize File System Access handler
+    await FS.init();
   },
 
   setupTabs() {
@@ -59,6 +310,11 @@ const Admin = {
     });
   },
 
+  async saveCurrent() {
+    this.syncConfig();
+    await FS.syncAll(this.data);
+  },
+
   /* ================= 1. Config Section ================= */
   renderConfigForm() {
     const c = this.data.config || {};
@@ -68,14 +324,10 @@ const Admin = {
     };
 
     setVal('cfg-serverName', c.serverName);
-    setVal('cfg-serverIp', c.serverIp);
-    setVal('cfg-serverPort', c.serverPort || '25565');
-    setVal('cfg-version', c.version);
-    setVal('cfg-discordUrl', c.discordUrl);
     setVal('cfg-tagline', c.tagline);
     setVal('cfg-description', c.description);
 
-    ['cfg-serverName', 'cfg-serverIp', 'cfg-serverPort', 'cfg-version', 'cfg-discordUrl', 'cfg-tagline', 'cfg-description'].forEach(id => {
+    ['cfg-serverName', 'cfg-tagline', 'cfg-description'].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
         el.oninput = () => this.syncConfig();
@@ -89,13 +341,11 @@ const Admin = {
       return el ? el.value.trim() : '';
     };
 
-    this.data.config.serverName = getVal('cfg-serverName');
-    this.data.config.serverIp = getVal('cfg-serverIp');
-    this.data.config.serverPort = getVal('cfg-serverPort');
-    this.data.config.version = getVal('cfg-version');
-    this.data.config.discordUrl = getVal('cfg-discordUrl');
-    this.data.config.tagline = getVal('cfg-tagline');
-    this.data.config.description = getVal('cfg-description');
+    this.data.config = {
+      serverName: getVal('cfg-serverName') || 'Cobblemon 伺服器',
+      tagline: getVal('cfg-tagline'),
+      description: getVal('cfg-description')
+    };
     Core.saveDraft('config', this.data.config);
   },
 
@@ -129,23 +379,21 @@ const Admin = {
               <option value="重要" ${a.category === '重要' ? 'selected' : ''}>重要</option>
               <option value="更新" ${a.category === '更新' ? 'selected' : ''}>更新</option>
               <option value="活動" ${a.category === '活動' ? 'selected' : ''}>活動</option>
-              <option value="維護" ${a.category === '維護' ? 'selected' : ''}>維護</option>
-              <option value="一般" ${a.category === '一般' ? 'selected' : ''}>一般</option>
+              <option value="公告" ${a.category === '公告' ? 'selected' : ''}>公告</option>
             </select>
           </div>
           <div class="form-group" style="max-width: 160px;">
             <label class="form-label">發布日期</label>
-            <input type="date" class="form-control" value="${escapeAttr(a.date || '')}" oninput="Admin.updateAnnouncement(${idx}, 'date', this.value)">
-          </div>
-          <div class="form-group" style="max-width: 110px; display: flex; flex-direction: column; justify-content: flex-end;">
-            <label style="display: flex; align-items: center; gap: 4px; font-weight: 700; font-size: 0.85rem; margin-bottom: 0.75rem; cursor: pointer;">
-              <input type="checkbox" ${a.pinned ? 'checked' : ''} onchange="Admin.updateAnnouncement(${idx}, 'pinned', this.checked)"> 📌 置頂
-            </label>
+            <input type="date" class="form-control" value="${escapeAttr(a.date || '')}" onchange="Admin.updateAnnouncement(${idx}, 'date', this.value)">
           </div>
         </div>
         <div class="form-group">
           <label class="form-label">公告內容</label>
-          <textarea class="form-control" style="min-height: 80px;" oninput="Admin.updateAnnouncement(${idx}, 'content', this.value)" placeholder="輸入公告內容說明...">${escapeAttr(a.content || '')}</textarea>
+          <textarea class="form-control" style="min-height: 80px;" oninput="Admin.updateAnnouncement(${idx}, 'content', this.value)">${escapeAttr(a.content || '')}</textarea>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+          <input type="checkbox" id="ann-pin-${idx}" ${a.pinned ? 'checked' : ''} onchange="Admin.updateAnnouncement(${idx}, 'pinned', this.checked)">
+          <label for="ann-pin-${idx}" style="font-size: 0.88rem; font-weight: 700; cursor: pointer; color: var(--accent-red);">📌 置頂於首頁最上方</label>
         </div>
       `;
       container.appendChild(item);
@@ -155,15 +403,15 @@ const Admin = {
   addAnnouncement() {
     const today = new Date().toISOString().slice(0, 10);
     this.data.announcements.unshift({
-      title: '全新公告標題',
-      category: '更新',
+      title: '新公告標題',
+      category: '重要',
       date: today,
       pinned: false,
-      content: '請在此輸入詳細公告說明內容。'
+      content: '請在此輸入公告詳細內容說明。'
     });
     this.renderAnnouncementsList();
     Core.saveDraft('announcements', this.data.announcements);
-    Core.showToast('已新增一則最新公告');
+    Core.showToast('已新增一則公告');
   },
 
   updateAnnouncement(idx, field, val) {
@@ -192,7 +440,7 @@ const Admin = {
       return;
     }
 
-    this.data.commands.forEach((cmd, idx) => {
+    this.data.commands.forEach((c, idx) => {
       const item = document.createElement('div');
       item.className = 'editable-item';
       item.innerHTML = `
@@ -201,28 +449,26 @@ const Admin = {
           <button type="button" class="btn btn-danger btn-sm" onclick="Admin.deleteCommand(${idx})">刪除</button>
         </div>
         <div class="form-row">
-          <div class="form-group">
+          <div class="form-group" style="flex: 1.5;">
             <label class="form-label">指令名稱</label>
-            <input type="text" class="form-control" value="${escapeAttr(cmd.name || '')}" oninput="Admin.updateCommand(${idx}, 'name', this.value)" placeholder="例如: /pc">
+            <input type="text" class="form-control" value="${escapeAttr(c.name || '')}" oninput="Admin.updateCommand(${idx}, 'name', this.value)" placeholder="例如: /pc">
           </div>
-          <div class="form-group">
-            <label class="form-label">分類</label>
-            <input type="text" class="form-control" value="${escapeAttr(cmd.category || '寶可夢')}" oninput="Admin.updateCommand(${idx}, 'category', this.value)" placeholder="例如: 寶可夢 / 常用 / 領地">
+          <div class="form-group" style="flex: 1;">
+            <label class="form-label">分類名稱</label>
+            <input type="text" class="form-control" value="${escapeAttr(c.category || '常用')}" oninput="Admin.updateCommand(${idx}, 'category', this.value)" placeholder="例如: 常用 / 領地 / 寶可夢 / 經濟">
           </div>
-          <div class="form-group">
-            <label class="form-label">權限標籤</label>
-            <input type="text" class="form-control" value="${escapeAttr(cmd.permission || '玩家')}" oninput="Admin.updateCommand(${idx}, 'permission', this.value)" placeholder="例如: 玩家 / VIP / 管理員">
+          <div class="form-group" style="max-width: 140px;">
+            <label class="form-label">使用權限</label>
+            <input type="text" class="form-control" value="${escapeAttr(c.permission || '玩家')}" oninput="Admin.updateCommand(${idx}, 'permission', this.value)">
           </div>
         </div>
-        <div class="form-row">
-          <div class="form-group" style="flex: 2;">
-            <label class="form-label">完整語法說明</label>
-            <input type="text" class="form-control" value="${escapeAttr(cmd.syntax || '')}" oninput="Admin.updateCommand(${idx}, 'syntax', this.value)" placeholder="例如: /pc [頁數]">
-          </div>
-          <div class="form-group" style="flex: 3;">
-            <label class="form-label">功能說明</label>
-            <input type="text" class="form-control" value="${escapeAttr(cmd.description || '')}" oninput="Admin.updateCommand(${idx}, 'description', this.value)" placeholder="例如: 隨時隨地打開個人寶可夢電腦儲存箱">
-          </div>
+        <div class="form-group">
+          <label class="form-label">完整語法</label>
+          <input type="text" class="form-control" value="${escapeAttr(c.syntax || '')}" oninput="Admin.updateCommand(${idx}, 'syntax', this.value)" placeholder="例如: /trade <玩家名稱>">
+        </div>
+        <div class="form-group">
+          <label class="form-label">功能說明</label>
+          <input type="text" class="form-control" value="${escapeAttr(c.description || '')}" oninput="Admin.updateCommand(${idx}, 'description', this.value)" placeholder="詳細說明此指令的用途與效果">
         </div>
       `;
       container.appendChild(item);
@@ -232,14 +478,14 @@ const Admin = {
   addCommand() {
     this.data.commands.push({
       name: '/newcmd',
-      category: '一般',
+      category: '常用',
       permission: '玩家',
       syntax: '/newcmd',
       description: '指令說明'
     });
     this.renderCommandsList();
     Core.saveDraft('commands', this.data.commands);
-    Core.showToast('已新增一筆指令');
+    Core.showToast('已新增一個指令');
   },
 
   updateCommand(idx, field, val) {
@@ -257,7 +503,7 @@ const Admin = {
     }
   },
 
-  /* ================= 4. Pokédex Section (High Performance) ================= */
+  /* ================= 4. Pokédex Section ================= */
   renderPokemonList() {
     const container = document.getElementById('admin-pokemon-list');
     if (!container) return;
@@ -342,7 +588,6 @@ const Admin = {
         this.pokePage = 1;
         this.renderPokemonList();
       });
-      // Restore cursor position if re-rendering
       sInput.focus();
       sInput.setSelectionRange(sInput.value.length, sInput.value.length);
     }
@@ -390,81 +635,450 @@ const Admin = {
     }
   },
 
-  /* ================= 5. Guides Section ================= */
+  /* ================= 5. Guides Section with Multi-Step Modal & Word Formatting ================= */
+  currentGuideIdx: null,
+  guideModalStep: 1,
+
   renderGuidesList() {
     const container = document.getElementById('admin-guides-list');
     if (!container) return;
     container.innerHTML = '';
 
     if (!this.data.guides || this.data.guides.length === 0) {
-      container.innerHTML = '<div style="color: var(--text-muted); padding: 1.5rem; text-align: center; border: 1px dashed var(--border-color); border-radius: var(--radius-md);">目前無任何攻略，點擊上方「＋ 新增攻略文章」建立第一篇。</div>';
+      container.innerHTML = '<div style="color: var(--text-muted); padding: 1.5rem; text-align: center; border: 1px dashed var(--border-color); border-radius: var(--radius-md);">目前無任何攻略，點擊上方「＋ 新增攻略文章」開啟兩步驟引導編輯。</div>';
       return;
     }
 
     this.data.guides.forEach((g, idx) => {
       const item = document.createElement('div');
       item.className = 'editable-item';
+      item.style.display = 'flex';
+      item.style.justifyContent = 'space-between';
+      item.style.alignItems = 'center';
+      item.style.gap = '1rem';
+      item.style.flexWrap = 'wrap';
       item.innerHTML = `
-        <div class="item-toolbar">
-          <span class="item-index">攻略篇章 #${idx + 1}</span>
-          <button type="button" class="btn btn-danger btn-sm" onclick="Admin.deleteGuide(${idx})">刪除</button>
-        </div>
-        <div class="form-row">
-          <div class="form-group" style="flex: 2;">
-            <label class="form-label">攻略標題</label>
-            <input type="text" class="form-control" value="${escapeAttr(g.title || '')}" oninput="Admin.updateGuide(${idx}, 'title', this.value)" placeholder="例如: Cobblemon 新手起步與精靈球製作">
+        <div style="flex: 1; min-width: 260px;">
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <span style="font-size: 0.75rem; background: var(--primary-light); color: var(--primary-text); padding: 2px 8px; border-radius: var(--radius-sm); font-weight: 700;">${escapeAttr(g.category || '新手教學')}</span>
+            <strong style="font-size: 1.1rem; color: var(--text-main);">${escapeAttr(g.title || '未命名攻略')}</strong>
           </div>
-          <div class="form-group">
-            <label class="form-label">文章分類</label>
-            <input type="text" class="form-control" value="${escapeAttr(g.category || '新手教學')}" oninput="Admin.updateGuide(${idx}, 'category', this.value)">
+          <div style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.35rem;">
+            ${escapeAttr(g.summary || '（暫無簡介摘要）')}
           </div>
-          <div class="form-group">
-            <label class="form-label">作者名稱</label>
-            <input type="text" class="form-control" value="${escapeAttr(g.author || '管理員')}" oninput="Admin.updateGuide(${idx}, 'author', this.value)">
+          <div style="font-size: 0.8rem; color: var(--text-light);">
+            作者: ${escapeAttr(g.author || '管理員')} ｜ 最後更新: ${escapeAttr(g.updatedAt || '剛剛')}
           </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">簡介摘要（卡片展示用）</label>
-          <input type="text" class="form-control" value="${escapeAttr(g.summary || '')}" oninput="Admin.updateGuide(${idx}, 'summary', this.value)">
-        </div>
-        <div class="form-group">
-          <label class="form-label">內文 (支援插入圖片)</label>
-          <textarea class="form-control" style="min-height: 140px;" oninput="Admin.updateGuide(${idx}, 'content', this.value)">${escapeAttr(g.content || '')}</textarea>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="Admin.openGuideModal(${idx})">✏️ 編輯文章</button>
+          <button type="button" class="btn btn-danger btn-sm" onclick="Admin.deleteGuide(${idx})">🗑️ 刪除</button>
         </div>
       `;
       container.appendChild(item);
     });
   },
 
-  addGuide() {
-    const today = new Date().toISOString().slice(0, 10);
-    this.data.guides.push({
-      title: '新攻略標題',
-      category: '新手教學',
-      author: '管理員',
-      updatedAt: today,
-      summary: '攻略大綱簡述...',
-      content: '請在此輸入攻略內文說明。',
-      coverImage: ''
-    });
-    this.renderGuidesList();
-    Core.saveDraft('guides', this.data.guides);
-    Core.showToast('已新增一篇攻略草稿');
+  openGuideModal(idx = null) {
+    this.currentGuideIdx = idx;
+    this.guideModalStep = 1;
+
+    const modalTitle = document.getElementById('modal-guide-header-title');
+    const inputTitle = document.getElementById('modal-input-title');
+    const inputCat = document.getElementById('modal-input-category');
+    const inputAuthor = document.getElementById('modal-input-author');
+    const inputSummary = document.getElementById('modal-input-summary');
+    const editor = document.getElementById('modal-guide-visual-editor');
+
+    if (idx !== null && this.data.guides[idx]) {
+      const g = this.data.guides[idx];
+      if (modalTitle) modalTitle.textContent = `✏️ 編輯攻略文章`;
+      if (inputTitle) inputTitle.value = g.title || '';
+      if (inputCat) inputCat.value = g.category || '新手教學';
+      if (inputAuthor) inputAuthor.value = g.author || '管理員';
+      if (inputSummary) inputSummary.value = g.summary || '';
+      if (editor) editor.innerHTML = this.convertMarkdownToHTML(g.content || '');
+    } else {
+      if (modalTitle) modalTitle.textContent = '📖 新增攻略文章';
+      if (inputTitle) inputTitle.value = '';
+      if (inputCat) inputCat.value = '新手教學';
+      if (inputAuthor) inputAuthor.value = '管理員';
+      if (inputSummary) inputSummary.value = '';
+      if (editor) editor.innerHTML = '';
+    }
+
+    this.switchGuideTab('write');
+    this.showGuideStep(1);
+
+    const overlay = document.getElementById('guide-modal-overlay');
+    if (overlay) overlay.style.display = 'flex';
+
+    this.setupVisualEditorEvents();
   },
 
-  updateGuide(idx, field, val) {
-    if (this.data.guides[idx]) {
-      this.data.guides[idx][field] = val;
-      Core.saveDraft('guides', this.data.guides);
+  closeGuideModal() {
+    const overlay = document.getElementById('guide-modal-overlay');
+    if (overlay) overlay.style.display = 'none';
+  },
+
+  showGuideStep(step) {
+    this.guideModalStep = step;
+    const step1El = document.getElementById('modal-guide-step-1');
+    const step2El = document.getElementById('modal-guide-step-2');
+    const badge1 = document.getElementById('modal-step-badge-1');
+    const badge2 = document.getElementById('modal-step-badge-2');
+    const btnCancel = document.getElementById('btn-modal-cancel');
+    const btnPrev = document.getElementById('btn-modal-prev');
+    const btnNext = document.getElementById('btn-modal-next');
+    const btnSubmit = document.getElementById('btn-modal-submit');
+
+    if (step === 1) {
+      if (step1El) step1El.style.display = 'block';
+      if (step2El) step2El.style.display = 'none';
+      if (badge1) badge1.className = 'step-item active';
+      if (badge2) badge2.className = 'step-item';
+      if (btnCancel) btnCancel.style.display = 'inline-block';
+      if (btnPrev) btnPrev.style.display = 'none';
+      if (btnNext) btnNext.style.display = 'inline-block';
+      if (btnSubmit) btnSubmit.style.display = 'none';
+    } else {
+      if (step1El) step1El.style.display = 'none';
+      if (step2El) step2El.style.display = 'block';
+      if (badge1) badge1.className = 'step-item';
+      if (badge2) badge2.className = 'step-item active';
+      if (btnCancel) btnCancel.style.display = 'none';
+      if (btnPrev) btnPrev.style.display = 'inline-block';
+      if (btnNext) btnNext.style.display = 'none';
+      if (btnSubmit) btnSubmit.style.display = 'inline-block';
+
+      // Update Top Review Summary Box
+      const titleVal = document.getElementById('modal-input-title').value.trim() || '未命名攻略';
+      const catVal = document.getElementById('modal-input-category').value.trim() || '新手教學';
+      const authorVal = document.getElementById('modal-input-author').value.trim() || '管理員';
+      const summaryVal = document.getElementById('modal-input-summary').value.trim() || '（無簡介摘要）';
+
+      document.getElementById('review-guide-title').textContent = titleVal;
+      document.getElementById('review-guide-category').textContent = catVal;
+      document.getElementById('review-guide-author').textContent = `作者: ${authorVal}`;
+      document.getElementById('review-guide-summary').textContent = summaryVal;
+
+      this.switchGuideTab('write');
+    }
+  },
+
+  previewSubTab: 'reader',
+
+  switchGuideTab(tab) {
+    const btnWrite = document.getElementById('btn-tab-write');
+    const btnPreview = document.getElementById('btn-tab-preview');
+    const toolbarBox = document.getElementById('modal-word-toolbar-box');
+    const previewPane = document.getElementById('modal-guide-live-preview');
+
+    if (tab === 'write') {
+      if (btnWrite) btnWrite.classList.add('active');
+      if (btnPreview) btnPreview.classList.remove('active');
+      if (toolbarBox) toolbarBox.style.display = 'block';
+      if (previewPane) previewPane.style.display = 'none';
+    } else {
+      if (btnWrite) btnWrite.classList.remove('active');
+      if (btnPreview) btnPreview.classList.add('active');
+      if (toolbarBox) toolbarBox.style.display = 'none';
+      if (previewPane) {
+        previewPane.style.display = 'block';
+        this.renderMockPreview();
+      }
+    }
+  },
+
+  renderMockPreview(viewMode = null) {
+    if (viewMode) this.previewSubTab = viewMode;
+    const previewPane = document.getElementById('modal-guide-live-preview');
+    const editor = document.getElementById('modal-guide-visual-editor');
+    if (!previewPane) return;
+
+    const titleVal = document.getElementById('modal-input-title').value.trim() || '未命名攻略文章';
+    const catVal = document.getElementById('modal-input-category').value.trim() || '新手教學';
+    const authorVal = document.getElementById('modal-input-author').value.trim() || '管理員';
+    const summaryVal = document.getElementById('modal-input-summary').value.trim() || '（此文章尚無簡介摘要說明）';
+    const today = new Date().toISOString().slice(0, 10);
+    const contentHTML = editor ? editor.innerHTML : '';
+
+    const isReader = this.previewSubTab === 'reader';
+
+    previewPane.innerHTML = `
+      <div class="frontend-mock-wrapper">
+        <!-- Mock Browser Bar -->
+        <div class="frontend-mock-topbar">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="frontend-mock-dots">
+              <span class="mock-dot-red"></span>
+              <span class="mock-dot-yellow"></span>
+              <span class="mock-dot-green"></span>
+            </div>
+            <span style="font-family: var(--font-mono); font-size: 0.78rem; color: #64748b; background: #fff; padding: 2px 10px; border-radius: 4px; border: 1px solid #cbd5e1;">
+              🌐 模擬前端視窗: guides.html
+            </span>
+          </div>
+          <!-- View Toggle Pills -->
+          <div style="display: flex; gap: 4px;">
+            <button type="button" class="btn btn-sm ${isReader ? 'btn-primary' : 'btn-secondary'}" style="font-size: 0.75rem; padding: 2px 8px;" onclick="Admin.renderMockPreview('reader')">
+              📖 點開後文章閱讀頁
+            </button>
+            <button type="button" class="btn btn-sm ${!isReader ? 'btn-primary' : 'btn-secondary'}" style="font-size: 0.75rem; padding: 2px 8px;" onclick="Admin.renderMockPreview('card')">
+              🗂️ 前台清單卡片樣式
+            </button>
+          </div>
+        </div>
+
+        <!-- Mock Content Screen -->
+        <div class="frontend-mock-content">
+          ${isReader ? `
+            <!-- 1:1 Simulation of guides.html reader card -->
+            <div class="mock-guide-reader">
+              <button type="button" class="btn btn-secondary btn-sm" style="margin-bottom: 1.5rem; pointer-events: none; opacity: 0.85;">
+                ← 返回攻略清單
+              </button>
+              <div style="margin-bottom: 0.5rem;">
+                <span style="font-size: 0.75rem; background: var(--primary-light); color: var(--primary-text); display: inline-block; padding: 2px 10px; border-radius: var(--radius-sm); font-weight: 700;">
+                  ${escapeAttr(catVal)}
+                </span>
+              </div>
+              <h1>${escapeAttr(titleVal)}</h1>
+              <div class="mock-guide-meta">
+                <span>${escapeAttr(catVal)}</span>
+                <span>•</span>
+                <span>作者: ${escapeAttr(authorVal)}</span>
+                <span>•</span>
+                <span>更新於: ${today}</span>
+              </div>
+              <div class="mock-guide-body">
+                ${contentHTML || '<p style="color: var(--text-muted); font-style: italic;">（目前無內文，請回到編輯分頁輸入文字）</p>'}
+              </div>
+            </div>
+          ` : `
+            <!-- 1:1 Simulation of guides.html listing card -->
+            <div style="max-width: 340px; margin: 1.5rem auto;">
+              <div style="font-size: 0.82rem; color: var(--text-muted); text-align: center; margin-bottom: 0.5rem; font-weight: 700;">
+                👇 玩家在「攻略專區」清單中看到的卡片外觀
+              </div>
+              <div class="card" style="padding: 1.5rem; border: 1px solid var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); background: #ffffff; cursor: default;">
+                <div style="font-size: 0.75rem; background: var(--primary-light); color: var(--primary-text); display: inline-block; padding: 2px 8px; border-radius: var(--radius-sm); font-weight: 700; margin-bottom: 0.5rem;">
+                  ${escapeAttr(catVal)}
+                </div>
+                <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--text-main); line-height: 1.4;">${escapeAttr(titleVal)}</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.55; margin-bottom: 1rem;">
+                  ${escapeAttr(summaryVal)}
+                </p>
+                <div style="font-size: 0.8rem; color: var(--text-light); display: flex; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
+                  <span>作者: ${escapeAttr(authorVal)}</span>
+                  <span>${today}</span>
+                </div>
+              </div>
+            </div>
+          `}
+        </div>
+      </div>
+    `;
+  },
+
+  guideNextStep() {
+    const title = document.getElementById('modal-input-title').value.trim();
+    if (!title) {
+      alert('請先輸入攻略標題！');
+      document.getElementById('modal-input-title').focus();
+      return;
+    }
+    this.showGuideStep(2);
+  },
+
+  guidePrevStep() {
+    this.showGuideStep(1);
+  },
+
+  async submitGuideModal() {
+    const title = document.getElementById('modal-input-title').value.trim();
+    if (!title) {
+      alert('攻略標題不能為空！');
+      this.showGuideStep(1);
+      return;
+    }
+
+    const category = document.getElementById('modal-input-category').value.trim() || '新手教學';
+    const author = document.getElementById('modal-input-author').value.trim() || '管理員';
+    const summary = document.getElementById('modal-input-summary').value.trim();
+    const editor = document.getElementById('modal-guide-visual-editor');
+    const content = editor ? editor.innerHTML : '';
+    const today = new Date().toISOString().slice(0, 10);
+
+    const guideObj = {
+      title,
+      category,
+      author,
+      updatedAt: today,
+      summary,
+      content,
+      coverImage: ''
+    };
+
+    if (this.currentGuideIdx !== null && this.data.guides[this.currentGuideIdx]) {
+      this.data.guides[this.currentGuideIdx] = guideObj;
+      Core.showToast(`✅ 已更新攻略「${title}」`);
+    } else {
+      if (!this.data.guides) this.data.guides = [];
+      this.data.guides.unshift(guideObj);
+      Core.showToast(`✅ 已成功新增攻略「${title}」`);
+    }
+
+    Core.saveDraft('guides', this.data.guides);
+    this.renderGuidesList();
+    this.closeGuideModal();
+
+    // Auto-sync to disk if folder is connected
+    if (FS.dirHandle) {
+      await FS.writeFile(['data', 'guides.json'], JSON.stringify(this.data.guides, null, 2));
+      await FS.syncAll(this.data);
     }
   },
 
   deleteGuide(idx) {
-    if (confirm('確定刪除此篇攻略嗎？')) {
+    if (confirm('確定刪除這篇攻略文章嗎？')) {
       this.data.guides.splice(idx, 1);
       this.renderGuidesList();
       Core.saveDraft('guides', this.data.guides);
+      if (FS.dirHandle) {
+        FS.syncAll(this.data);
+      }
     }
+  },
+
+  /* True WYSIWYG Formatting Actions */
+  applyWordFormat(type) {
+    const editor = document.getElementById('modal-guide-visual-editor');
+    if (!editor) return;
+    editor.focus();
+
+    switch (type) {
+      case 'bold':
+        document.execCommand('bold', false, null);
+        break;
+      case 'italic':
+        document.execCommand('italic', false, null);
+        break;
+      case 'h2':
+        document.execCommand('formatBlock', false, '<h2>');
+        break;
+      case 'h3':
+        document.execCommand('formatBlock', false, '<h3>');
+        break;
+      case 'list':
+        document.execCommand('insertUnorderedList', false, null);
+        break;
+    }
+  },
+
+  applyTextColor(colorHex) {
+    const editor = document.getElementById('modal-guide-visual-editor');
+    if (!editor) return;
+    editor.focus();
+    document.execCommand('foreColor', false, colorHex);
+  },
+
+  applyHighlight(colorHex) {
+    const editor = document.getElementById('modal-guide-visual-editor');
+    if (!editor) return;
+    editor.focus();
+
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0 && !sel.isCollapsed) {
+      const range = sel.getRangeAt(0);
+      const mark = document.createElement('mark');
+      mark.style.backgroundColor = colorHex;
+      mark.style.padding = '2px 5px';
+      mark.style.borderRadius = '4px';
+      mark.style.fontWeight = '600';
+      mark.appendChild(range.extractContents());
+      range.insertNode(mark);
+      sel.removeAllRanges();
+    } else {
+      document.execCommand('hiliteColor', false, colorHex);
+    }
+  },
+
+  setupVisualEditorEvents() {
+    const editor = document.getElementById('modal-guide-visual-editor');
+    if (!editor || editor._hasVisualEvents) return;
+    editor._hasVisualEvents = true;
+
+    editor.addEventListener('paste', async (e) => {
+      const clipboardData = e.clipboardData || window.clipboardData;
+      if (!clipboardData) return;
+      const items = clipboardData.items;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+          e.preventDefault();
+          const file = items[i].getAsFile();
+          if (file) {
+            await Admin.handleModalGuideImageUpload(file);
+          }
+          break;
+        }
+      }
+    });
+
+    editor.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      editor.style.borderColor = 'var(--primary)';
+    });
+    editor.addEventListener('dragleave', () => {
+      editor.style.borderColor = '';
+    });
+    editor.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      editor.style.borderColor = '';
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        const file = e.dataTransfer.files[0];
+        if (file.type.startsWith('image/')) {
+          await Admin.handleModalGuideImageUpload(file);
+        }
+      }
+    });
+  },
+
+  async handleModalImageFile(inputEl) {
+    if (inputEl.files && inputEl.files[0]) {
+      await this.handleModalGuideImageUpload(inputEl.files[0]);
+      inputEl.value = '';
+    }
+  },
+
+  async handleModalGuideImageUpload(file) {
+    Core.showToast('⏳ 正在儲存圖片至本機 images/guides/ ...');
+    const relPath = await FS.saveGuideImage(file);
+    if (!relPath) return;
+
+    const editor = document.getElementById('modal-guide-visual-editor');
+    if (editor) {
+      editor.focus();
+      const imgHTML = `<p><img src="${relPath}" alt="圖片" style="max-width: 100%; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin: 8px 0;"></p><p><br></p>`;
+      document.execCommand('insertHTML', false, imgHTML);
+      Core.showToast(`✅ 圖片已存入 ${relPath} 並即時顯示於編輯框！`);
+    }
+  },
+
+  convertMarkdownToHTML(text) {
+    if (!text) return '';
+    if (/<[a-z][\s\S]*>/i.test(text)) return text;
+    return text.split(/\n\n+/).map(p => {
+      const t = p.trim();
+      const img = t.match(/^!\[(.*?)\]\((.*?)\)$/);
+      if (img) return `<p><img src="${img[2]}" alt="${img[1]}" style="max-width: 100%; border-radius: 8px;"></p>`;
+      if (t.startsWith('## ')) return `<h2>${t.slice(3)}</h2>`;
+      if (t.startsWith('### ')) return `<h3>${t.slice(4)}</h3>`;
+      if (t.split('\n').every(l => l.trim().startsWith('- '))) {
+        return `<ul>${t.split('\n').map(l => `<li>${l.trim().slice(2)}</li>`).join('')}</ul>`;
+      }
+      return `<p>${t.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/\n/g, '<br>')}</p>`;
+    }).join('');
   },
 
   /* ================= 6. Donate Section ================= */
@@ -494,7 +1108,7 @@ const Admin = {
 
     const packages = this.data.donate.packages || [];
     if (packages.length === 0) {
-      container.innerHTML = '<div style="color: var(--text-muted); padding: 1.5rem; text-align: center; border: 1px dashed var(--border-color); border-radius: var(--radius-md);">目前無任何方案，點擊上方「＋ 新增贊助方案」建立第一筆。</div>';
+      container.innerHTML = '<div style="color: var(--text-muted); padding: 1.5rem; text-align: center; border: 1px dashed var(--border-color); border-radius: var(--radius-md);">目前無任何贊助方案，點擊上方「＋ 新增贊助方案」建立第一筆。</div>';
       return;
     }
 
@@ -598,5 +1212,3 @@ function escapeAttr(str) {
 document.addEventListener('DOMContentLoaded', () => {
   Admin.init();
 });
-
-

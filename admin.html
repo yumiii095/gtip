@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
@@ -42,6 +42,18 @@
       </div>
     </div>
 
+    <!-- Local File Sync Bar -->
+    <div class="fs-sync-bar">
+      <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+        <span id="fs-status-badge" class="fs-badge fs-disconnected">⚪ 未連結本機專案資料夾</span>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">（連結資料夾後，編輯中心所有改動與圖片上傳將直接寫入本機硬碟檔案）</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+        <button id="btn-fs-connect" type="button" class="btn btn-secondary btn-sm">📁 連結本機專案資料夾</button>
+        <button id="btn-fs-sync-all" type="button" class="btn btn-primary btn-sm" style="display: none;">💾 同步寫入本機檔案</button>
+      </div>
+    </div>
+
     <!-- Admin Layout -->
     <div class="admin-layout">
       
@@ -74,51 +86,33 @@
       <section id="panel-config" class="admin-panel active">
         <div class="panel-header">
           <h2 class="panel-title">伺服器基本參數設定</h2>
+          <button type="button" class="btn btn-success btn-sm" onclick="Admin.saveCurrent()">💾 儲存寫入檔案</button>
         </div>
         
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">伺服器名稱</label>
-            <input type="text" id="cfg-serverName" class="form-control">
-          </div>
-          <div class="form-group">
-            <label class="form-label">遊戲版本</label>
-            <input type="text" id="cfg-version" class="form-control" placeholder="例如: 1.20.1 / Cobblemon 1.5">
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">連線 IP 網址</label>
-            <input type="text" id="cfg-serverIp" class="form-control" placeholder="例如: play.your-server.com">
-          </div>
-          <div class="form-group">
-            <label class="form-label">伺服器 Port (預設 25565)</label>
-            <input type="text" id="cfg-serverPort" class="form-control" value="25565">
-          </div>
+        <div class="form-group">
+          <label class="form-label">伺服器名稱</label>
+          <input type="text" id="cfg-serverName" class="form-control" placeholder="例如: Cobblemon 伺服器">
         </div>
 
         <div class="form-group">
-          <label class="form-label">Discord 社群邀請連結</label>
-          <input type="text" id="cfg-discordUrl" class="form-control" placeholder="https://discord.gg/...">
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">首頁標語 (Tagline)</label>
+          <label class="form-label">首頁副標語 (Tagline)</label>
           <input type="text" id="cfg-tagline" class="form-control" placeholder="在全新的方塊世界中，踏上專屬於你的寶可夢冒險旅程！">
         </div>
 
         <div class="form-group">
           <label class="form-label">伺服器詳細簡介</label>
-          <textarea id="cfg-description" class="form-control" style="min-height: 80px;"></textarea>
+          <textarea id="cfg-description" class="form-control" style="min-height: 100px;" placeholder="輸入伺服器的背景設定與簡介說明..."></textarea>
         </div>
       </section>
 
       <!-- Panel 2: Announcements -->
       <section id="panel-announcements" class="admin-panel">
         <div class="panel-header">
-          <h2 class="panel-title">伺服器最新公告管理</h2>
-          <button type="button" class="btn btn-primary btn-sm" onclick="Admin.addAnnouncement()">＋ 新增公告</button>
+          <h2 class="panel-title">最新公告管理</h2>
+          <div style="display: flex; gap: 0.5rem;">
+            <button type="button" class="btn btn-primary btn-sm" onclick="Admin.addAnnouncement()">＋ 新增公告</button>
+            <button type="button" class="btn btn-success btn-sm" onclick="Admin.saveCurrent()">💾 儲存寫入檔案</button>
+          </div>
         </div>
         <div id="admin-announcements-list"></div>
       </section>
@@ -127,7 +121,10 @@
       <section id="panel-commands" class="admin-panel">
         <div class="panel-header">
           <h2 class="panel-title">指令庫管理</h2>
-          <button type="button" class="btn btn-primary btn-sm" onclick="Admin.addCommand()">＋ 新增指令</button>
+          <div style="display: flex; gap: 0.5rem;">
+            <button type="button" class="btn btn-primary btn-sm" onclick="Admin.addCommand()">＋ 新增指令</button>
+            <button type="button" class="btn btn-success btn-sm" onclick="Admin.saveCurrent()">💾 儲存寫入檔案</button>
+          </div>
         </div>
         <div id="admin-commands-list"></div>
       </section>
@@ -136,7 +133,10 @@
       <section id="panel-pokemon" class="admin-panel">
         <div class="panel-header">
           <h2 class="panel-title">圖鑑庫管理</h2>
-          <button type="button" class="btn btn-primary btn-sm" onclick="Admin.addPokemon()">＋ 新增寶可夢</button>
+          <div style="display: flex; gap: 0.5rem;">
+            <button type="button" class="btn btn-primary btn-sm" onclick="Admin.addPokemon()">＋ 新增寶可夢</button>
+            <button type="button" class="btn btn-success btn-sm" onclick="Admin.saveCurrent()">💾 儲存寫入檔案</button>
+          </div>
         </div>
         <div id="admin-pokemon-list"></div>
       </section>
@@ -145,7 +145,10 @@
       <section id="panel-guides" class="admin-panel">
         <div class="panel-header">
           <h2 class="panel-title">攻略文章管理</h2>
-          <button type="button" class="btn btn-primary btn-sm" onclick="Admin.addGuide()">＋ 新增攻略文章</button>
+          <div style="display: flex; gap: 0.5rem;">
+            <button type="button" class="btn btn-primary btn-sm" onclick="Admin.openGuideModal()">＋ 新增攻略文章</button>
+            <button type="button" class="btn btn-success btn-sm" onclick="Admin.saveCurrent()">💾 儲存寫入檔案</button>
+          </div>
         </div>
         <div id="admin-guides-list"></div>
       </section>
@@ -154,7 +157,10 @@
       <section id="panel-donate" class="admin-panel">
         <div class="panel-header">
           <h2 class="panel-title">贊助專區設定</h2>
-          <button type="button" class="btn btn-primary btn-sm" onclick="Admin.addPackage()">＋ 新增贊助方案</button>
+          <div style="display: flex; gap: 0.5rem;">
+            <button type="button" class="btn btn-primary btn-sm" onclick="Admin.addPackage()">＋ 新增贊助方案</button>
+            <button type="button" class="btn btn-success btn-sm" onclick="Admin.saveCurrent()">💾 儲存寫入檔案</button>
+          </div>
         </div>
 
         <div class="form-group">
@@ -193,6 +199,136 @@
 
     </div>
   </main>
+
+  <!-- Guide Multi-step Modal -->
+  <div id="guide-modal-overlay" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-guide-header-title" class="modal-title">📖 新增攻略文章</h3>
+        <button type="button" class="modal-close" onclick="Admin.closeGuideModal()">✕</button>
+      </div>
+
+      <!-- Step Indicator -->
+      <div class="modal-step-indicator">
+        <div id="modal-step-badge-1" class="step-item active">
+          <span class="step-badge">1</span>
+          <span>基本資訊</span>
+        </div>
+        <span class="step-arrow">➔</span>
+        <div id="modal-step-badge-2" class="step-item">
+          <span class="step-badge">2</span>
+          <span>內文撰寫與排版</span>
+        </div>
+      </div>
+
+      <!-- Step 1: Basic Info -->
+      <div id="modal-guide-step-1" class="modal-body">
+        <div class="form-group">
+          <label class="form-label" style="font-weight: 700;">攻略標題 <span style="color: #dc2626;">*</span></label>
+          <input type="text" id="modal-input-title" class="form-control" placeholder="例如: Cobblemon 新手起步與精靈球製作">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" style="flex: 1;">
+            <label class="form-label">文章分類</label>
+            <input type="text" id="modal-input-category" class="form-control" placeholder="例如: 新手教學 / 進階培育 / 牧場繁育" value="新手教學">
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label class="form-label">作者名稱</label>
+            <input type="text" id="modal-input-author" class="form-control" placeholder="例如: 管理員 / 訓練家" value="管理員">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">簡介摘要（卡片展示用）</label>
+          <textarea id="modal-input-summary" class="form-control" style="min-height: 100px;" placeholder="請輸入 1~2 句重點摘要，供前台攻略卡片列表瀏覽時展示..."></textarea>
+        </div>
+      </div>
+
+      <!-- Step 2: Content Writing with Word Toolbar & Review Card -->
+      <div id="modal-guide-step-2" class="modal-body" style="display: none;">
+        <!-- Top Review Summary Box -->
+        <div class="guide-review-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span id="review-guide-category" style="font-size: 0.75rem; background: var(--primary-light); color: var(--primary-text); padding: 2px 8px; border-radius: var(--radius-sm); font-weight: 700;">新手教學</span>
+              <strong id="review-guide-title" style="font-size: 1.05rem; color: var(--text-main);">攻略標題</strong>
+            </div>
+            <span id="review-guide-author" style="font-size: 0.8rem; color: var(--text-muted);">作者: 管理員</span>
+          </div>
+          <div id="review-guide-summary" style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;"></div>
+        </div>
+
+        <!-- Mode Switcher Tabs -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div class="editor-tabs">
+            <button type="button" id="btn-tab-write" class="btn-tab active" onclick="Admin.switchGuideTab('write')">✏️ 視覺化編輯 (Word 模式)</button>
+            <button type="button" id="btn-tab-preview" class="btn-tab" onclick="Admin.switchGuideTab('preview')">👁️ 前台效果即時預覽</button>
+          </div>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">💡 選取文字後點擊工具列，即時呈現變色、粗體與螢光效果！</span>
+        </div>
+
+        <!-- Word-like Formatting Toolbar (visible in write mode) -->
+        <div id="modal-word-toolbar-box" class="form-group" style="margin-bottom: 0;">
+          <div class="word-toolbar">
+            <button type="button" class="wt-btn" onclick="Admin.applyWordFormat('bold')" title="粗體 (選取文字後點擊)"><strong>B</strong> 粗體</button>
+            <button type="button" class="wt-btn" onclick="Admin.applyWordFormat('italic')" title="斜體 (選取文字後點擊)"><em>I</em> 斜體</button>
+            <button type="button" class="wt-btn" onclick="Admin.applyWordFormat('h2')" title="插入大標題">H2 大標</button>
+            <button type="button" class="wt-btn" onclick="Admin.applyWordFormat('h3')" title="插入次標題">H3 次標</button>
+            <button type="button" class="wt-btn" onclick="Admin.applyWordFormat('list')" title="項目符號清單">• 列點</button>
+
+            <div class="wt-divider"></div>
+
+            <!-- Text Color Dropdown -->
+            <div class="wt-dropdown">
+              <button type="button" class="wt-btn" title="文字顏色">🎨 文字顏色 ▾</button>
+              <div class="wt-dropdown-menu">
+                <button type="button" class="wt-color-item" onclick="Admin.applyTextColor('#dc2626')"><span class="wt-dot" style="background: #dc2626;"></span> 🔴 警告紅</button>
+                <button type="button" class="wt-color-item" onclick="Admin.applyTextColor('#16a34a')"><span class="wt-dot" style="background: #16a34a;"></span> 🟢 成功綠</button>
+                <button type="button" class="wt-color-item" onclick="Admin.applyTextColor('#2563eb')"><span class="wt-dot" style="background: #2563eb;"></span> 🔵 提示藍</button>
+                <button type="button" class="wt-color-item" onclick="Admin.applyTextColor('#d97706')"><span class="wt-dot" style="background: #d97706;"></span> 🟡 稀有金</button>
+                <button type="button" class="wt-color-item" onclick="Admin.applyTextColor('#9333ea')"><span class="wt-dot" style="background: #9333ea;"></span> 🟣 史詩紫</button>
+              </div>
+            </div>
+
+            <!-- Highlighter Dropdown -->
+            <div class="wt-dropdown">
+              <button type="button" class="wt-btn" title="螢光筆標記">🖍️ 螢光筆 ▾</button>
+              <div class="wt-dropdown-menu">
+                <button type="button" class="wt-color-item" onclick="Admin.applyHighlight('#fef08a')"><span class="wt-dot" style="background: #fef08a;"></span> 🟡 經典黃</button>
+                <button type="button" class="wt-color-item" onclick="Admin.applyHighlight('#bbf7d0')"><span class="wt-dot" style="background: #bbf7d0;"></span> 🟢 柔和綠</button>
+                <button type="button" class="wt-color-item" onclick="Admin.applyHighlight('#fbcfe8')"><span class="wt-dot" style="background: #fbcfe8;"></span> 🌸 淡粉紅</button>
+                <button type="button" class="wt-color-item" onclick="Admin.applyHighlight('#bfdbfe')"><span class="wt-dot" style="background: #bfdbfe;"></span> 💎 淺藍光</button>
+              </div>
+            </div>
+
+            <div class="wt-divider"></div>
+
+            <!-- Image Upload Button -->
+            <input type="file" id="modal-guide-file-input" accept="image/*" style="display: none;" onchange="Admin.handleModalImageFile(this)">
+            <button type="button" class="wt-btn" style="color: var(--primary-text);" onclick="document.getElementById('modal-guide-file-input').click()" title="插入圖片（支援拖曳與貼上）">
+              📷 插入圖片
+            </button>
+          </div>
+
+          <!-- True Visual Rich Text Editor -->
+          <div id="modal-guide-visual-editor" class="visual-editor" contenteditable="true" 
+            placeholder="請在此輸入攻略內文...&#10;💡 小提示：選取文字後點擊上方工具列，文字會立刻加粗、變色或套上螢光底色！支援直接拖曳或 Ctrl+V 貼上圖片！"></div>
+        </div>
+
+        <!-- Live Preview Container (shown in preview tab) -->
+        <div id="modal-guide-live-preview" class="guide-preview-pane" style="display: none;"></div>
+      </div>
+
+      <!-- Modal Footer with Step Navigation -->
+      <div class="modal-footer">
+        <button type="button" id="btn-modal-cancel" class="btn btn-secondary" onclick="Admin.closeGuideModal()">取消</button>
+        <button type="button" id="btn-modal-prev" class="btn btn-secondary" style="display: none;" onclick="Admin.guidePrevStep()">← 上一步 (修改基本資訊)</button>
+        <button type="button" id="btn-modal-next" class="btn btn-primary" onclick="Admin.guideNextStep()">下一步：編輯內文 →</button>
+        <button type="button" id="btn-modal-submit" class="btn btn-success" style="display: none;" onclick="Admin.submitGuideModal()">✅ 完成並儲存送出</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Site Footer -->
   <footer class="site-footer">

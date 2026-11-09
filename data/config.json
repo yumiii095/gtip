@@ -1,17 +1,5 @@
 {
-  "serverName": "Cobblemon 伺服器",
-  "serverIp": "play.your-server.com",
-  "serverPort": "25565",
-  "version": "1.20.1 / Cobblemon 1.5+",
+  "serverName": "CobblemonOasis 綠洲",
   "tagline": "在全新的方塊世界中，踏上專屬於你的寶可夢冒險旅程！",
-  "description": "這是一個提供純淨、流暢且充滿社群活力的 Cobblemon 伺服器，期待與你一同建立家園與冒險。",
-  "discordUrl": "https://discord.gg/",
-  "bannerImage": "",
-  "announcement": {
-    "enabled": false,
-    "title": "",
-    "content": "",
-    "date": ""
-  },
-  "features": []
+  "description": "這是一個提供純淨、流暢且充滿社群活力的 Cobblemon 伺服器，期待與你一同建立家園與冒險。"
 }
