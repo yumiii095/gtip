@@ -3,15 +3,19 @@
  */
 
 const Core = {
-  // Load JSON with localStorage draft override & offline INITIAL_DATABASE fallback
+  // Load JSON with localStorage draft override (Admin only) & offline INITIAL_DATABASE fallback
   async loadJSON(key, defaultPath) {
-    // 1. Check for local user-edited drafts in localStorage first
-    const cached = localStorage.getItem('draft_' + key);
-    if (cached) {
-      try {
-        return JSON.parse(cached);
-      } catch (e) {
-        console.warn('Draft parse error:', e);
+    const isAdmin = window.location.pathname.includes('admin') || window.location.href.includes('admin');
+
+    // 1. Only in Admin mode: check for user-edited unsaved drafts
+    if (isAdmin) {
+      const cached = localStorage.getItem('draft_' + key);
+      if (cached) {
+        try {
+          return JSON.parse(cached);
+        } catch (e) {
+          console.warn('Draft parse error:', e);
+        }
       }
     }
 
