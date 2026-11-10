@@ -3,6 +3,14 @@
  * High-performance, offline-first admin controller with Direct Local File System Access API
  */
 
+function escapeHTML(str) {
+  return String(str || '').replace(/[&<>'"]/g, 
+    tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+}
+function escapeAttr(str) {
+  return escapeHTML(str);
+}
+
 /* ================= File System Access API Module ================= */
 const FS = {
   dirHandle: null,
@@ -90,20 +98,28 @@ const FS = {
       return false;
     }
     try {
+      // If we have a remembered handle that needs permission authorization on page load:
       if (this.dirHandle) {
-        const perm = await this.dirHandle.requestPermission({ mode: 'readwrite' });
-        if (perm === 'granted') {
-          this.updateStatus(true);
-          Core.showToast(`✅ 已連線至資料夾: ${this.dirHandle.name}`);
-          return true;
+        const queryPerm = await this.dirHandle.queryPermission({ mode: 'readwrite' });
+        if (queryPerm !== 'granted') {
+          const perm = await this.dirHandle.requestPermission({ mode: 'readwrite' });
+          if (perm === 'granted') {
+            this.updateStatus(true);
+            Core.showToast(`✅ 已授權連線至資料夾: ${this.dirHandle.name}`);
+            return true;
+          }
         }
       }
-      this.dirHandle = await window.showDirectoryPicker({
+
+      // If already granted (user clicked "🔄 切換資料夾") or no handle stored:
+      // Always open native directory picker dialog!
+      const newHandle = await window.showDirectoryPicker({
         mode: 'readwrite'
       });
+      this.dirHandle = newHandle;
       await this.storeHandle(this.dirHandle);
       this.updateStatus(true);
-      Core.showToast(`✅ 已成功連結專案資料夾: ${this.dirHandle.name}`);
+      Core.showToast(`🎉 已成功切換並連結專案資料夾: ${this.dirHandle.name}`);
       return true;
     } catch (err) {
       if (err.name !== 'AbortError') {
@@ -114,9 +130,23 @@ const FS = {
     }
   },
 
+  async disconnect() {
+    this.dirHandle = null;
+    this.isConnected = false;
+    try {
+      const db = await this.openIDB();
+      const tx = db.transaction('handles', 'readwrite');
+      tx.objectStore('handles').delete('projectDir');
+    } catch (e) {}
+    this.updateStatus(false, '已解除資料夾連結');
+    Core.showToast('⚪ 已解除本機資料夾連結');
+  },
+
   updateStatus(isConnected, note = '') {
+    this.isConnected = !!isConnected;
     const badge = document.getElementById('fs-status-badge');
     const btn = document.getElementById('btn-fs-connect');
+    const disconnectBtn = document.getElementById('btn-fs-disconnect');
     const syncBtn = document.getElementById('btn-fs-sync-all');
 
     if (isConnected && this.dirHandle) {
@@ -126,6 +156,9 @@ const FS = {
       }
       if (btn) {
         btn.textContent = '🔄 切換資料夾';
+      }
+      if (disconnectBtn) {
+        disconnectBtn.style.display = 'inline-flex';
       }
       if (syncBtn) {
         syncBtn.style.display = 'inline-flex';
@@ -137,6 +170,9 @@ const FS = {
       }
       if (btn) {
         btn.textContent = '📁 連結本機專案資料夾';
+      }
+      if (disconnectBtn) {
+        disconnectBtn.style.display = 'none';
       }
       if (syncBtn) {
         syncBtn.style.display = 'none';
@@ -216,6 +252,10 @@ const FS = {
       await this.writeFile(['data', 'guides.json'], JSON.stringify(data.guides || [], null, 2));
       // 5. donate.json
       await this.writeFile(['data', 'donate.json'], JSON.stringify(data.donate || {}, null, 2));
+      // 5.5 beginner.json
+      if (data.beginner) {
+        await this.writeFile(['data', 'beginner.json'], JSON.stringify(data.beginner, null, 2));
+      }
 
       // 6. poke.json
       if (data.pokemon && data.pokemon.length > 0) {
@@ -230,6 +270,7 @@ const FS = {
         '  commands: ' + JSON.stringify(data.commands || [], null, 2) + ',\n' +
         '  guides: ' + JSON.stringify(data.guides || [], null, 2) + ',\n' +
         '  donate: ' + JSON.stringify(data.donate || {}, null, 2) + ',\n' +
+        '  beginner: ' + JSON.stringify(data.beginner || {}, null, 2) + ',\n' +
         '  poke: ' + JSON.stringify(data.pokemon || []) + '\n' +
         '};\n';
       await this.writeFile(['data', 'database.js'], dbContent);
@@ -261,8 +302,60 @@ const Admin = {
   expandedCommandIndices: new Set(),
   draggedCmdIndex: null,
 
+  // Commands Grouping & Categories
+  commandsViewMode: 'category', // 'category' or 'time'
+  commandCategories: ['個人功能', '社交', '任務/獎勵', '領地', 'Home系統', '經濟', '傳送', 'VIP專屬'],
+  commandCategoryMeta: {
+    '個人功能': { icon: '🎮', label: '個人功能' },
+    '社交': { icon: '💬', label: '社交' },
+    '任務/獎勵': { icon: '🎁', label: '任務/獎勵' },
+    '領地': { icon: '🏕️', label: '領地' },
+    'Home系統': { icon: '🏠', label: 'Home系統' },
+    '經濟': { icon: '💰', label: '經濟' },
+    '傳送': { icon: '🧭', label: '傳送' },
+    'VIP專屬': { icon: '👑', label: 'VIP專屬' }
+  },
+  // Requirement: Default all categories collapsed in admin
+  expandedAdminCategories: new Set(),
+
+  initCommandCategories() {
+    const defaultCategories = [
+      { name: '個人功能', icon: '🎮' },
+      { name: '社交', icon: '💬' },
+      { name: '任務/獎勵', icon: '🎁' },
+      { name: '領地', icon: '🏕️' },
+      { name: 'Home系統', icon: '🏠' },
+      { name: '經濟', icon: '💰' },
+      { name: '傳送', icon: '🧭' },
+      { name: 'VIP專屬', icon: '👑' }
+    ];
+
+    if (!this.data.config.commandCategories || !Array.isArray(this.data.config.commandCategories) || this.data.config.commandCategories.length === 0) {
+      this.data.config.commandCategories = defaultCategories;
+    }
+
+    this.commandCategories = [];
+    this.commandCategoryMeta = {};
+
+    this.data.config.commandCategories.forEach(cat => {
+      this.commandCategories.push(cat.name);
+      this.commandCategoryMeta[cat.name] = { icon: cat.icon || '📌', label: cat.name };
+    });
+
+    if (this.data.commands && Array.isArray(this.data.commands)) {
+      this.data.commands.forEach(cmd => {
+        if (cmd.category && !this.commandCategoryMeta[cmd.category]) {
+          this.commandCategories.push(cmd.category);
+          this.commandCategoryMeta[cmd.category] = { icon: '📌', label: cmd.category };
+          this.data.config.commandCategories.push({ name: cmd.category, icon: '📌' });
+        }
+      });
+    }
+  },
+
   async init() {
     this.setupTabs();
+    this.setupFloatingToolbar();
 
     // Clear stale drafts from previous mock data session
     if (localStorage.getItem('admin_draft_cleaned_v2') !== 'done') {
@@ -276,9 +369,16 @@ const Admin = {
     this.data.commands = await Core.loadJSON('commands', 'data/commands.json') || [];
     if (Array.isArray(this.data.commands)) {
       this.data.commands.forEach(c => {
-        if (c.category === '常用' || !c.category) c.category = '個人';
+        if (c.category === '常用' || c.category === '個人' || !c.category) {
+          if (c.permission && c.permission.includes('VIP')) {
+            c.category = 'VIP專屬';
+          } else {
+            c.category = '個人功能';
+          }
+        }
       });
     }
+    this.initCommandCategories();
 
     // Load Pokédex data (supports poke.json with 1,000+ Cobblemon entries)
     let pList = await Core.loadJSON('poke', 'data/poke.json');
@@ -288,6 +388,7 @@ const Admin = {
     this.data.pokemon = pList;
 
     this.data.guides = await Core.loadJSON('guides', 'data/guides.json') || [];
+    this.data.beginner = await Core.loadJSON('beginner', 'data/beginner.json') || null;
     this.data.donate = await Core.loadJSON('donate', 'data/donate.json') || { packages: [] };
 
     // 2. Render all panels
@@ -296,6 +397,7 @@ const Admin = {
     this.renderCommandsList();
     this.renderPokemonList();
     this.renderGuidesList();
+    this.renderBeginnerPanel();
     this.renderDonateList();
     this.setupExportActions();
 
@@ -319,6 +421,9 @@ const Admin = {
 
   async saveCurrent() {
     this.syncConfig();
+    if (this.data.beginner) {
+      Core.saveDraft('beginner', this.data.beginner);
+    }
     await FS.syncAll(this.data);
   },
 
@@ -332,14 +437,83 @@ const Admin = {
 
     setVal('cfg-serverName', c.serverName);
     setVal('cfg-tagline', c.tagline);
-    setVal('cfg-description', c.description);
 
-    ['cfg-serverName', 'cfg-tagline', 'cfg-description'].forEach(id => {
+    ['cfg-serverName', 'cfg-tagline'].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
         el.oninput = () => this.syncConfig();
       }
     });
+
+    this.renderQuickNavConfig();
+  },
+
+  renderQuickNavConfig() {
+    const container = document.getElementById('cfg-quicknav-container');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const defaultQuickNav = [
+      { icon: '🔰', title: '新手入門專區', desc: '鍵盤快捷鍵對照、從零開始的冒險開局與領地防護教學。', link: 'beginner.html' },
+      { icon: '⌨️', title: '指令速查手冊', desc: '寶可夢指令、領地操作、實用快捷功能一鍵複製。', link: 'commands.html' },
+      { icon: '📖', title: 'Cobblemon 圖鑑', desc: '查詢 1,000+ 隻寶可夢擊敗掉落物機率、群系加成與立繪。', link: 'pokedex.html' },
+      { icon: '🧭', title: '進階攻略指南', desc: '精靈球製作、牧場繁育、努力值培育等實用教學。', link: 'guides.html' }
+    ];
+
+    if (!this.data.config.quickNav || !Array.isArray(this.data.config.quickNav) || this.data.config.quickNav.length < 4) {
+      this.data.config.quickNav = defaultQuickNav;
+    }
+
+    const pageOptions = [
+      { val: 'beginner.html', label: '🔰 新手專區 (beginner.html)' },
+      { val: 'commands.html', label: '⌨️ 指令速查 (commands.html)' },
+      { val: 'pokedex.html', label: '📖 寶可夢圖鑑 (pokedex.html)' },
+      { val: 'type-chart.html', label: '⚔️ 屬性相剋 (type-chart.html)' },
+      { val: 'guides.html', label: '🧭 攻略專區 (guides.html)' },
+      { val: 'donate.html', label: '💖 贊助支持 (donate.html)' }
+    ];
+
+    this.data.config.quickNav.forEach((item, idx) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.cssText = 'padding: 1.25rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: #ffffff;';
+
+      const optHtml = pageOptions.map(p => 
+        `<option value="${p.val}" ${item.link === p.val ? 'selected' : ''}>${p.label}</option>`
+      ).join('');
+
+      card.innerHTML = `
+        <div style="font-weight: 800; font-size: 0.95rem; margin-bottom: 0.75rem; color: var(--primary-text); display: flex; align-items: center; justify-content: space-between;">
+          <span>📌 第 ${idx + 1} 個導覽鍵</span>
+        </div>
+        <div class="form-group" style="margin-bottom: 0.65rem;">
+          <label class="form-label" style="font-size: 0.8rem;">按鈕圖示 (Emoji / 圖示)</label>
+          <input type="text" class="form-control" style="font-size: 1.1rem; width: 80px;" value="${escapeAttr(item.icon || '')}" oninput="Admin.updateQuickNavItem(${idx}, 'icon', this.value)">
+        </div>
+        <div class="form-group" style="margin-bottom: 0.65rem;">
+          <label class="form-label" style="font-size: 0.8rem;">按鈕標題</label>
+          <input type="text" class="form-control" value="${escapeAttr(item.title || '')}" oninput="Admin.updateQuickNavItem(${idx}, 'title', this.value)">
+        </div>
+        <div class="form-group" style="margin-bottom: 0.65rem;">
+          <label class="form-label" style="font-size: 0.8rem;">副簡介說明</label>
+          <input type="text" class="form-control" value="${escapeAttr(item.desc || '')}" oninput="Admin.updateQuickNavItem(${idx}, 'desc', this.value)">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label" style="font-size: 0.8rem;">點擊跳轉頁面</label>
+          <select class="form-control" onchange="Admin.updateQuickNavItem(${idx}, 'link', this.value)">
+            ${optHtml}
+          </select>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  },
+
+  updateQuickNavItem(idx, field, value) {
+    if (this.data.config.quickNav && this.data.config.quickNav[idx]) {
+      this.data.config.quickNav[idx][field] = value.trim();
+      Core.saveDraft('config', this.data.config);
+    }
   },
 
   syncConfig() {
@@ -348,11 +522,8 @@ const Admin = {
       return el ? el.value.trim() : '';
     };
 
-    this.data.config = {
-      serverName: getVal('cfg-serverName') || 'CobblemonOasis 綠洲',
-      tagline: getVal('cfg-tagline'),
-      description: getVal('cfg-description')
-    };
+    this.data.config.serverName = getVal('cfg-serverName') || 'CobblemonOasis 綠洲';
+    this.data.config.tagline = getVal('cfg-tagline');
     Core.saveDraft('config', this.data.config);
   },
 
@@ -437,6 +608,82 @@ const Admin = {
   },
 
   /* ================= 3. Commands Section ================= */
+  setCommandsViewMode(mode) {
+    this.commandsViewMode = mode;
+    const catBtn = document.getElementById('btn-cmd-view-cat');
+    const timeBtn = document.getElementById('btn-cmd-view-time');
+    if (catBtn && timeBtn) {
+      if (mode === 'category') {
+        catBtn.style.background = 'var(--primary)';
+        catBtn.style.color = '#fff';
+        timeBtn.style.background = 'transparent';
+        timeBtn.style.color = 'var(--text-main)';
+      } else {
+        timeBtn.style.background = 'var(--primary)';
+        timeBtn.style.color = '#fff';
+        catBtn.style.background = 'transparent';
+        catBtn.style.color = 'var(--text-main)';
+      }
+    }
+    this.renderCommandsList();
+  },
+
+  toggleAdminCategory(cat) {
+    if (this.expandedAdminCategories.has(cat)) {
+      this.expandedAdminCategories.delete(cat);
+    } else {
+      this.expandedAdminCategories.add(cat);
+    }
+    this.renderCommandsList();
+  },
+
+  promptAddCommandCategory() {
+    const catName = prompt('請輸入新分類名稱 (例如: 抽獎系統、公會、釣魚):');
+    if (!catName || !catName.trim()) return;
+    const trimmed = catName.trim();
+
+    if (this.commandCategories.includes(trimmed)) {
+      Core.showToast(`⚠️ 分類「${trimmed}」已存在！`);
+      return;
+    }
+
+    const icon = prompt(`請輸入「${trimmed}」代表的 Emoji 圖示 (例如: 🎰, 🛡️, 🎣, 🎪, 📦):`, '📌') || '📌';
+
+    if (!this.data.config.commandCategories) {
+      this.data.config.commandCategories = [];
+    }
+
+    this.data.config.commandCategories.push({
+      name: trimmed,
+      icon: icon.trim()
+    });
+
+    this.initCommandCategories();
+    // Auto expand the new category so the user sees it immediately
+    this.expandedAdminCategories.add(trimmed);
+    this.renderCommandsList();
+
+    Core.saveDraft('config', this.data.config);
+    Core.showToast(`✅ 已新增分類 [ ${icon.trim()} ${trimmed} ]！`);
+  },
+
+  deleteCommandCategory(catName) {
+    const inUseCount = (this.data.commands || []).filter(c => (c.category || '個人功能') === catName).length;
+    if (inUseCount > 0) {
+      alert(`無法刪除分類「${catName}」：目前尚有 ${inUseCount} 個指令屬於此分類！請先將指令移至其他分類或刪除。`);
+      return;
+    }
+
+    if (!confirm(`確定要刪除無指令的分類「${catName}」嗎？`)) return;
+
+    this.data.config.commandCategories = (this.data.config.commandCategories || []).filter(c => c.name !== catName);
+    this.expandedAdminCategories.delete(catName);
+    this.initCommandCategories();
+    this.renderCommandsList();
+    Core.saveDraft('config', this.data.config);
+    Core.showToast(`🗑️ 已刪除分類 [ ${catName} ]`);
+  },
+
   renderCommandsList() {
     const container = document.getElementById('admin-commands-list');
     if (!container) return;
@@ -447,44 +694,44 @@ const Admin = {
       return;
     }
 
-    const categoryOptions = ['個人', '領地', '傳送', '經濟', 'VIP專屬'];
+    const categoryOptions = this.commandCategories;
     const permissionOptions = ['所有玩家', 'VIP專屬', 'Master VIP專屬'];
 
-    this.data.commands.forEach((c, idx) => {
-      if (c.category === '常用' || !c.category) {
-        c.category = '個人';
-      }
+    // Helper to render an individual command card
+    const renderCommandCard = (c, idx) => {
       const isExpanded = this.expandedCommandIndices.has(idx);
-      const currentCat = c.category;
+      const currentCat = c.category || '個人功能';
       const currentPerm = (c.permission === '玩家' || !c.permission) ? '所有玩家' : c.permission;
 
       let catSelectHtml = categoryOptions.map(opt => `<option value="${opt}" ${currentCat === opt ? 'selected' : ''}>${opt}</option>`).join('');
       if (!categoryOptions.includes(currentCat)) {
-        catSelectHtml += `<option value="${escapeAttr(currentCat)}" selected>${escapeAttr(currentCat)} (舊有自訂)</option>`;
+        catSelectHtml += `<option value="${escapeAttr(currentCat)}" selected>${escapeAttr(currentCat)} (自訂)</option>`;
       }
 
       let permSelectHtml = permissionOptions.map(opt => `<option value="${opt}" ${currentPerm === opt ? 'selected' : ''}>${opt}</option>`).join('');
       if (!permissionOptions.includes(currentPerm)) {
-        permSelectHtml += `<option value="${escapeAttr(currentPerm)}" selected>${escapeAttr(currentPerm)} (舊有自訂)</option>`;
+        permSelectHtml += `<option value="${escapeAttr(currentPerm)}" selected>${escapeAttr(currentPerm)} (自訂)</option>`;
       }
 
-      // Permission badge display (VIP專屬 不帶圖示)
       let permBadgeHtml = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 2px 7px; border-radius: var(--radius-sm);">${escapeAttr(currentPerm)}</span>`;
       if (currentPerm === 'VIP專屬') {
-        permBadgeHtml = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #fef3c7; color: #b45309; border: 1px solid #fde68a; padding: 2px 7px; border-radius: var(--radius-sm); font-weight: 700;">VIP專屬</span>`;
+        permBadgeHtml = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #fef3c7; color: #b45309; border: 1px solid #fde68a; padding: 2px 7px; border-radius: var(--radius-sm); font-weight: 700;">👑 VIP專屬</span>`;
       } else if (currentPerm === 'Master VIP專屬') {
-        permBadgeHtml = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; padding: 2px 7px; border-radius: var(--radius-sm); font-weight: 800;">Master VIP專屬</span>`;
+        permBadgeHtml = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; padding: 2px 7px; border-radius: var(--radius-sm); font-weight: 800;">👑 Master VIP專屬</span>`;
       }
 
       const item = document.createElement('div');
       item.className = 'editable-item';
       item.id = `cmd-item-${idx}`;
       item.style.padding = '0.9rem 1.15rem';
-      item.style.marginBottom = '0.85rem';
+      item.style.marginBottom = '0.75rem';
+      item.style.background = '#ffffff';
+      item.style.border = '1px solid var(--border-color)';
+      item.style.borderRadius = 'var(--radius-md)';
       item.style.transition = 'all 0.15s ease';
       item.dataset.index = idx;
 
-      // Drag and Drop Event Handlers
+      // Drag and Drop
       item.addEventListener('dragstart', (e) => {
         Admin.draggedCmdIndex = idx;
         e.dataTransfer.effectAllowed = 'move';
@@ -520,19 +767,16 @@ const Admin = {
       });
 
       item.innerHTML = `
-        <!-- Summary Header Bar (Click to toggle single expand) -->
         <div class="item-toolbar" style="margin-bottom: ${isExpanded ? '0.85rem' : '0'}; padding-bottom: ${isExpanded ? '0.65rem' : '0'}; border-bottom: ${isExpanded ? '1px dashed var(--border-color)' : 'none'}; cursor: pointer; user-select: none;" onclick="Admin.toggleCommand(${idx}, event)">
           <div style="display: flex; align-items: center; gap: 0.65rem; flex: 1; flex-wrap: wrap;">
-            <!-- Drag Handle: only activates draggable on the card while hovering/grabbing -->
             <span class="cmd-drag-handle" title="按住上下拖曳排序" onmouseenter="this.closest('.editable-item').draggable=true" onmouseleave="this.closest('.editable-item').draggable=false" onclick="event.stopPropagation()">⠿</span>
-            <span class="item-index">#${idx + 1}</span>
+            <span class="item-index" style="font-size: 0.78rem; font-weight: 800; color: var(--text-muted);">#${idx + 1}</span>
             <code id="cmd-name-preview-${idx}" style="font-family: var(--font-mono); font-weight: 800; font-size: 1.05rem; color: var(--primary-text); background: var(--primary-light); padding: 2px 8px; border-radius: var(--radius-sm);">${escapeAttr(c.name || '/未命名')}</code>
             <span id="cmd-cat-badge-${idx}" style="font-size: 0.75rem; background: var(--bg-subtle); color: var(--text-muted); padding: 2px 7px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-weight: 600;">${escapeAttr(currentCat)}</span>
             ${permBadgeHtml}
-            <span id="cmd-desc-preview-${idx}" style="color: var(--text-muted); font-size: 0.88rem; margin-left: 0.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 320px;">${escapeAttr(c.description || '（尚未填寫說明）')}</span>
+            <span id="cmd-desc-preview-${idx}" style="color: var(--text-muted); font-size: 0.88rem; margin-left: 0.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 340px;">${escapeAttr(c.description || '（尚未填寫說明）')}</span>
           </div>
           <div style="display: flex; gap: 0.35rem; align-items: center;" onclick="event.stopPropagation()">
-            <!-- Quick Move Up/Down buttons -->
             <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 6px;" title="向上移動" onclick="Admin.moveCommand(${idx}, -1, event)" ${idx === 0 ? 'disabled' : ''}>⬆️</button>
             <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 6px;" title="向下移動" onclick="Admin.moveCommand(${idx}, 1, event)" ${idx === this.data.commands.length - 1 ? 'disabled' : ''}>⬇️</button>
             <button type="button" id="cmd-toggle-btn-${idx}" class="btn btn-secondary btn-sm" onclick="Admin.toggleCommand(${idx}, event)">
@@ -542,15 +786,14 @@ const Admin = {
           </div>
         </div>
 
-        <!-- Collapsible Edit Body -->
         <div id="cmd-body-${idx}" style="display: ${isExpanded ? 'block' : 'none'};">
           <div class="form-row">
             <div class="form-group" style="flex: 1.5;">
-              <label class="form-label">指令名稱</label>
+              <label class="form-label">指令名稱 (或語法)</label>
               <input type="text" class="form-control" value="${escapeAttr(c.name || '')}" oninput="Admin.updateCommand(${idx}, 'name', this.value)" placeholder="例如: /pc">
             </div>
             <div class="form-group" style="flex: 1; min-width: 140px;">
-              <label class="form-label">分類名稱</label>
+              <label class="form-label">所屬分類</label>
               <select class="form-control" onchange="Admin.updateCommand(${idx}, 'category', this.value)">
                 ${catSelectHtml}
               </select>
@@ -562,9 +805,9 @@ const Admin = {
               </select>
             </div>
           </div>
-          <div class="form-group">
-            <label class="form-label">功能說明</label>
-            <input type="text" class="form-control" value="${escapeAttr(c.description || '')}" oninput="Admin.updateCommand(${idx}, 'description', this.value)" placeholder="詳細說明此指令的用途與效果">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">功能說明 (詳細說明此指令的用途)</label>
+            <input type="text" class="form-control" value="${escapeAttr(c.description || '')}" oninput="Admin.updateCommand(${idx}, 'description', this.value)" placeholder="例如: 快速回覆上一個私聊訊息">
           </div>
           <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px dashed var(--border-color);">
             <button type="button" class="btn btn-primary btn-sm" onclick="Admin.collapseCommand(${idx}, event)">
@@ -573,17 +816,89 @@ const Admin = {
           </div>
         </div>
       `;
-      container.appendChild(item);
+      return item;
+    };
+
+    // 1. Category Accordion Mode
+    if (this.commandsViewMode === 'category') {
+      this.commandCategories.forEach(cat => {
+        const meta = this.commandCategoryMeta[cat] || { icon: '📌', label: cat };
+        const catCommandsWithIndex = [];
+        this.data.commands.forEach((c, i) => {
+          if ((c.category || '個人功能') === cat) {
+            catCommandsWithIndex.push({ cmd: c, index: i });
+          }
+        });
+
+        const isCatOpen = this.expandedAdminCategories.has(cat);
+
+        const groupEl = document.createElement('div');
+        groupEl.className = `cmd-accordion-group ${isCatOpen ? 'open' : ''}`;
+        groupEl.style.cssText = 'margin-bottom: 1rem; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg, 12px); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04);';
+
+        const headerEl = document.createElement('div');
+        headerEl.className = 'cmd-accordion-header';
+        headerEl.style.cssText = 'display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 1.25rem; background: #ffffff; cursor: pointer; user-select: none; border-bottom: 1px solid var(--border-color);';
+
+        headerEl.innerHTML = `
+          <div class="cmd-accordion-title-wrap" style="display: flex; align-items: center; gap: 0.75rem;">
+            <span style="font-size: 1.3rem;">${meta.icon}</span>
+            <span style="font-size: 1.05rem; font-weight: 800; color: var(--text-main);">${cat}</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <span class="cmd-count-badge" style="font-size: 0.8rem; font-weight: 800; color: #2563eb; background: #eff6ff; border: 1px solid #dbeafe; padding: 2px 10px; border-radius: 999px;">
+              ${catCommandsWithIndex.length} 指令
+            </span>
+            <button type="button" class="btn btn-primary btn-sm" style="padding: 2px 9px; font-size: 0.78rem;" onclick="event.stopPropagation(); Admin.addCommand('${escapeAttr(cat)}')" title="在此分類新增指令">
+              ＋ 新增
+            </button>
+            ${catCommandsWithIndex.length === 0 ? `
+              <button type="button" class="btn btn-danger btn-sm" style="padding: 2px 7px; font-size: 0.75rem;" onclick="event.stopPropagation(); Admin.deleteCommandCategory('${escapeAttr(cat)}')" title="刪除此無指令分類">
+                🗑️ 刪除
+              </button>
+            ` : ''}
+            <span class="cmd-chevron" style="color: #3b82f6; font-size: 0.75rem; transform: ${isCatOpen ? 'rotate(180deg)' : 'rotate(0deg)'}; transition: transform 0.2s;">▼</span>
+          </div>
+        `;
+
+        headerEl.addEventListener('click', () => {
+          this.toggleAdminCategory(cat);
+        });
+
+        const bodyEl = document.createElement('div');
+        bodyEl.className = 'cmd-accordion-body';
+        bodyEl.style.cssText = `padding: 1rem 1.15rem; background: #f8fafc; display: ${isCatOpen ? 'block' : 'none'};`;
+
+        if (catCommandsWithIndex.length === 0) {
+          bodyEl.innerHTML = `
+            <div style="color: var(--text-muted); font-size: 0.88rem; padding: 0.75rem 0.5rem; text-align: center; border: 1px dashed var(--border-color); border-radius: var(--radius-sm); background: #ffffff;">
+              此分類目前尚無指令，可點擊上方「＋ 新增」建立。
+            </div>
+          `;
+        } else {
+          catCommandsWithIndex.forEach(({ cmd, index }) => {
+            bodyEl.appendChild(renderCommandCard(cmd, index));
+          });
+        }
+
+        groupEl.appendChild(headerEl);
+        groupEl.appendChild(bodyEl);
+        container.appendChild(groupEl);
+      });
+      return;
+    }
+
+    // 2. Chronological / Time Mode
+    this.data.commands.forEach((c, idx) => {
+      container.appendChild(renderCommandCard(c, idx));
     });
   },
 
   toggleCommand(idx, event) {
     if (event) event.stopPropagation();
     if (this.expandedCommandIndices.has(idx)) {
-      // Collapse this one
       this.expandedCommandIndices.delete(idx);
     } else {
-      // Accordion mode: Collapse all other items, only expand the newly clicked command
       this.expandedCommandIndices.clear();
       this.expandedCommandIndices.add(idx);
     }
@@ -598,10 +913,16 @@ const Admin = {
 
   collapseAllCommands() {
     this.expandedCommandIndices.clear();
+    if (this.commandsViewMode === 'category') {
+      this.expandedAdminCategories.clear();
+    }
     this.renderCommandsList();
   },
 
   expandAllCommands() {
+    if (this.commandsViewMode === 'category') {
+      this.commandCategories.forEach(c => this.expandedAdminCategories.add(c));
+    }
     if (this.data.commands) {
       this.data.commands.forEach((_, i) => this.expandedCommandIndices.add(i));
     }
@@ -613,7 +934,6 @@ const Admin = {
     const [moved] = this.data.commands.splice(fromIdx, 1);
     this.data.commands.splice(toIdx, 0, moved);
 
-    // Keep the moved item expanded if it was expanded
     if (this.expandedCommandIndices.has(fromIdx)) {
       this.expandedCommandIndices.clear();
       this.expandedCommandIndices.add(toIdx);
@@ -633,25 +953,26 @@ const Admin = {
     this.reorderCommand(idx, toIdx);
   },
 
-  addCommand() {
-    // New command is inserted at the very beginning (top of list)
+  addCommand(defaultCategory) {
+    const cat = defaultCategory || (this.commandCategories[0] || '個人功能');
     this.data.commands.unshift({
       name: '/newcmd',
-      category: '個人',
-      permission: '所有玩家',
+      category: cat,
+      permission: cat === 'VIP專屬' ? 'VIP專屬' : '所有玩家',
       syntax: '/newcmd',
-      description: '指令說明'
+      description: '請在此輸入指令說明與用途'
     });
 
-    // Accordion mode: collapse all others, expand ONLY the new item at index 0
+    if (this.commandsViewMode === 'category') {
+      this.expandedAdminCategories.add(cat);
+    }
     this.expandedCommandIndices.clear();
     this.expandedCommandIndices.add(0);
 
     this.renderCommandsList();
     Core.saveDraft('commands', this.data.commands);
-    Core.showToast('已新增指令於最上方');
+    Core.showToast(`已於 [ ${cat} ] 分類中新增指令！`);
 
-    // Auto-focus on command name
     setTimeout(() => {
       const firstInput = document.querySelector('#cmd-item-0 input');
       if (firstInput) {
@@ -669,20 +990,21 @@ const Admin = {
       }
       Core.saveDraft('commands', this.data.commands);
 
-      // Real-time update in summary header bar
+      if (field === 'category') {
+        this.renderCommandsList();
+        return;
+      }
+
       if (field === 'name') {
         const namePreview = document.getElementById(`cmd-name-preview-${idx}`);
         if (namePreview) namePreview.textContent = val || '/未命名';
-      } else if (field === 'category') {
-        const catBadge = document.getElementById(`cmd-cat-badge-${idx}`);
-        if (catBadge) catBadge.textContent = val || '個人';
       } else if (field === 'permission') {
         const permBadge = document.getElementById(`cmd-perm-badge-${idx}`);
         if (permBadge) {
           if (val === 'VIP專屬') {
-            permBadge.outerHTML = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #fef3c7; color: #b45309; border: 1px solid #fde68a; padding: 2px 7px; border-radius: var(--radius-sm); font-weight: 700;">VIP專屬</span>`;
+            permBadge.outerHTML = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #fef3c7; color: #b45309; border: 1px solid #fde68a; padding: 2px 7px; border-radius: var(--radius-sm); font-weight: 700;">👑 VIP專屬</span>`;
           } else if (val === 'Master VIP專屬') {
-            permBadge.outerHTML = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; padding: 2px 7px; border-radius: var(--radius-sm); font-weight: 800;">Master VIP專屬</span>`;
+            permBadge.outerHTML = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; padding: 2px 7px; border-radius: var(--radius-sm); font-weight: 800;">👑 Master VIP專屬</span>`;
           } else {
             permBadge.outerHTML = `<span id="cmd-perm-badge-${idx}" style="font-size: 0.75rem; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 2px 7px; border-radius: var(--radius-sm);">${escapeAttr(val || '所有玩家')}</span>`;
           }
@@ -1151,22 +1473,146 @@ const Admin = {
     }
   },
 
-  /* True WYSIWYG Formatting Actions */
+  /* True Universal WYSIWYG & Textarea / Input Formatting Engine */
+  _savedRange: null,
+  lastActiveTarget: null,
+
+  saveSelection() {
+    const info = this.getSelectionInfo();
+    if (info) {
+      this.lastActiveTarget = info;
+    }
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      this._savedRange = sel.getRangeAt(0).cloneRange();
+    }
+  },
+
+  restoreSelection() {
+    if (this._savedRange) {
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(this._savedRange);
+    }
+  },
+
+  getSelectionInfo() {
+    // 1. Check active input / textarea
+    const active = document.activeElement;
+    if (active && (active.tagName === 'TEXTAREA' || (active.tagName === 'INPUT' && active.type === 'text'))) {
+      const start = active.selectionStart;
+      const end = active.selectionEnd;
+      if (typeof start === 'number' && typeof end === 'number' && start !== end) {
+        const text = active.value.substring(start, end).trim();
+        if (text.length > 0) {
+          return {
+            type: 'input',
+            el: active,
+            text: text,
+            start: start,
+            end: end,
+            rect: active.getBoundingClientRect()
+          };
+        }
+      }
+    }
+
+    // 2. Check contenteditable selection
+    const sel = window.getSelection();
+    if (sel && !sel.isCollapsed && sel.rangeCount > 0) {
+      const text = sel.toString().trim();
+      if (text.length > 0) {
+        const anchor = sel.anchorNode;
+        const parent = anchor ? (anchor.nodeType === 1 ? anchor : anchor.parentElement) : null;
+        const editable = parent ? parent.closest('[contenteditable="true"]') : null;
+        if (editable) {
+          return {
+            type: 'contenteditable',
+            el: editable,
+            text: text,
+            range: sel.getRangeAt(0),
+            rect: sel.getRangeAt(0).getBoundingClientRect()
+          };
+        }
+      }
+    }
+
+    return null;
+  },
+
+  getLastEditTarget() {
+    const active = document.activeElement;
+    if (active && (active.isContentEditable || active.tagName === 'TEXTAREA' || (active.tagName === 'INPUT' && active.type === 'text'))) {
+      return {
+        el: active,
+        type: active.isContentEditable ? 'contenteditable' : 'input',
+        start: active.selectionStart,
+        end: active.selectionEnd
+      };
+    }
+    if (this.lastActiveTarget && this.lastActiveTarget.el && document.body.contains(this.lastActiveTarget.el)) {
+      return this.lastActiveTarget;
+    }
+    const guideEditor = document.getElementById('modal-guide-visual-editor');
+    if (guideEditor) {
+      return { el: guideEditor, type: 'contenteditable' };
+    }
+    return null;
+  },
+
+  triggerTargetInput(el) {
+    if (!el) return;
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+  },
+
   applyWordFormat(type) {
-    const editor = document.getElementById('modal-guide-visual-editor');
-    if (!editor) return;
-    editor.focus();
+    const target = this.getLastEditTarget();
+    if (!target) return;
+
+    if (target.type === 'input') {
+      const el = target.el;
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      const val = el.value;
+      const selected = val.substring(start, end);
+
+      let rep = '';
+      switch (type) {
+        case 'bold': rep = selected ? `**${selected}**` : `**粗體**`; break;
+        case 'italic': rep = selected ? `*${selected}*` : `*斜體*`; break;
+        case 'strikethrough': rep = selected ? `~~${selected}~~` : `~~刪除線~~`; break;
+        case 'hr': rep = `\n---\n`; break;
+        case 'h2': rep = selected ? `\n## ${selected}\n` : `\n## 大標題\n`; break;
+        case 'h3': rep = selected ? `\n### ${selected}\n` : `\n### 次標題\n`; break;
+        case 'list':
+          rep = (selected || '清單項目').split('\n').map(l => `- ${l}`).join('\n');
+          break;
+        case 'numlist':
+          rep = (selected || '清單項目').split('\n').map((l, i) => `${i + 1}. ${l}`).join('\n');
+          break;
+        case 'outdent':
+          rep = selected.replace(/^\s{2,4}/gm, '');
+          break;
+        case 'indent':
+          rep = selected.replace(/^/gm, '  ');
+          break;
+      }
+      el.setRangeText(rep, start, end, 'end');
+      el.focus();
+      this.triggerTargetInput(el);
+      return;
+    }
+
+    // contenteditable
+    this.restoreSelection();
+    const editor = target.el;
+    if (editor && editor.focus) editor.focus();
 
     switch (type) {
-      case 'bold':
-        document.execCommand('bold', false, null);
-        break;
-      case 'italic':
-        document.execCommand('italic', false, null);
-        break;
-      case 'strikethrough':
-        document.execCommand('strikeThrough', false, null);
-        break;
+      case 'bold': document.execCommand('bold', false, null); break;
+      case 'italic': document.execCommand('italic', false, null); break;
+      case 'strikethrough': document.execCommand('strikeThrough', false, null); break;
       case 'hr': {
         document.execCommand('insertHorizontalRule', false, null);
         if (editor.lastElementChild && editor.lastElementChild.tagName === 'HR') {
@@ -1177,52 +1623,320 @@ const Admin = {
         break;
       }
       case 'h2':
-        document.execCommand('formatBlock', false, '<h2>');
+        try { document.execCommand('formatBlock', false, '<h2>'); }
+        catch (e) { document.execCommand('formatBlock', false, 'H2'); }
         break;
       case 'h3':
-        document.execCommand('formatBlock', false, '<h3>');
+        try { document.execCommand('formatBlock', false, '<h3>'); }
+        catch (e) { document.execCommand('formatBlock', false, 'H3'); }
         break;
-      case 'list':
-        document.execCommand('insertUnorderedList', false, null);
-        break;
-      case 'numlist':
-        document.execCommand('insertOrderedList', false, null);
-        break;
-      case 'outdent':
-        document.execCommand('outdent', false, null);
-        break;
-      case 'indent':
-        document.execCommand('indent', false, null);
-        break;
+      case 'list': document.execCommand('insertUnorderedList', false, null); break;
+      case 'numlist': document.execCommand('insertOrderedList', false, null); break;
+      case 'outdent': document.execCommand('outdent', false, null); break;
+      case 'indent': document.execCommand('indent', false, null); break;
     }
+    this.triggerTargetInput(editor);
   },
 
   applyTextColor(colorHex) {
-    const editor = document.getElementById('modal-guide-visual-editor');
-    if (!editor) return;
-    editor.focus();
+    const target = this.getLastEditTarget();
+    if (!target) return;
+
+    if (target.type === 'input') {
+      const el = target.el;
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      const selected = el.value.substring(start, end);
+      const rep = `<span style="color: ${colorHex}; font-weight: 700;">${selected || '文字'}</span>`;
+      el.setRangeText(rep, start, end, 'end');
+      el.focus();
+      this.triggerTargetInput(el);
+      return;
+    }
+
+    this.restoreSelection();
+    const editor = target.el;
+    if (editor && editor.focus) editor.focus();
     document.execCommand('foreColor', false, colorHex);
+    this.triggerTargetInput(editor);
   },
 
   applyHighlight(colorHex) {
-    const editor = document.getElementById('modal-guide-visual-editor');
-    if (!editor) return;
-    editor.focus();
+    const target = this.getLastEditTarget();
+    if (!target) return;
+
+    if (target.type === 'input') {
+      const el = target.el;
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      const selected = el.value.substring(start, end);
+      let rep = '';
+      if (colorHex === 'transparent') {
+        rep = selected.replace(/<\/?mark[^>]*>/gi, '');
+      } else {
+        rep = `<mark style="background-color: ${colorHex}; padding: 2px 5px; border-radius: 4px;">${selected || '重點文字'}</mark>`;
+      }
+      el.setRangeText(rep, start, end, 'end');
+      el.focus();
+      this.triggerTargetInput(el);
+      return;
+    }
+
+    this.restoreSelection();
+    const editor = target.el;
+    if (editor && editor.focus) editor.focus();
 
     const sel = window.getSelection();
     if (sel && sel.rangeCount > 0 && !sel.isCollapsed) {
       const range = sel.getRangeAt(0);
-      const mark = document.createElement('mark');
-      mark.style.backgroundColor = colorHex;
-      mark.style.padding = '2px 5px';
-      mark.style.borderRadius = '4px';
-      mark.style.fontWeight = '600';
-      mark.appendChild(range.extractContents());
-      range.insertNode(mark);
+      if (colorHex === 'transparent') {
+        const span = document.createElement('span');
+        span.style.backgroundColor = 'transparent';
+        span.appendChild(range.extractContents());
+        range.insertNode(span);
+      } else {
+        const mark = document.createElement('mark');
+        mark.style.backgroundColor = colorHex;
+        mark.style.padding = '2px 5px';
+        mark.style.borderRadius = '4px';
+        mark.style.fontWeight = '600';
+        mark.appendChild(range.extractContents());
+        range.insertNode(mark);
+      }
       sel.removeAllRanges();
     } else {
       document.execCommand('hiliteColor', false, colorHex);
     }
+    this.triggerTargetInput(editor);
+  },
+
+  applyFontSize(size) {
+    const target = this.getLastEditTarget();
+    if (!target) return;
+
+    if (target.type === 'input') {
+      const el = target.el;
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      const selected = el.value.substring(start, end);
+      const rep = `<span style="font-size: ${size}; line-height: 1.4;">${selected || '文字'}</span>`;
+      el.setRangeText(rep, start, end, 'end');
+      el.focus();
+      this.triggerTargetInput(el);
+      Core.showToast(`🔤 已設定字級：${size}`);
+      return;
+    }
+
+    this.restoreSelection();
+    const editor = target.el;
+    if (editor && editor.focus) editor.focus();
+
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0 || sel.isCollapsed) {
+      Core.showToast('💡 請先用滑鼠選取要更改大小的文字！');
+      return;
+    }
+
+    const range = sel.getRangeAt(0);
+    const span = document.createElement('span');
+    span.style.fontSize = size;
+    span.style.lineHeight = '1.4';
+    span.appendChild(range.extractContents());
+    range.insertNode(span);
+
+    sel.removeAllRanges();
+    const newRange = document.createRange();
+    newRange.selectNodeContents(span);
+    sel.addRange(newRange);
+    this.saveSelection();
+    this.triggerTargetInput(editor);
+    Core.showToast(`🔤 已設定字級：${size}`);
+  },
+
+  insertKeycap(keyText) {
+    const target = this.getLastEditTarget();
+    if (!target) return;
+
+    if (target.type === 'input') {
+      const el = target.el;
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      const rep = `<span class="keycap">${keyText}</span> `;
+      el.setRangeText(rep, start, end, 'end');
+      el.focus();
+      this.triggerTargetInput(el);
+      Core.showToast(`⌨️ 已嵌入 [ ${keyText} ] 按鍵！`);
+      return;
+    }
+
+    this.restoreSelection();
+    const editor = target.el;
+    if (editor && editor.focus) editor.focus();
+
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return;
+    const range = sel.getRangeAt(0);
+    range.deleteContents();
+
+    const keySpan = document.createElement('span');
+    keySpan.className = 'keycap';
+    keySpan.setAttribute('contenteditable', 'false');
+    keySpan.textContent = keyText;
+    keySpan.style.margin = '0 3px';
+    keySpan.style.verticalAlign = 'middle';
+    keySpan.style.userSelect = 'all';
+
+    range.insertNode(keySpan);
+
+    const space = document.createTextNode('\u00A0');
+    if (keySpan.nextSibling) {
+      keySpan.parentNode.insertBefore(space, keySpan.nextSibling);
+    } else {
+      keySpan.parentNode.appendChild(space);
+    }
+
+    range.setStartAfter(space);
+    range.setEndAfter(space);
+    sel.removeAllRanges();
+    sel.addRange(range);
+    this.saveSelection();
+    this.triggerTargetInput(editor);
+    Core.showToast(`⌨️ 已嵌入 [ ${keyText} ] 按鍵！`);
+  },
+
+  insertMouseAction(btnType) {
+    const target = this.getLastEditTarget();
+    if (!target) return;
+
+    const isRight = btnType === 'right';
+    const mouseBadgeHTML = `
+      <span class="mouse-indicator mouse-${btnType}" contenteditable="false" style="margin: 0 4px; vertical-align: middle; user-select: all;" title="${isRight ? '滑鼠右鍵點擊' : '滑鼠左鍵點擊'}">
+        <svg viewBox="0 0 24 34" width="16" height="22" style="display:inline-block; vertical-align:middle;">
+          <rect x="1" y="1" width="22" height="32" rx="11" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+          <line x1="12" y1="1" x2="12" y2="15" stroke="#94a3b8" stroke-width="1.5"/>
+          <path class="btn-left" d="M1 12 C1 6 6 1 12 1 L12 15 L1 15 Z" fill="${isRight ? 'transparent' : '#dc2626'}"/>
+          <path class="btn-right" d="M12 1 C18 1 23 6 23 12 L23 15 L12 15 Z" fill="${isRight ? '#0284c7' : 'transparent'}"/>
+          <rect x="10.5" y="6" width="3" height="5" rx="1.5" fill="#64748b"/>
+        </svg>
+        <span class="mouse-label" style="font-size: 0.78rem;">${isRight ? '右鍵' : '左鍵'}</span>
+      </span>
+    `.trim() + ' ';
+
+    if (target.type === 'input') {
+      const el = target.el;
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      el.setRangeText(mouseBadgeHTML, start, end, 'end');
+      el.focus();
+      this.triggerTargetInput(el);
+      Core.showToast(`🖱️ 已嵌入 [ ${isRight ? '滑鼠右鍵' : '滑鼠左鍵'} ] 動作！`);
+      return;
+    }
+
+    this.restoreSelection();
+    const editor = target.el;
+    if (editor && editor.focus) editor.focus();
+
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return;
+    const range = sel.getRangeAt(0);
+    range.deleteContents();
+
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = mouseBadgeHTML;
+    const frag = document.createDocumentFragment();
+    let node;
+    while ((node = tempDiv.firstChild)) {
+      frag.appendChild(node);
+    }
+    range.insertNode(frag);
+    this.saveSelection();
+    this.triggerTargetInput(editor);
+    Core.showToast(`🖱️ 已嵌入 [ ${isRight ? '滑鼠右鍵' : '滑鼠左鍵'} ] 動作！`);
+  },
+
+  insertCustomKeycap(btnEl) {
+    let input = null;
+    if (btnEl && btnEl.parentElement) {
+      input = btnEl.parentElement.querySelector('.wt-custom-key-input') || btnEl.parentElement.querySelector('input');
+    }
+    if (!input) {
+      input = document.querySelector('.wt-custom-key-input') || document.getElementById('wt-custom-key-input');
+    }
+    if (!input) return;
+    const text = input.value.trim();
+    if (!text) {
+      Core.showToast('⚠️ 請輸入自訂按鍵文字 (例如: Shift + 右鍵)');
+      return;
+    }
+    this.insertKeycap(text);
+    input.value = '';
+  },
+
+  setupFloatingToolbar() {
+    const floatBar = document.getElementById('floating-word-toolbar');
+    if (!floatBar) return;
+
+    // Track focused inputs & contenteditable across the whole page
+    document.addEventListener('focusin', (e) => {
+      const el = e.target;
+      if (el && (el.isContentEditable || el.tagName === 'TEXTAREA' || (el.tagName === 'INPUT' && el.type === 'text'))) {
+        this.lastActiveTarget = {
+          el: el,
+          type: el.isContentEditable ? 'contenteditable' : 'input'
+        };
+      }
+    });
+
+    const updateFloatingToolbar = () => {
+      const info = this.getSelectionInfo();
+      if (!info) {
+        floatBar.style.display = 'none';
+        return;
+      }
+
+      this.lastActiveTarget = info;
+
+      floatBar.style.display = 'flex';
+      const barWidth = floatBar.offsetWidth || 420;
+      const barHeight = floatBar.offsetHeight || 38;
+
+      const rect = info.rect;
+      let left = rect.left + (rect.width / 2) - (barWidth / 2);
+      let top = rect.top - barHeight - 10;
+
+      if (left < 10) left = 10;
+      if (left + barWidth > window.innerWidth - 10) {
+        left = window.innerWidth - barWidth - 10;
+      }
+      if (top < 10) {
+        top = rect.bottom + 10;
+      }
+
+      floatBar.style.left = `${left}px`;
+      floatBar.style.top = `${top}px`;
+    };
+
+    document.addEventListener('selectionchange', () => {
+      updateFloatingToolbar();
+    });
+
+    document.addEventListener('mouseup', () => {
+      setTimeout(updateFloatingToolbar, 20);
+    });
+
+    document.addEventListener('keyup', () => {
+      setTimeout(updateFloatingToolbar, 20);
+    });
+
+    document.addEventListener('mousedown', (e) => {
+      if (!floatBar.contains(e.target)) {
+        const isInput = e.target.tagName === 'TEXTAREA' || (e.target.tagName === 'INPUT' && e.target.type === 'text') || (e.target.isContentEditable);
+        if (!isInput) {
+          floatBar.style.display = 'none';
+        }
+      }
+    });
   },
 
   setupVisualEditorEvents() {
@@ -1304,6 +2018,399 @@ const Admin = {
       }
       return `<p>${t.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/~~(.*?)~~/g, '<del>$1</del>').replace(/\n/g, '<br>')}</p>`;
     }).join('');
+  },
+
+  /* ================= 5.5 Beginner Guide Hub Section ================= */
+  switchBeginnerTab(tabName, btnEl) {
+    document.querySelectorAll('.beginner-sub-tab').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('#panel-beginner .editor-tabs .btn-tab').forEach(b => b.classList.remove('active'));
+
+    if (btnEl) btnEl.classList.add('active');
+    const target = document.getElementById(`beginner-sub-${tabName}`);
+    if (target) target.style.display = 'block';
+
+    if (tabName === 'live-view') {
+      this.refreshBeginnerPreview();
+    }
+  },
+
+  refreshBeginnerPreview() {
+    const iframe = document.getElementById('beginner-live-iframe');
+    if (iframe) {
+      if (this.data && this.data.beginner) {
+        Core.saveDraft('beginner', this.data.beginner);
+      }
+      iframe.src = 'beginner.html?edit=1&t=' + Date.now();
+    }
+  },
+
+  renderBeginnerPanel() {
+    if (!this.data.beginner) {
+      this.data.beginner = { shortcuts: [], steps: [], safety: [], faq: [] };
+    }
+    const nameEl = document.getElementById('admin-sim-server-name');
+    if (nameEl && this.data.config && this.data.config.serverName) {
+      nameEl.textContent = this.data.config.serverName;
+    }
+    this.renderAdminBeginnerShortcuts();
+    this.renderAdminBeginnerSteps();
+    this.renderAdminBeginnerSafety();
+    this.renderAdminBeginnerFaq();
+  },
+
+  renderAdminBeginnerShortcuts() {
+    const container = document.getElementById('admin-beginner-shortcuts-list');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const list = this.data.beginner.shortcuts || [];
+    if (list.length === 0) {
+      container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.9rem; grid-column: 1/-1;">目前無快捷操作資料，可點擊上方按鈕新增。</div>';
+      return;
+    }
+
+    list.forEach((item, idx) => {
+      const card = document.createElement('div');
+      card.className = 'sim-shortcut-card';
+
+      card.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.45rem; padding-bottom: 0.5rem; border-bottom: 1px dashed var(--border-color); flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 0.4rem;">
+            <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted);">鍵位:</span>
+            <input type="text" class="form-control" style="font-size: 0.82rem; padding: 3px 8px; width: 110px; font-family: var(--font-mono); font-weight: 800;" value="${escapeAttr(item.keyDisplay || '')}" oninput="Admin.updateBeginnerShortcutKey(${idx}, this.value)" placeholder="如 R, Shift">
+            <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-left: 0.25rem;">滑鼠:</span>
+            <select class="form-control" style="font-size: 0.8rem; padding: 3px 6px; width: auto;" onchange="Admin.updateBeginnerShortcutMouse(${idx}, this.value)">
+              <option value="none" ${item.mouseButton === 'none' || !item.mouseButton ? 'selected' : ''}>無滑鼠</option>
+              <option value="left" ${item.mouseButton === 'left' ? 'selected' : ''}>滑鼠左鍵</option>
+              <option value="right" ${item.mouseButton === 'right' ? 'selected' : ''}>滑鼠右鍵</option>
+            </select>
+          </div>
+          <button type="button" class="btn btn-danger btn-sm" style="padding: 2px 7px; font-size: 0.75rem;" onclick="Admin.deleteBeginnerShortcut(${idx})" title="刪除此操作項">🗑️ 刪除</button>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div id="admin-sc-preview-${idx}">
+            ${this.renderAdminKeyMouseVisual(item)}
+          </div>
+          <div style="flex: 1;">
+            <div contenteditable="true" style="font-weight: 800; font-size: 1rem; color: var(--text-main); margin-bottom: 3px;" oninput="Admin.updateBeginnerShortcut(${idx}, 'title', this.innerHTML)" title="點擊直接修改操作名稱">${item.title || ''}</div>
+            <div contenteditable="true" style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;" oninput="Admin.updateBeginnerShortcut(${idx}, 'desc', this.innerHTML)" title="點擊直接修改操作說明">${item.desc || ''}</div>
+          </div>
+        </div>
+      `;
+
+      container.appendChild(card);
+    });
+  },
+
+  updateBeginnerShortcutKey(idx, val) {
+    if (!this.data.beginner.shortcuts[idx]) return;
+    this.data.beginner.shortcuts[idx].keyDisplay = val.trim();
+    Core.saveDraft('beginner', this.data.beginner);
+    const prevEl = document.getElementById(`admin-sc-preview-${idx}`);
+    if (prevEl) prevEl.innerHTML = this.renderAdminKeyMouseVisual(this.data.beginner.shortcuts[idx]);
+  },
+
+  updateBeginnerShortcutMouse(idx, val) {
+    if (!this.data.beginner.shortcuts[idx]) return;
+    this.data.beginner.shortcuts[idx].mouseButton = val;
+    Core.saveDraft('beginner', this.data.beginner);
+    const prevEl = document.getElementById(`admin-sc-preview-${idx}`);
+    if (prevEl) prevEl.innerHTML = this.renderAdminKeyMouseVisual(this.data.beginner.shortcuts[idx]);
+  },
+
+  renderAdminKeyMouseVisual(item) {
+    const parts = [];
+    const btn = item.mouseButton || 'none';
+    
+    if (item.keyDisplay) {
+      if (item.keyType === 'mouse' && item.keyDisplay === '手持精靈球') {
+        parts.push(`<span class="keycap" style="font-size: 0.75rem; padding: 0 6px; white-space: nowrap;">手持精靈球</span>`);
+      } else {
+        const keys = item.keyDisplay.split(/(\s*\+\s*|\s*或\s*)/);
+        keys.forEach(k => {
+          const trimmed = k.trim();
+          if (trimmed === '+' || trimmed === '或') {
+            parts.push(`<span style="font-weight: 800; color: var(--text-muted); font-size: 0.8rem;">${trimmed}</span>`);
+          } else if (trimmed) {
+            parts.push(`<span class="keycap" style="min-width: 28px; height: 28px; font-size: 0.85rem;">${escapeHTML(trimmed)}</span>`);
+          }
+        });
+      }
+    }
+
+    if (btn === 'right') {
+      if (parts.length > 0 && item.keyType !== 'mouse') {
+        parts.push(`<span style="font-weight: 800; color: var(--text-muted); font-size: 0.8rem;">+</span>`);
+      }
+      parts.push(`
+        <div class="mouse-indicator mouse-right" title="滑鼠右鍵點擊">
+          <svg viewBox="0 0 24 34" width="16" height="22">
+            <rect x="1" y="1" width="22" height="32" rx="11" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+            <line x1="12" y1="1" x2="12" y2="15" stroke="#94a3b8" stroke-width="1.5"/>
+            <path class="btn-left" d="M1 12 C1 6 6 1 12 1 L12 15 L1 15 Z" fill="transparent"/>
+            <path class="btn-right" d="M12 1 C18 1 23 6 23 12 L23 15 L12 15 Z" fill="#0284c7"/>
+            <rect x="10.5" y="6" width="3" height="5" rx="1.5" fill="#64748b"/>
+          </svg>
+          <span class="mouse-label" style="font-size: 0.78rem;">右鍵</span>
+        </div>
+      `);
+    } else if (btn === 'left') {
+      if (parts.length > 0 && item.keyType !== 'mouse') {
+        parts.push(`<span style="font-weight: 800; color: var(--text-muted); font-size: 0.8rem;">+</span>`);
+      }
+      parts.push(`
+        <div class="mouse-indicator mouse-left" title="滑鼠左鍵點擊">
+          <svg viewBox="0 0 24 34" width="16" height="22">
+            <rect x="1" y="1" width="22" height="32" rx="11" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+            <line x1="12" y1="1" x2="12" y2="15" stroke="#94a3b8" stroke-width="1.5"/>
+            <path class="btn-left" d="M1 12 C1 6 6 1 12 1 L12 15 L1 15 Z" fill="#dc2626"/>
+            <path class="btn-right" d="M12 1 C18 1 23 6 23 12 L23 15 L12 15 Z" fill="transparent"/>
+            <rect x="10.5" y="6" width="3" height="5" rx="1.5" fill="#64748b"/>
+          </svg>
+          <span class="mouse-label" style="font-size: 0.78rem;">左鍵</span>
+        </div>
+      `);
+    }
+
+    return `<div class="keycap-combo">${parts.join('')}</div>`;
+  },
+
+  addBeginnerShortcut() {
+    if (!this.data.beginner.shortcuts) this.data.beginner.shortcuts = [];
+    this.data.beginner.shortcuts.push({
+      keyType: 'keyboard',
+      keyDisplay: '新按鍵',
+      mouseButton: 'none',
+      title: '自訂操作名稱',
+      desc: '請在此輸入操作之功能說明...'
+    });
+    this.renderAdminBeginnerShortcuts();
+    Core.saveDraft('beginner', this.data.beginner);
+  },
+
+  deleteBeginnerShortcut(idx) {
+    if (confirm('確定刪除此快捷操作項目嗎？')) {
+      this.data.beginner.shortcuts.splice(idx, 1);
+      this.renderAdminBeginnerShortcuts();
+      Core.saveDraft('beginner', this.data.beginner);
+    }
+  },
+
+  updateBeginnerShortcut(idx, field, val) {
+    const item = this.data.beginner.shortcuts[idx];
+    if (item) {
+      item[field] = val.trim();
+      Core.saveDraft('beginner', this.data.beginner);
+      const prevEl = document.getElementById(`admin-sc-preview-${idx}`);
+      if (prevEl) {
+        prevEl.innerHTML = this.renderAdminKeyMouseVisual(item);
+      }
+    }
+  },
+
+  addBeginnerStep() {
+    if (!this.data.beginner.steps) this.data.beginner.steps = [];
+    const num = this.data.beginner.steps.length + 1;
+    this.data.beginner.steps.push({
+      badge: `階段 0${num}`,
+      title: '新步驟指引',
+      desc: '步驟簡要說明...',
+      points: ['重點 1: 說明文字']
+    });
+    this.renderAdminBeginnerSteps();
+    Core.saveDraft('beginner', this.data.beginner);
+  },
+
+  deleteBeginnerStep(idx) {
+    if (confirm('確定刪除此開局步驟嗎？')) {
+      this.data.beginner.steps.splice(idx, 1);
+      this.renderAdminBeginnerSteps();
+      Core.saveDraft('beginner', this.data.beginner);
+    }
+  },
+
+  renderAdminBeginnerSteps() {
+    const container = document.getElementById('admin-beginner-steps-list');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const steps = this.data.beginner.steps || [];
+    if (steps.length === 0) {
+      container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.9rem;">目前無開局步驟，可點擊上方按鈕新增。</div>';
+      return;
+    }
+
+    steps.forEach((step, idx) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.cssText = 'padding: 1.25rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: #ffffff;';
+
+      const pointsText = (step.points || []).join('\n');
+
+      card.innerHTML = `
+        <div style="font-weight: 800; font-size: 1rem; color: var(--primary-text); margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
+          <span>📌 第 ${idx + 1} 階段教學</span>
+          <button type="button" class="btn btn-danger btn-sm" onclick="Admin.deleteBeginnerStep(${idx})">🗑️ 刪除</button>
+        </div>
+        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 0.75rem; margin-bottom: 0.65rem;">
+          <div>
+            <label class="form-label" style="font-size: 0.8rem;">階段徽章標籤 (Badge)</label>
+            <input type="text" class="form-control" value="${escapeAttr(step.badge || '')}" oninput="Admin.updateBeginnerStep(${idx}, 'badge', this.value)">
+          </div>
+          <div>
+            <label class="form-label" style="font-size: 0.8rem;">步驟標題 (Title)</label>
+            <input type="text" class="form-control" value="${escapeAttr(step.title || '')}" oninput="Admin.updateBeginnerStep(${idx}, 'title', this.value)">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom: 0.65rem;">
+          <label class="form-label" style="font-size: 0.8rem;">前言引導說明 (Description)</label>
+          <input type="text" class="form-control" value="${escapeAttr(step.desc || '')}" oninput="Admin.updateBeginnerStep(${idx}, 'desc', this.value)">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label" style="font-size: 0.8rem;">重點列點清單 (每行一點)</label>
+          <textarea class="form-control" style="min-height: 90px; font-size: 0.9rem;" oninput="Admin.updateBeginnerStepPoints(${idx}, this.value)">${escapeHTML(pointsText)}</textarea>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  },
+
+  updateBeginnerStep(idx, field, val) {
+    if (this.data.beginner.steps[idx]) {
+      this.data.beginner.steps[idx][field] = val.trim();
+      Core.saveDraft('beginner', this.data.beginner);
+    }
+  },
+
+  updateBeginnerStepPoints(idx, multiline) {
+    if (this.data.beginner.steps[idx]) {
+      this.data.beginner.steps[idx].points = multiline.split('\n').map(s => s.trim()).filter(Boolean);
+      Core.saveDraft('beginner', this.data.beginner);
+    }
+  },
+
+  addBeginnerSafety() {
+    if (!this.data.beginner.safety) this.data.beginner.safety = [];
+    this.data.beginner.safety.push({
+      title: '新領地與家園教學',
+      desc: '請在此輸入領地或指令教學說明...'
+    });
+    this.renderAdminBeginnerSafety();
+    Core.saveDraft('beginner', this.data.beginner);
+  },
+
+  deleteBeginnerSafety(idx) {
+    if (confirm('確定刪除此領地教學項目嗎？')) {
+      this.data.beginner.safety.splice(idx, 1);
+      this.renderAdminBeginnerSafety();
+      Core.saveDraft('beginner', this.data.beginner);
+    }
+  },
+
+  renderAdminBeginnerSafety() {
+    const container = document.getElementById('admin-beginner-safety-list');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const safety = this.data.beginner.safety || [];
+    if (safety.length === 0) {
+      container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.9rem;">目前無領地教學項目，可點擊上方按鈕新增。</div>';
+      return;
+    }
+
+    safety.forEach((s, idx) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.cssText = 'padding: 1.25rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: #ffffff;';
+
+      card.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
+          <span style="font-weight: 800; font-size: 0.95rem; color: var(--primary-text);">領地防護指南 #${idx + 1}</span>
+          <button type="button" class="btn btn-danger btn-sm" onclick="Admin.deleteBeginnerSafety(${idx})">🗑️ 刪除</button>
+        </div>
+        <div class="form-group" style="margin-bottom: 0.65rem;">
+          <label class="form-label" style="font-size: 0.8rem;">指南標題</label>
+          <input type="text" class="form-control" value="${escapeAttr(s.title || '')}" oninput="Admin.updateBeginnerSafety(${idx}, 'title', this.value)">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label" style="font-size: 0.8rem;">防護教學詳細說明</label>
+          <textarea class="form-control" style="min-height: 60px;" oninput="Admin.updateBeginnerSafety(${idx}, 'desc', this.value)">${escapeHTML(s.desc || '')}</textarea>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  },
+
+  updateBeginnerSafety(idx, field, val) {
+    if (this.data.beginner.safety[idx]) {
+      this.data.beginner.safety[idx][field] = val.trim();
+      Core.saveDraft('beginner', this.data.beginner);
+    }
+  },
+
+  renderAdminBeginnerFaq() {
+    const container = document.getElementById('admin-beginner-faq-list');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const faq = this.data.beginner.faq || [];
+    faq.forEach((f, idx) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.cssText = 'padding: 1.25rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: #ffffff;';
+
+      card.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
+          <span style="font-weight: 800; font-size: 0.9rem; color: var(--primary-text);">問答 #${idx + 1}</span>
+          <button type="button" class="btn btn-danger btn-sm" onclick="Admin.deleteBeginnerFaq(${idx})">🗑️ 刪除</button>
+        </div>
+        <div class="form-group" style="margin-bottom: 0.65rem;">
+          <label class="form-label" style="font-size: 0.8rem;">問題 (Q)</label>
+          <input type="text" class="form-control" value="${escapeAttr(f.q || '')}" oninput="Admin.updateBeginnerFaq(${idx}, 'q', this.value)">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label" style="font-size: 0.8rem;">解答說明 (A)</label>
+          <textarea class="form-control" style="min-height: 60px;" oninput="Admin.updateBeginnerFaq(${idx}, 'a', this.value)">${escapeHTML(f.a || '')}</textarea>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  },
+
+  addBeginnerFaq() {
+    if (!this.data.beginner.faq) this.data.beginner.faq = [];
+    this.data.beginner.faq.push({
+      q: '新常見問題標題？',
+      a: '請在此輸入詳細解答與說明操作方式...'
+    });
+    this.renderAdminBeginnerFaq();
+    Core.saveDraft('beginner', this.data.beginner);
+  },
+
+  deleteBeginnerFaq(idx) {
+    if (confirm('確定刪除此問答項目嗎？')) {
+      this.data.beginner.faq.splice(idx, 1);
+      this.renderAdminBeginnerFaq();
+      Core.saveDraft('beginner', this.data.beginner);
+    }
+  },
+
+  updateBeginnerFaq(idx, field, val) {
+    if (this.data.beginner.faq[idx]) {
+      this.data.beginner.faq[idx][field] = val.trim();
+      Core.saveDraft('beginner', this.data.beginner);
+    }
+  },
+
+  async saveBeginnerData() {
+    Core.saveDraft('beginner', this.data.beginner);
+    if (FS.dirHandle) {
+      await FS.writeFile(['data', 'beginner.json'], JSON.stringify(this.data.beginner, null, 2));
+      await FS.syncAll(this.data);
+      Core.showToast('🎉 新手專區設定已成功儲存並同步寫入硬碟！');
+    } else {
+      Core.showToast('✅ 新手專區設定已暫存至瀏覽器快取！');
+    }
   },
 
   /* ================= 6. Donate Section ================= */
@@ -1430,9 +2537,13 @@ const Admin = {
 };
 
 function escapeAttr(str) {
-  return String(str || '').replace(/[&<>'"]/g, 
-    tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+  return escapeHTML(str);
 }
+
+window.Admin = Admin;
+window.FS = FS;
+window.escapeHTML = escapeHTML;
+window.escapeAttr = escapeAttr;
 
 document.addEventListener('DOMContentLoaded', () => {
   Admin.init();

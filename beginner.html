@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CobblemonOasis 綠洲 - 新手入門專區</title>
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    .shortcut-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.15rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .shortcut-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+      border-color: #cbd5e1;
+    }
+    .step-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+      box-shadow: var(--shadow-sm);
+    }
+    .step-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--primary-text);
+      background: var(--primary-light);
+      padding: 3px 12px;
+      border-radius: 999px;
+      margin-bottom: 0.75rem;
+    }
+    .faq-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 0.85rem;
+    }
+    .faq-q {
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.35rem;
+    }
+    .faq-a {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="index.html" class="brand-link">
+        <span class="server-name-target">CobblemonOasis 綠洲</span>
+        <span class="brand-badge">WIKI</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">首頁</a></li>
+        <li><a href="beginner.html" class="active">新手專區</a></li>
+        <li><a href="commands.html">指令查詢</a></li>
+        <li><a href="pokedex.html">寶可夢圖鑑</a></li>
+        <li><a href="type-chart.html">屬性相剋</a></li>
+        <li><a href="guides.html">攻略專區</a></li>
+        <li><a href="donate.html">贊助支持</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1 class="page-title">🔰 新手冒險專區</h1>
+      <p class="page-desc">歡迎來到 <span class="server-name-target">CobblemonOasis 綠洲</span>！這裡整理了最關鍵的鍵盤操作、新手開局四步驟與家園領地防護，助你輕鬆啟程！</p>
+    </div>
+
+    <!-- Section 1: Keybindings & Controls -->
+    <section style="margin-bottom: 3.5rem;">
+      <h2 style="font-size: 1.45rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+        <span>🎮</span> 核心鍵盤與滑鼠操作對照表
+      </h2>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.25rem;">
+        Cobblemon 擁有獨創的戰鬥與精靈互動控制，滑鼠左右鍵高亮與鍵帽圖示助你一眼看懂操作：
+      </p>
+
+      <!-- Dynamic Shortcuts Grid -->
+      <div id="beginner-shortcuts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 1rem;"></div>
+    </section>
+
+    <!-- Section 2: Beginner 4 Steps -->
+    <section style="margin-bottom: 3.5rem;">
+      <h2 style="font-size: 1.45rem; font-weight: 800; color: var(--text-main); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <span>🌱</span> 新手開局第一天：從零開始拓荒指南
+      </h2>
+      <div id="beginner-steps-container"></div>
+    </section>
+
+    <!-- Section 3: Territory & Home Safety -->
+    <section style="margin-bottom: 3.5rem;">
+      <h2 style="font-size: 1.45rem; font-weight: 800; color: var(--text-main); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <span>🛡️</span> 家園與領地防護教學（防偷防拆）
+      </h2>
+      <div class="card" style="padding: 1.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-lg);">
+        <p style="color: var(--text-main); line-height: 1.8; margin-bottom: 1rem;">
+          在伺服器中建立家園前，第一件事就是<strong>圈立領地（Claim）</strong>，領地能百分之百保護你的建築不被破壞、箱子不被偷竊、牧場精靈不被他人攻擊：
+        </p>
+
+        <div id="beginner-safety-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;"></div>
+
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 0.85rem 1rem; border-radius: var(--radius-md); font-size: 0.9rem; color: #166534;">
+          💡 更多領地擴展、子領地劃分與個人指令，請點擊上方導覽前往 <strong><a href="commands.html" style="color: #15803d; font-weight: 800; text-decoration: underline;">「指令速查手冊」</a></strong> 查看！
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Beginner FAQ -->
+    <section style="margin-bottom: 3.5rem;">
+      <h2 style="font-size: 1.45rem; font-weight: 800; color: var(--text-main); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <span>💡</span> 新手常見問答（FAQ）
+      </h2>
+      <div id="beginner-faq-container"></div>
+    </section>
+
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="footer-links">
+      <a href="index.html">首頁</a>
+      <a href="beginner.html">新手專區</a>
+      <a href="commands.html">指令</a>
+      <a href="pokedex.html">圖鑑</a>
+      <a href="type-chart.html">屬性相剋</a>
+      <a href="guides.html">攻略</a>
+      <a href="donate.html">贊助支持</a>
+    </div>
+    <p>© Cobblemon Community. Minecraft is copyright Mojang AB. Pokémon is copyright Nintendo/Game Freak.</p>
+  </footer>
+
+  <script src="data/database.js"></script>
+  <script src="js/core.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Dynamic Server Name
+      const cfg = await Core.loadJSON('config', 'data/config.json');
+      if (cfg && cfg.serverName) {
+        document.title = `${cfg.serverName} - 新手入門專區`;
+        document.querySelectorAll('.server-name-target').forEach(el => {
+          el.textContent = cfg.serverName;
+        });
+      }
+
+      // Load Beginner Data from JSON
+      const data = await Core.loadJSON('beginner', 'data/beginner.json');
+      if (!data) return;
+
+      // 1. Render Shortcuts
+      const grid = document.getElementById('beginner-shortcuts-grid');
+      if (grid && data.shortcuts && Array.isArray(data.shortcuts)) {
+        grid.innerHTML = data.shortcuts.map(item => `
+          <div class="shortcut-card">
+            ${renderKeyMouseVisual(item)}
+            <div>
+              <div style="font-weight: 800; font-size: 1rem; color: var(--text-main); margin-bottom: 2px;">${renderRichText(item.title || '')}</div>
+              <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">${renderRichText(item.desc || '')}</div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // 2. Render Steps
+      const stepsContainer = document.getElementById('beginner-steps-container');
+      if (stepsContainer && data.steps && Array.isArray(data.steps)) {
+        stepsContainer.innerHTML = data.steps.map(step => `
+          <div class="step-card">
+            <div class="step-badge">${renderRichText(step.badge || '指南')}</div>
+            <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--text-main);">${renderRichText(step.title || '')}</h3>
+            ${step.desc ? `<p style="color: var(--text-main); line-height: 1.8; margin-bottom: 0.75rem;">${renderRichText(step.desc)}</p>` : ''}
+            ${step.points && step.points.length > 0 ? `
+              <ul style="padding-left: 1.5rem; line-height: 1.8; color: var(--text-muted);">
+                ${step.points.map(pt => `<li>${renderRichText(pt)}</li>`).join('')}
+              </ul>
+            ` : ''}
+          </div>
+        `).join('');
+      }
+
+      // 3. Render Safety
+      const safetyGrid = document.getElementById('beginner-safety-grid');
+      if (safetyGrid && data.safety && Array.isArray(data.safety)) {
+        safetyGrid.innerHTML = data.safety.map(s => `
+          <div style="background: var(--bg-page); padding: 1.15rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <div style="font-weight: 800; color: var(--primary-text); margin-bottom: 0.35rem; font-size: 1rem;">${renderRichText(s.title || '')}</div>
+            <div style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6;">${renderRichText(s.desc || '')}</div>
+          </div>
+        `).join('');
+      }
+
+      // 4. Render FAQ
+      const faqContainer = document.getElementById('beginner-faq-container');
+      if (faqContainer && data.faq && Array.isArray(data.faq)) {
+        faqContainer.innerHTML = data.faq.map(f => `
+          <div class="faq-card">
+            <div class="faq-q"><span>❓</span> ${renderRichText(f.q || '')}</div>
+            <div class="faq-a">${renderRichText(f.a || '')}</div>
+          </div>
+        `).join('');
+      }
+    });
+
+    function renderKeyMouseVisual(item) {
+      const parts = [];
+      const btn = item.mouseButton || 'none';
+      
+      if (item.keyDisplay) {
+        if (item.keyType === 'mouse' && item.keyDisplay === '手持精靈球') {
+          parts.push(`<span class="keycap" style="font-size: 0.8rem; padding: 0 8px; white-space: nowrap;">手持精靈球</span>`);
+        } else {
+          const keys = item.keyDisplay.split(/(\s*\+\s*|\s*或\s*)/);
+          keys.forEach(k => {
+            const trimmed = k.trim();
+            if (trimmed === '+' || trimmed === '或') {
+              parts.push(`<span style="font-weight: 800; color: var(--text-muted); font-size: 0.85rem;">${trimmed}</span>`);
+            } else if (trimmed) {
+              parts.push(`<span class="keycap">${escapeHTML(trimmed)}</span>`);
+            }
+          });
+        }
+      }
+
+      if (btn === 'right') {
+        if (parts.length > 0 && item.keyType !== 'mouse') {
+          parts.push(`<span style="font-weight: 800; color: var(--text-muted); font-size: 0.85rem;">+</span>`);
+        }
+        parts.push(`
+          <div class="mouse-indicator mouse-right" title="滑鼠右鍵點擊">
+            <svg viewBox="0 0 24 34" width="18" height="25">
+              <rect x="1" y="1" width="22" height="32" rx="11" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+              <line x1="12" y1="1" x2="12" y2="15" stroke="#94a3b8" stroke-width="1.5"/>
+              <path class="btn-left" d="M1 12 C1 6 6 1 12 1 L12 15 L1 15 Z" fill="transparent"/>
+              <path class="btn-right" d="M12 1 C18 1 23 6 23 12 L23 15 L12 15 Z" fill="#0284c7"/>
+              <rect x="10.5" y="6" width="3" height="5" rx="1.5" fill="#64748b"/>
+            </svg>
+            <span class="mouse-label">右鍵</span>
+          </div>
+        `);
+      } else if (btn === 'left') {
+        if (parts.length > 0 && item.keyType !== 'mouse') {
+          parts.push(`<span style="font-weight: 800; color: var(--text-muted); font-size: 0.85rem;">+</span>`);
+        }
+        parts.push(`
+          <div class="mouse-indicator mouse-left" title="滑鼠左鍵點擊">
+            <svg viewBox="0 0 24 34" width="18" height="25">
+              <rect x="1" y="1" width="22" height="32" rx="11" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+              <line x1="12" y1="1" x2="12" y2="15" stroke="#94a3b8" stroke-width="1.5"/>
+              <path class="btn-left" d="M1 12 C1 6 6 1 12 1 L12 15 L1 15 Z" fill="#dc2626"/>
+              <path class="btn-right" d="M12 1 C18 1 23 6 23 12 L23 15 L12 15 Z" fill="transparent"/>
+              <rect x="10.5" y="6" width="3" height="5" rx="1.5" fill="#64748b"/>
+            </svg>
+            <span class="mouse-label">左鍵</span>
+          </div>
+        `);
+      }
+
+      return `<div class="keycap-combo">${parts.join('')}</div>`;
+    }
+
+    function renderRichText(str) {
+      if (!str) return '';
+      // If string already contains formatted HTML tags, return directly
+      if (/<(span|mark|strong|b|em|i|del|s|code|h2|h3|svg|div|p|ul|ol|li)[^>]*>/i.test(str)) {
+        return str;
+      }
+      let res = escapeHTML(str);
+      // Colon label bolding (e.g., 草系：說明)
+      const colonParts = res.split('：');
+      if (colonParts.length > 1 && colonParts[0].length < 25) {
+        res = `<strong>${colonParts[0]}：</strong>${colonParts.slice(1).join('：')}`;
+      }
+      // Markdown bold
+      res = res.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      // Markdown italic
+      res = res.replace(/\*(.*?)\*/g, '<em>$1</em>');
+      // Markdown strikethrough
+      res = res.replace(/~~(.*?)~~/g, '<del>$1</del>');
+      // Markdown highlight ==text==
+      res = res.replace(/==(.*?)==/g, '<mark style="background:#fef08a; padding:2px 5px; border-radius:4px;">$1</mark>');
+      // Markdown keys [W] -> 3D keycap
+      res = res.replace(/\[([A-Za-z0-9\s\/\+\-]+)\]/g, '<span class="keycap" style="min-width:24px; height:24px; font-size:0.8rem; padding:0 6px;">$1</span>');
+      // Command code formatting
+      res = res.replace(/(\/[a-zA-Z0-9_-]+(\s+\[.*?\]|\s+&lt;.*?&gt;)?)/g, '<code>$1</code>');
+      return res;
+    }
+
+    function escapeHTML(str) {
+      return String(str || '').replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+    }
+  </script>
+</body>
+</html>

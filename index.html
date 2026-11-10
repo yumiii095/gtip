@@ -143,6 +143,7 @@
       </a>
       <ul class="nav-links">
         <li><a href="index.html" class="active">首頁</a></li>
+        <li><a href="beginner.html">新手專區</a></li>
         <li><a href="commands.html">指令查詢</a></li>
         <li><a href="pokedex.html">寶可夢圖鑑</a></li>
         <li><a href="type-chart.html">屬性相剋</a></li>
@@ -157,9 +158,6 @@
     
     <!-- Hero Section (Left-aligned & perfectly flush with content) -->
     <section class="hero-open-section">
-      <div class="hero-badge">
-        🌿 官方冒險指南
-      </div>
       <h1 id="hero-title" class="server-name-target hero-title">
         CobblemonOasis 綠洲
       </h1>
@@ -169,7 +167,14 @@
     </section>
 
     <!-- Quick Navigation Hub (Frosted Glass Cards) -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-bottom: 2.75rem;">
+    <div id="hero-quick-nav" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-bottom: 2.75rem;">
+      <a href="beginner.html" class="nav-card">
+        <div>
+          <div style="font-size: 2rem; margin-bottom: 0.65rem;">🔰</div>
+          <div style="font-weight: 800; font-size: 1.2rem; margin-bottom: 0.35rem; color: var(--text-main);">新手入門專區</div>
+          <div style="font-size: 0.92rem; color: var(--text-muted); line-height: 1.55;">鍵盤快捷鍵對照、從零開始的冒險開局與領地防護教學。</div>
+        </div>
+      </a>
       <a href="commands.html" class="nav-card">
         <div>
           <div style="font-size: 2rem; margin-bottom: 0.65rem;">⌨️</div>
@@ -184,17 +189,10 @@
           <div style="font-size: 0.92rem; color: var(--text-muted); line-height: 1.55;">查詢 1,000+ 隻寶可夢擊敗掉落物機率、群系加成與立繪。</div>
         </div>
       </a>
-      <a href="type-chart.html" class="nav-card">
-        <div>
-          <div style="font-size: 2rem; margin-bottom: 0.65rem;">⚔️</div>
-          <div style="font-weight: 800; font-size: 1.2rem; margin-bottom: 0.35rem; color: var(--text-main);">屬性相剋計算機</div>
-          <div style="font-size: 0.92rem; color: var(--text-muted); line-height: 1.55;">支援攻擊雙屬性與防守雙屬性即時打擊分析。</div>
-        </div>
-      </a>
       <a href="guides.html" class="nav-card">
         <div>
           <div style="font-size: 2rem; margin-bottom: 0.65rem;">🧭</div>
-          <div style="font-weight: 800; font-size: 1.2rem; margin-bottom: 0.35rem; color: var(--text-main);">新手與進階攻略</div>
+          <div style="font-weight: 800; font-size: 1.2rem; margin-bottom: 0.35rem; color: var(--text-main);">進階攻略指南</div>
           <div style="font-size: 0.92rem; color: var(--text-muted); line-height: 1.55;">精靈球製作、牧場繁育、努力值培育等實用教學。</div>
         </div>
       </a>
@@ -227,6 +225,7 @@
   <footer class="site-footer">
     <div class="footer-links">
       <a href="index.html">首頁</a>
+      <a href="beginner.html">新手專區</a>
       <a href="commands.html">指令</a>
       <a href="pokedex.html">圖鑑</a>
       <a href="type-chart.html">屬性相剋</a>
@@ -251,6 +250,22 @@
         }
         if (cfg.tagline) {
           document.getElementById('hero-tagline').textContent = cfg.tagline;
+        }
+
+        // Render Quick Nav Cards from config
+        if (cfg.quickNav && Array.isArray(cfg.quickNav) && cfg.quickNav.length > 0) {
+          const navContainer = document.getElementById('hero-quick-nav');
+          if (navContainer) {
+            navContainer.innerHTML = cfg.quickNav.map(item => `
+              <a href="${escapeHTML(item.link || '#')}" class="nav-card">
+                <div>
+                  <div style="font-size: 2rem; margin-bottom: 0.65rem;">${escapeHTML(item.icon || '📌')}</div>
+                  <div style="font-weight: 800; font-size: 1.2rem; margin-bottom: 0.35rem; color: var(--text-main);">${escapeHTML(item.title || '')}</div>
+                  <div style="font-size: 0.92rem; color: var(--text-muted); line-height: 1.55;">${escapeHTML(item.desc || '')}</div>
+                </div>
+              </a>
+            `).join('');
+          }
         }
       }
 

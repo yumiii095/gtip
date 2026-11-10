@@ -1,5 +1,69 @@
 {
   "serverName": "CobblemonOasis 綠洲",
   "tagline": "在全新的方塊世界中，踏上專屬於你的寶可夢冒險旅程！",
-  "description": "這是一個提供純淨、流暢且充滿社群活力的 Cobblemon 伺服器，期待與你一同建立家園與冒險。"
+  "description": "這是一個提供純淨、流暢且充滿社群活力的 Cobblemon 伺服器，期待與你一同建立家園與冒險。",
+  "quickNav": [
+    {
+      "icon": "🔰",
+      "title": "新手入門專區",
+      "desc": "鍵盤快捷鍵對照、從零開始的冒險開局與領地防護教學。",
+      "link": "beginner.html"
+    },
+    {
+      "icon": "⌨️",
+      "title": "指令速查手冊",
+      "desc": "寶可夢指令、領地操作、實用快捷功能一鍵複製。",
+      "link": "commands.html"
+    },
+    {
+      "icon": "📖",
+      "title": "Cobblemon 圖鑑",
+      "desc": "查詢 1,000+ 隻寶可夢擊敗掉落物機率、群系加成與立繪。",
+      "link": "pokedex.html"
+    },
+    {
+      "icon": "🧭",
+      "title": "進階攻略指南",
+      "desc": "精靈球製作、牧場繁育、努力值培育等實用教學。",
+      "link": "guides.html"
+    }
+  ],
+  "commandCategories": [
+    {
+      "name": "個人功能",
+      "icon": "🎮"
+    },
+    {
+      "name": "社交",
+      "icon": "💬"
+    },
+    {
+      "name": "任務/獎勵",
+      "icon": "🎁"
+    },
+    {
+      "name": "領地",
+      "icon": "🏕️"
+    },
+    {
+      "name": "Home系統",
+      "icon": "🏠"
+    },
+    {
+      "name": "經濟",
+      "icon": "💰"
+    },
+    {
+      "name": "傳送",
+      "icon": "🧭"
+    },
+    {
+      "name": "VIP專屬",
+      "icon": "👑"
+    },
+    {
+      "name": "究極洞穴",
+      "icon": "🌀"
+    }
+  ]
 }

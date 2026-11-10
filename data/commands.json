@@ -1,56 +1,98 @@
 [
   {
+    "name": "/newcmd",
+    "category": "經濟",
+    "permission": "所有玩家",
+    "syntax": "/newcmd",
+    "description": "請在此輸入指令說明與用途"
+  },
+  {
+    "name": "/money",
+    "category": "經濟",
+    "permission": "所有玩家",
+    "syntax": "/money",
+    "description": "查詢玩家錢包餘額"
+  },
+  {
+    "name": "/r",
+    "category": "社交",
+    "permission": "所有玩家",
+    "syntax": "/r",
+    "description": "快速回覆上一個私聊訊息（例如 /r hello）"
+  },
+  {
+    "name": "/m",
+    "category": "社交",
+    "permission": "所有玩家",
+    "syntax": "/m",
+    "description": "快速單次私聊（例如 /m player hello）"
+  },
+  {
+    "name": "/message",
+    "category": "社交",
+    "permission": "所有玩家",
+    "syntax": "/message",
+    "description": "私聊玩家，同 /msg 、/talk 、/tell 、/m（例如 /message player hello）"
+  },
+  {
+    "name": "/pvp",
+    "category": "個人功能",
+    "permission": "所有玩家",
+    "syntax": "/pvp",
+    "description": "開啟或關閉個人互傷功能，關閉後雙方都不會受到彼此傷害。每次切換冷卻時間為 15 秒。"
+  },
+  {
     "name": "/pokeheal toggle",
-    "category": "個人",
+    "category": "VIP專屬",
     "permission": "Master VIP專屬",
     "syntax": "/pokeheal toggle",
     "description": "切換開啟／關閉「戰後自動治療」開關（預設關閉）"
   },
   {
     "name": "/pokeheal",
-    "category": "個人",
+    "category": "VIP專屬",
     "permission": "VIP專屬",
     "syntax": "/pokeheal",
     "description": "查看 VIP 治療指令使用幫助與規則說明"
   },
   {
     "name": "/pokeheal team",
-    "category": "個人",
+    "category": "VIP專屬",
     "permission": "VIP專屬",
     "syntax": "/pokeheal team",
     "description": "治療整個隊伍的寶可夢（消耗藥品＋1 遺跡硬幣）"
   },
   {
     "name": "/pokeheal 1~6",
-    "category": "個人",
+    "category": "VIP專屬",
     "permission": "VIP專屬",
     "syntax": "/pokeheal 1~6",
     "description": "治療隊伍中第 1~6 號位的寶可夢（消耗藥品＋1 遺跡硬幣）"
   },
   {
     "name": "/repair",
-    "category": "個人",
+    "category": "VIP專屬",
     "permission": "VIP專屬",
     "syntax": "/repair",
     "description": "修補目前主手手持物品（消耗日／月額度）"
   },
   {
     "name": "/fly",
-    "category": "個人",
+    "category": "VIP專屬",
     "permission": "VIP專屬",
     "syntax": "/fly",
     "description": "開啟／關閉飛行（切換分流或重生後需重新輸入開啟）"
   },
   {
     "name": "/ultra resume",
-    "category": "個人",
+    "category": "究極洞穴",
     "permission": "所有玩家",
     "syntax": "/ultra resume",
     "description": "恢復之前在究極空間登記暫停的巢穴挑戰"
   },
   {
     "name": "/ultra leave",
-    "category": "個人",
+    "category": "究極洞穴",
     "permission": "所有玩家",
     "syntax": "/ultra leave",
     "description": "究極空間巢穴背包滿時，整理背包後結算並離場"
@@ -64,35 +106,35 @@
   },
   {
     "name": "/lbl progress",
-    "category": "個人",
+    "category": "任務/獎勵",
     "permission": "所有玩家",
     "syntax": "/lbl progress",
     "description": "查詢幸運方塊累計開啟次數與保底進度"
   },
   {
     "name": "/bingo",
-    "category": "個人",
+    "category": "任務/獎勵",
     "permission": "所有玩家",
     "syntax": "/bingo",
     "description": "打開 Bingo（冰菓）活動任務棋盤"
   },
   {
     "name": "/daycare",
-    "category": "個人",
+    "category": "個人功能",
     "permission": "所有玩家",
     "syntax": "/daycare",
     "description": "快速開啟培育屋（孵蛋）操作介面"
   },
   {
     "name": "/cosmetic",
-    "category": "個人",
+    "category": "個人功能",
     "permission": "所有玩家",
     "syntax": "/cosmetic",
     "description": "快速開啟個人衣櫥／時裝介面"
   },
   {
     "name": "/onlinereward",
-    "category": "個人",
+    "category": "任務/獎勵",
     "permission": "所有玩家",
     "syntax": "/onlinereward",
     "description": "領取在線獎勵（閃光幸運方塊會寄送至信箱）"

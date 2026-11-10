@@ -18,6 +18,7 @@
       </a>
       <ul class="nav-links">
         <li><a href="index.html">返回前台首頁</a></li>
+        <li><a href="beginner.html">前台新手</a></li>
         <li><a href="commands.html">前台指令</a></li>
         <li><a href="pokedex.html">前台圖鑑</a></li>
         <li><a href="guides.html">前台攻略</a></li>
@@ -50,6 +51,7 @@
       </div>
       <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
         <button id="btn-fs-connect" type="button" class="btn btn-secondary btn-sm">📁 連結本機專案資料夾</button>
+        <button id="btn-fs-disconnect" type="button" class="btn btn-secondary btn-sm" style="display: none;" onclick="FS.disconnect()">✕ 解除連結</button>
         <button id="btn-fs-sync-all" type="button" class="btn btn-primary btn-sm" style="display: none;">💾 同步寫入本機檔案</button>
       </div>
     </div>
@@ -73,6 +75,9 @@
         </button>
         <button class="tab-btn" data-target="panel-guides">
           <span>🧭</span> 攻略文章
+        </button>
+        <button class="tab-btn" data-target="panel-beginner">
+          <span>🔰</span> 新手專區
         </button>
         <button class="tab-btn" data-target="panel-donate">
           <span>💖</span> 贊助方案
@@ -99,9 +104,15 @@
           <input type="text" id="cfg-tagline" class="form-control" placeholder="在全新的方塊世界中，踏上專屬於你的寶可夢冒險旅程！">
         </div>
 
-        <div class="form-group">
-          <label class="form-label">伺服器詳細簡介</label>
-          <textarea id="cfg-description" class="form-control" style="min-height: 100px;" placeholder="輸入伺服器的背景設定與簡介說明..."></textarea>
+        <!-- Quick Navigation Cards Configuration -->
+        <div style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+          <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span>🧭</span> 首頁四個快速導覽鍵設定
+          </h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+            管理員可直接於此自訂首頁中間 4 張卡片的圖示、標題、說明與跳轉連結：
+          </p>
+          <div id="cfg-quicknav-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem;"></div>
         </div>
       </section>
 
@@ -120,8 +131,18 @@
       <!-- Panel 3: Commands -->
       <section id="panel-commands" class="admin-panel">
         <div class="panel-header">
-          <h2 class="panel-title">指令庫管理</h2>
-          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <div>
+            <h2 class="panel-title">指令庫管理</h2>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 3px;">
+              管理 8 大分類伺服器指令、權限與說明，支援依分類自動歸類收折與建立時間排序。
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+            <div style="display: flex; background: #e2e8f0; padding: 2px; border-radius: var(--radius-sm); gap: 2px;">
+              <button type="button" id="btn-cmd-view-cat" class="btn btn-sm" style="padding: 4px 10px; font-size: 0.82rem; font-weight: 700; background: var(--primary); color: #fff;" onclick="Admin.setCommandsViewMode('category')">🗂️ 依分類歸類</button>
+              <button type="button" id="btn-cmd-view-time" class="btn btn-sm" style="padding: 4px 10px; font-size: 0.82rem; font-weight: 700; background: transparent; color: var(--text-main);" onclick="Admin.setCommandsViewMode('time')">⏱️ 依建立時間排序</button>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="Admin.promptAddCommandCategory()">🏷️ ＋ 新增分類</button>
             <button type="button" class="btn btn-secondary btn-sm" onclick="Admin.collapseAllCommands()">▲ 全部收折</button>
             <button type="button" class="btn btn-secondary btn-sm" onclick="Admin.expandAllCommands()">▼ 全部展開</button>
             <button type="button" class="btn btn-primary btn-sm" onclick="Admin.addCommand()">＋ 新增指令</button>
@@ -153,6 +174,196 @@
           </div>
         </div>
         <div id="admin-guides-list"></div>
+      </section>
+
+      <!-- Panel: Beginner Guide Hub (Direct 1:1 In-Place Simulation) -->
+      <section id="panel-beginner" class="admin-panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">🔰 新手專區 1:1 即時視覺化編輯</h2>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 3px;">
+              在此直接點擊文字即可修改，下方完整模擬前台呈現，邊改邊即時預覽！
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <a href="beginner.html" target="_blank" class="btn btn-secondary btn-sm">👁️ 檢視前台頁面</a>
+            <button type="button" class="btn btn-success btn-sm" onclick="Admin.saveBeginnerData()">💾 儲存寫入檔案</button>
+          </div>
+        </div>
+
+        <!-- Sticky / Top Edit Bar -->
+        <div style="background: #f0fdf4; border: 2px solid #86efac; border-radius: var(--radius-md); padding: 0.75rem 1.25rem; display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.75rem;">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <span style="background: #22c55e; color: #fff; font-weight: 800; font-size: 0.88rem; padding: 4px 12px; border-radius: 999px;">🟢 編輯模式中</span>
+            <span style="font-size: 0.88rem; color: #166534; font-weight: 600;">點選任何卡片文字或下方欄位，搭配工具列即可即時排版與嵌入鍵位！</span>
+          </div>
+          <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="Admin.addBeginnerShortcut()">＋ 快捷鍵</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="Admin.addBeginnerStep()">＋ 拓荒步驟</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="Admin.addBeginnerSafety()">＋ 領地教學</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="Admin.addBeginnerFaq()">＋ FAQ 問答</button>
+          </div>
+        </div>
+
+        <!-- Universal Word-like Formatting Toolbar for Beginner & Panel Editing -->
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <div class="word-toolbar" style="border-radius: var(--radius-md); border-bottom: 1px solid var(--border-color); background: #ffffff; box-shadow: var(--shadow-sm);">
+            <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('bold')" title="粗體 (選取文字後點擊)"><strong>B</strong> 粗體</button>
+            <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('italic')" title="斜體 (選取文字後點擊)"><em>I</em> 斜體</button>
+            <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('strikethrough')" title="刪除線 (選取文字後點擊)"><del>S</del> 刪除線</button>
+            <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('hr')" title="插入水平分隔線">― 分隔線</button>
+            <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('h2')" title="插入大標題">H2 大標</button>
+            <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('h3')" title="插入次標題">H3 次標</button>
+            <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('list')" title="項目符號清單">• 列點</button>
+            <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('numlist')" title="數字編號清單">1. 編號</button>
+            <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('outdent')" title="減少縮排 (靠左)">⇤ 減縮排</button>
+            <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('indent')" title="增加縮排 (向右)">⇥ 加縮排</button>
+
+            <div class="wt-divider"></div>
+
+            <!-- Font Size Dropdown -->
+            <div class="wt-dropdown">
+              <button type="button" class="wt-btn" onmousedown="event.preventDefault();" title="更改字型大小">A▾ 字級</button>
+              <div class="wt-dropdown-menu">
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyFontSize('24px')"><strong>特大 (24px)</strong></button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyFontSize('20px')">大 (20px)</button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyFontSize('18px')">中標 (18px)</button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyFontSize('16px')">標準 (16px)</button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyFontSize('13px')"><small>小字註解 (13px)</small></button>
+              </div>
+            </div>
+
+            <!-- Text Color Dropdown -->
+            <div class="wt-dropdown">
+              <button type="button" class="wt-btn" onmousedown="event.preventDefault();" title="文字顏色">🎨 文字顏色 ▾</button>
+              <div class="wt-dropdown-menu">
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyTextColor('#dc2626')"><span class="wt-dot" style="background: #dc2626;"></span> 🔴 警告紅</button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyTextColor('#16a34a')"><span class="wt-dot" style="background: #16a34a;"></span> 🟢 成功綠</button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyTextColor('#2563eb')"><span class="wt-dot" style="background: #2563eb;"></span> 🔵 提示藍</button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyTextColor('#d97706')"><span class="wt-dot" style="background: #d97706;"></span> 🟡 稀有金</button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyTextColor('#9333ea')"><span class="wt-dot" style="background: #9333ea;"></span> 🟣 史詩紫</button>
+              </div>
+            </div>
+
+            <!-- Highlighter Dropdown -->
+            <div class="wt-dropdown">
+              <button type="button" class="wt-btn" onmousedown="event.preventDefault();" title="螢光筆標記">🖍️ 螢光筆 ▾</button>
+              <div class="wt-dropdown-menu">
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyHighlight('#fef08a')"><span class="wt-dot" style="background: #fef08a;"></span> 🟡 經典黃</button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyHighlight('#bbf7d0')"><span class="wt-dot" style="background: #bbf7d0;"></span> 🟢 柔和綠</button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyHighlight('#fbcfe8')"><span class="wt-dot" style="background: #fbcfe8;"></span> 🌸 淡粉紅</button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyHighlight('#bfdbfe')"><span class="wt-dot" style="background: #bfdbfe;"></span> 💎 淺藍光</button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyHighlight('transparent')"><span class="wt-dot" style="background: #ffffff; border: 1px solid #94a3b8;"></span> ⚪ 清除螢光底色</button>
+              </div>
+            </div>
+
+            <div class="wt-divider"></div>
+
+            <!-- Embed Keycap / Mouse Dropdown -->
+            <div class="wt-dropdown">
+              <button type="button" class="wt-btn" onmousedown="event.preventDefault();" style="color: var(--primary-text); font-weight: 800;" title="在游標處插入立體 3D 鍵帽或滑鼠動作">⌨️ 嵌入鍵位 ▾</button>
+              <div class="wt-dropdown-menu" style="min-width: 290px; padding: 10px;">
+                <div style="font-size: 0.78rem; font-weight: 800; color: var(--text-muted); margin-bottom: 6px;">常用按鍵 (點擊直接插入)：</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px;">
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('W')">W</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('A')">A</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('S')">S</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('D')">D</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('Space')">Space</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('Shift')">Shift</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('Ctrl')">Ctrl</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('Alt')">Alt</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('R')">R</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('E')">E</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('F')">F</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('Q')">Q</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('X')">X</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('B')">B</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('M')">M</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('T')">T</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('/')">/</span>
+                </div>
+                <div style="font-size: 0.78rem; font-weight: 800; color: var(--text-muted); margin-bottom: 6px;">滑鼠動作：</div>
+                <div style="display: flex; gap: 6px; margin-bottom: 10px;">
+                  <button type="button" class="wt-btn" style="flex: 1; padding: 4px 6px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertMouseAction('left')">🖱️ 左鍵點擊</button>
+                  <button type="button" class="wt-btn" style="flex: 1; padding: 4px 6px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertMouseAction('right')">🖱️ 右鍵點擊</button>
+                </div>
+                <div style="font-size: 0.78rem; font-weight: 800; color: var(--text-muted); margin-bottom: 4px;">自訂按鍵文字：</div>
+                <div style="display: flex; gap: 4px;">
+                  <input type="text" class="form-control wt-custom-key-input" style="font-size: 0.82rem; padding: 3px 6px;" placeholder="如 Shift + 右鍵">
+                  <button type="button" class="btn btn-primary btn-sm" style="padding: 2px 10px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertCustomKeycap(this)">插入</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 1:1 True Front-end Simulation Canvas -->
+        <div class="sim-canvas">
+          
+          <!-- Page Header Preview -->
+          <div style="margin-bottom: 2.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border-color);">
+            <h1 style="font-size: 1.85rem; font-weight: 900; color: var(--text-main); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span>🔰</span> 新手冒險專區
+            </h1>
+            <p style="color: var(--text-muted); font-size: 1rem; line-height: 1.6;">
+              歡迎來到 <span style="font-weight: 800; color: var(--primary-text);" id="admin-sim-server-name">CobblemonOasis 綠洲</span>！這裡整理了最關鍵的鍵盤操作、新手開局四步驟與家園領地防護，助你輕鬆啟程！
+            </p>
+          </div>
+
+          <!-- Section 1: Shortcuts Grid -->
+          <section style="margin-bottom: 3.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
+                <span>🎮</span> 核心鍵盤與滑鼠操作對照表
+              </h2>
+              <button type="button" class="btn btn-primary btn-sm" onclick="Admin.addBeginnerShortcut()">＋ 新增快捷操作項</button>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 1.25rem;">
+              Cobblemon 擁有獨創的戰鬥與精靈互動控制，滑鼠左右鍵高亮與鍵帽圖示助你一眼看懂操作：
+            </p>
+            <div id="admin-beginner-shortcuts-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 1rem;"></div>
+          </section>
+
+          <!-- Section 2: Steps Container -->
+          <section style="margin-bottom: 3.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
+                <span>🌱</span> 新手開局第一天：從零開始拓荒指南
+              </h2>
+              <button type="button" class="btn btn-primary btn-sm" onclick="Admin.addBeginnerStep()">＋ 新增拓荒步驟</button>
+            </div>
+            <div id="admin-beginner-steps-list"></div>
+          </section>
+
+          <!-- Section 3: Safety Grid -->
+          <section style="margin-bottom: 3.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
+                <span>🛡️</span> 家園與領地防護教學（防偷防拆）
+              </h2>
+              <button type="button" class="btn btn-primary btn-sm" onclick="Admin.addBeginnerSafety()">＋ 新增領地教學</button>
+            </div>
+            <div style="background: var(--bg-surface); padding: 1.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-lg); margin-bottom: 1rem;">
+              <p style="color: var(--text-main); line-height: 1.8; margin-bottom: 1.25rem;">
+                在伺服器中建立家園前，第一件事就是<strong>圈立領地（Claim）</strong>，領地能百分之百保護你的建築不被破壞、箱子不被偷竊、牧場精靈不被他人攻擊：
+              </p>
+              <div id="admin-beginner-safety-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;"></div>
+            </div>
+          </section>
+
+          <!-- Section 4: FAQ Container -->
+          <section style="margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
+                <span>💡</span> 新手常見問答（FAQ）
+              </h2>
+              <button type="button" class="btn btn-primary btn-sm" onclick="Admin.addBeginnerFaq()">＋ 新增問答 (FAQ)</button>
+            </div>
+            <div id="admin-beginner-faq-list"></div>
+          </section>
+
+        </div>
       </section>
 
       <!-- Panel 6: Donate -->
@@ -273,39 +484,91 @@
         <!-- Word-like Formatting Toolbar (visible in write mode) -->
         <div id="modal-word-toolbar-box" class="form-group" style="margin-bottom: 0;">
           <div class="word-toolbar">
-            <button type="button" class="wt-btn" onclick="Admin.applyWordFormat('bold')" title="粗體 (選取文字後點擊)"><strong>B</strong> 粗體</button>
-            <button type="button" class="wt-btn" onclick="Admin.applyWordFormat('italic')" title="斜體 (選取文字後點擊)"><em>I</em> 斜體</button>
-            <button type="button" class="wt-btn" onclick="Admin.applyWordFormat('strikethrough')" title="刪除線 (選取文字後點擊)"><del>S</del> 刪除線</button>
-            <button type="button" class="wt-btn" onclick="Admin.applyWordFormat('hr')" title="插入水平分隔線">― 分隔線</button>
-            <button type="button" class="wt-btn" onclick="Admin.applyWordFormat('h2')" title="插入大標題">H2 大標</button>
-            <button type="button" class="wt-btn" onclick="Admin.applyWordFormat('h3')" title="插入次標題">H3 次標</button>
-            <button type="button" class="wt-btn" onclick="Admin.applyWordFormat('list')" title="項目符號清單">• 列點</button>
-            <button type="button" class="wt-btn" onclick="Admin.applyWordFormat('numlist')" title="數字編號清單">1. 編號</button>
-            <button type="button" class="wt-btn" onclick="Admin.applyWordFormat('outdent')" title="減少縮排 (靠左)">⇤ 減縮排</button>
-            <button type="button" class="wt-btn" onclick="Admin.applyWordFormat('indent')" title="增加縮排 (向右)">⇥ 加縮排</button>
+            <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('bold')" title="粗體 (選取文字後點擊)"><strong>B</strong> 粗體</button>
+            <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('italic')" title="斜體 (選取文字後點擊)"><em>I</em> 斜體</button>
+            <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('strikethrough')" title="刪除線 (選取文字後點擊)"><del>S</del> 刪除線</button>
+            <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('hr')" title="插入水平分隔線">― 分隔線</button>
+            <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('h2')" title="插入大標題">H2 大標</button>
+            <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('h3')" title="插入次標題">H3 次標</button>
+            <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('list')" title="項目符號清單">• 列點</button>
+            <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('numlist')" title="數字編號清單">1. 編號</button>
+            <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('outdent')" title="減少縮排 (靠左)">⇤ 減縮排</button>
+            <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('indent')" title="增加縮排 (向右)">⇥ 加縮排</button>
 
             <div class="wt-divider"></div>
 
+            <!-- Font Size Dropdown -->
+            <div class="wt-dropdown">
+              <button type="button" class="wt-btn" onmousedown="event.preventDefault();" title="更改字型大小">A▾ 字級</button>
+              <div class="wt-dropdown-menu">
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyFontSize('24px')"><strong>特大 (24px)</strong></button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyFontSize('20px')">大 (20px)</button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyFontSize('18px')">中標 (18px)</button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyFontSize('16px')">標準 (16px)</button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyFontSize('13px')"><small>小字註解 (13px)</small></button>
+              </div>
+            </div>
+
             <!-- Text Color Dropdown -->
             <div class="wt-dropdown">
-              <button type="button" class="wt-btn" title="文字顏色">🎨 文字顏色 ▾</button>
+              <button type="button" class="wt-btn" onmousedown="event.preventDefault();" title="文字顏色">🎨 文字顏色 ▾</button>
               <div class="wt-dropdown-menu">
-                <button type="button" class="wt-color-item" onclick="Admin.applyTextColor('#dc2626')"><span class="wt-dot" style="background: #dc2626;"></span> 🔴 警告紅</button>
-                <button type="button" class="wt-color-item" onclick="Admin.applyTextColor('#16a34a')"><span class="wt-dot" style="background: #16a34a;"></span> 🟢 成功綠</button>
-                <button type="button" class="wt-color-item" onclick="Admin.applyTextColor('#2563eb')"><span class="wt-dot" style="background: #2563eb;"></span> 🔵 提示藍</button>
-                <button type="button" class="wt-color-item" onclick="Admin.applyTextColor('#d97706')"><span class="wt-dot" style="background: #d97706;"></span> 🟡 稀有金</button>
-                <button type="button" class="wt-color-item" onclick="Admin.applyTextColor('#9333ea')"><span class="wt-dot" style="background: #9333ea;"></span> 🟣 史詩紫</button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyTextColor('#dc2626')"><span class="wt-dot" style="background: #dc2626;"></span> 🔴 警告紅</button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyTextColor('#16a34a')"><span class="wt-dot" style="background: #16a34a;"></span> 🟢 成功綠</button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyTextColor('#2563eb')"><span class="wt-dot" style="background: #2563eb;"></span> 🔵 提示藍</button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyTextColor('#d97706')"><span class="wt-dot" style="background: #d97706;"></span> 🟡 稀有金</button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyTextColor('#9333ea')"><span class="wt-dot" style="background: #9333ea;"></span> 🟣 史詩紫</button>
               </div>
             </div>
 
             <!-- Highlighter Dropdown -->
             <div class="wt-dropdown">
-              <button type="button" class="wt-btn" title="螢光筆標記">🖍️ 螢光筆 ▾</button>
+              <button type="button" class="wt-btn" onmousedown="event.preventDefault();" title="螢光筆標記">🖍️ 螢光筆 ▾</button>
               <div class="wt-dropdown-menu">
-                <button type="button" class="wt-color-item" onclick="Admin.applyHighlight('#fef08a')"><span class="wt-dot" style="background: #fef08a;"></span> 🟡 經典黃</button>
-                <button type="button" class="wt-color-item" onclick="Admin.applyHighlight('#bbf7d0')"><span class="wt-dot" style="background: #bbf7d0;"></span> 🟢 柔和綠</button>
-                <button type="button" class="wt-color-item" onclick="Admin.applyHighlight('#fbcfe8')"><span class="wt-dot" style="background: #fbcfe8;"></span> 🌸 淡粉紅</button>
-                <button type="button" class="wt-color-item" onclick="Admin.applyHighlight('#bfdbfe')"><span class="wt-dot" style="background: #bfdbfe;"></span> 💎 淺藍光</button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyHighlight('#fef08a')"><span class="wt-dot" style="background: #fef08a;"></span> 🟡 經典黃</button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyHighlight('#bbf7d0')"><span class="wt-dot" style="background: #bbf7d0;"></span> 🟢 柔和綠</button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyHighlight('#fbcfe8')"><span class="wt-dot" style="background: #fbcfe8;"></span> 🌸 淡粉紅</button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyHighlight('#bfdbfe')"><span class="wt-dot" style="background: #bfdbfe;"></span> 💎 淺藍光</button>
+                <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyHighlight('transparent')"><span class="wt-dot" style="background: #ffffff; border: 1px solid #94a3b8;"></span> ⚪ 清除螢光底色</button>
+              </div>
+            </div>
+
+            <div class="wt-divider"></div>
+
+            <!-- Embed Keycap / Mouse Dropdown -->
+            <div class="wt-dropdown">
+              <button type="button" class="wt-btn" onmousedown="event.preventDefault();" style="color: var(--primary-text); font-weight: 800;" title="在游標處插入立體 3D 鍵帽或滑鼠動作">⌨️ 嵌入鍵位 ▾</button>
+              <div class="wt-dropdown-menu" style="min-width: 290px; padding: 10px;">
+                <div style="font-size: 0.78rem; font-weight: 800; color: var(--text-muted); margin-bottom: 6px;">常用按鍵 (點擊直接插入)：</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px;">
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('W')">W</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('A')">A</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('S')">S</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('D')">D</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('Space')">Space</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('Shift')">Shift</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('Ctrl')">Ctrl</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('Alt')">Alt</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('R')">R</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('E')">E</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('F')">F</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('Q')">Q</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('X')">X</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('B')">B</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('M')">M</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('T')">T</span>
+                  <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('/')">/</span>
+                </div>
+                <div style="font-size: 0.78rem; font-weight: 800; color: var(--text-muted); margin-bottom: 6px;">滑鼠動作：</div>
+                <div style="display: flex; gap: 6px; margin-bottom: 10px;">
+                  <button type="button" class="wt-btn" style="flex: 1; padding: 4px 6px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertMouseAction('left')">🖱️ 左鍵點擊</button>
+                  <button type="button" class="wt-btn" style="flex: 1; padding: 4px 6px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertMouseAction('right')">🖱️ 右鍵點擊</button>
+                </div>
+                <div style="font-size: 0.78rem; font-weight: 800; color: var(--text-muted); margin-bottom: 4px;">自訂按鍵文字：</div>
+                <div style="display: flex; gap: 4px;">
+                  <input type="text" id="wt-custom-key-input" class="form-control" style="font-size: 0.82rem; padding: 3px 6px;" placeholder="如 Shift + 右鍵">
+                  <button type="button" class="btn btn-primary btn-sm" style="padding: 2px 10px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertCustomKeycap()">插入</button>
+                </div>
               </div>
             </div>
 
@@ -337,13 +600,68 @@
     </div>
   </div>
 
+  <!-- Floating Selection Bubble Toolbar (Word-like Floating Window) -->
+  <div id="floating-word-toolbar" class="floating-word-toolbar" style="display: none;">
+    <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('bold')" title="粗體 (Ctrl+B)"><strong>B</strong></button>
+    <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('italic')" title="斜體 (Ctrl+I)"><em>I</em></button>
+    <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('strikethrough')" title="刪除線"><del>S</del></button>
+    <div class="wt-divider"></div>
+    <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('h2')" title="H2 大標題"><strong>H2 大標</strong></button>
+    <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('h3')" title="H3 次標題"><strong>H3 次標</strong></button>
+    <div class="wt-divider"></div>
+    <div class="wt-dropdown">
+      <button type="button" class="wt-btn" onmousedown="event.preventDefault();" title="字型大小">A▾ 字級</button>
+      <div class="wt-dropdown-menu">
+        <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyFontSize('24px')"><strong>特大 (24px)</strong></button>
+        <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyFontSize('20px')">大 (20px)</button>
+        <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyFontSize('18px')">中標 (18px)</button>
+        <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyFontSize('16px')">標準 (16px)</button>
+        <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyFontSize('13px')"><small>小字 (13px)</small></button>
+      </div>
+    </div>
+    <div class="wt-divider"></div>
+    <div class="wt-dropdown">
+      <button type="button" class="wt-btn" onmousedown="event.preventDefault();" title="螢光筆標記">🖍️ 螢光 ▾</button>
+      <div class="wt-dropdown-menu">
+        <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyHighlight('#fef08a')"><span class="wt-dot" style="background: #fef08a;"></span> 🟡 經典黃</button>
+        <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyHighlight('#bbf7d0')"><span class="wt-dot" style="background: #bbf7d0;"></span> 🟢 柔和綠</button>
+        <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyHighlight('#fbcfe8')"><span class="wt-dot" style="background: #fbcfe8;"></span> 🌸 淡粉紅</button>
+        <button type="button" class="wt-color-item" onmousedown="event.preventDefault();" onclick="Admin.applyHighlight('transparent')"><span class="wt-dot" style="background: #fff; border: 1px solid #94a3b8;"></span> ⚪ 清除螢光底色</button>
+      </div>
+    </div>
+    <div class="wt-divider"></div>
+    <div class="wt-dropdown">
+      <button type="button" class="wt-btn" onmousedown="event.preventDefault();" style="font-weight: 800; color: var(--primary-text);" title="嵌入立體鍵位">⌨️ 鍵位 ▾</button>
+      <div class="wt-dropdown-menu" style="min-width: 250px; padding: 8px;">
+        <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); margin-bottom: 5px;">快速按鍵：</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px;">
+          <span class="keycap" style="cursor: pointer; min-width: 24px; height: 24px; font-size: 0.78rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('W')">W</span>
+          <span class="keycap" style="cursor: pointer; min-width: 24px; height: 24px; font-size: 0.78rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('Space')">Space</span>
+          <span class="keycap" style="cursor: pointer; min-width: 24px; height: 24px; font-size: 0.78rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('Shift')">Shift</span>
+          <span class="keycap" style="cursor: pointer; min-width: 24px; height: 24px; font-size: 0.78rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('Ctrl')">Ctrl</span>
+          <span class="keycap" style="cursor: pointer; min-width: 24px; height: 24px; font-size: 0.78rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('R')">R</span>
+          <span class="keycap" style="cursor: pointer; min-width: 24px; height: 24px; font-size: 0.78rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('E')">E</span>
+          <span class="keycap" style="cursor: pointer; min-width: 24px; height: 24px; font-size: 0.78rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('F')">F</span>
+        </div>
+        <div style="display: flex; gap: 4px;">
+          <button type="button" class="wt-btn" style="flex: 1; padding: 3px 5px; font-size: 0.78rem;" onmousedown="event.preventDefault();" onclick="Admin.insertMouseAction('left')">🖱️ 左鍵</button>
+          <button type="button" class="wt-btn" style="flex: 1; padding: 3px 5px; font-size: 0.78rem;" onmousedown="event.preventDefault();" onclick="Admin.insertMouseAction('right')">🖱️ 右鍵</button>
+        </div>
+      </div>
+    </div>
+    <div class="wt-divider"></div>
+    <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('list')" title="項目符號清單">•</button>
+    <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('numlist')" title="編號清單">1.</button>
+  </div>
+
   <!-- Site Footer -->
   <footer class="site-footer">
     <p>© Cobblemon Community. Minecraft is copyright Mojang AB.</p>
   </footer>
 
   <script src="js/lib/jszip.min.js"></script>
-  <script src="data/database.js"></script>`n  <script src="js/core.js"></script>
+  <script src="data/database.js"></script>
+  <script src="js/core.js"></script>
   <script src="js/exporter.js"></script>
   <script src="js/admin.js"></script>
 </body>

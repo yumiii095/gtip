@@ -774,6 +774,228 @@ textarea.form-control {
   opacity: 0.75;
 }
 
+/* Keyboard Keycap & Mouse Indicator Badges */
+.keycap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 9px;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 0.95rem;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-bottom: 3px solid #94a3b8;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  color: #0f172a;
+  line-height: 1;
+  user-select: none;
+}
+
+.mouse-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-bottom: 3px solid #94a3b8;
+  border-radius: 6px;
+  padding: 3px 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  user-select: none;
+}
+.mouse-indicator svg {
+  display: block;
+}
+.mouse-indicator.mouse-right .btn-right {
+  fill: #0284c7;
+}
+.mouse-indicator.mouse-left .btn-left {
+  fill: #dc2626;
+}
+.mouse-indicator.mouse-right .mouse-label {
+  color: #0284c7;
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+.mouse-indicator.mouse-left .mouse-label {
+  color: #dc2626;
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+.keycap-combo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* Beginner 1:1 Simulation Canvas in Admin */
+.sim-canvas {
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: var(--radius-lg, 12px);
+  padding: 2.25rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+.sim-canvas [contenteditable="true"] {
+  cursor: text;
+  transition: all 0.15s ease;
+  border-radius: 4px;
+}
+.sim-canvas [contenteditable="true"]:hover {
+  outline: 1.5px dashed #22c55e;
+  background: rgba(34, 197, 94, 0.05);
+}
+.sim-canvas [contenteditable="true"]:focus {
+  outline: 2px solid #16a34a;
+  background: rgba(34, 197, 94, 0.08);
+}
+.sim-shortcut-card {
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: var(--radius-md, 8px);
+  padding: 1.15rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: all 0.15s ease;
+}
+.sim-shortcut-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: var(--shadow-sm);
+}
+.sim-step-card {
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: var(--radius-lg, 12px);
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  box-shadow: var(--shadow-sm);
+}
+.sim-faq-card {
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: var(--radius-md, 8px);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 0.85rem;
+  position: relative;
+}
+
+/* Floating Selection Bubble Toolbar (Word-like) */
+.floating-word-toolbar {
+  position: fixed;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 5px 8px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.18), 0 4px 10px rgba(0, 0, 0, 0.08);
+  pointer-events: auto;
+  user-select: none;
+  animation: floatPopIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes floatPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.floating-word-toolbar .wt-btn {
+  padding: 4px 8px;
+  font-size: 0.82rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+}
+
+.floating-word-toolbar .wt-btn:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.floating-word-toolbar .wt-divider {
+  height: 16px;
+  margin: 0 2px;
+}
+
+/* Command Accordion in Admin */
+.cmd-accordion-group {
+  margin-bottom: 0.85rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.cmd-accordion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.25rem;
+  background: #ffffff;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease;
+}
+
+.cmd-accordion-header:hover {
+  background: #f8fafc;
+}
+
+.cmd-accordion-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.cmd-count-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #2563eb;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  padding: 3px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.cmd-chevron {
+  display: inline-block;
+  font-size: 0.75rem;
+  color: #3b82f6;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cmd-accordion-group.open .cmd-chevron {
+  transform: rotate(180deg);
+}
+
+.cmd-accordion-body {
+  padding: 0.85rem 1.15rem;
+  background: #f8fafc;
+  border-top: 1px solid var(--border-color);
+}
+
+
+
 
 
 

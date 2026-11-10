@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Cobblemon Exporter Engine
  * Packages all HTML, CSS, JS, updated JSON, and uploaded images into a clean ZIP ready for GitHub/Vercel.
  */
@@ -28,6 +28,7 @@ const Exporter = {
       'type-chart.html',
       'guides.html',
       'donate.html',
+      'beginner.html',
       'admin.html'
     ];
 
@@ -71,6 +72,7 @@ const Exporter = {
     zip.file('data/pokemon.json', JSON.stringify(currentData.pokemon || [], null, 2));
     zip.file('data/guides.json', JSON.stringify(currentData.guides || [], null, 2));
     zip.file('data/donate.json', JSON.stringify(currentData.donate || { packages: [] }, null, 2));
+    zip.file('data/beginner.json', JSON.stringify(currentData.beginner || {}, null, 2));
 
     try {
       const dbRes = await fetch('data/database.js?t=' + Date.now());

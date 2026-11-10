@@ -17,6 +17,7 @@
       </a>
       <ul class="nav-links">
         <li><a href="index.html">首頁</a></li>
+        <li><a href="beginner.html">新手專區</a></li>
         <li><a href="commands.html" class="active">指令查詢</a></li>
         <li><a href="pokedex.html">寶可夢圖鑑</a></li>
         <li><a href="type-chart.html">屬性相剋</a></li>
@@ -34,18 +35,26 @@
     </div>
 
     <!-- Search & Filter Controls -->
-    <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
-      <div style="flex: 1; min-width: 240px;">
-        <input type="text" id="command-search" class="card" style="width: 100%; padding: 0.65rem 1rem; border: 1px solid var(--border-color); font-size: 0.95rem; border-radius: var(--radius-md);" placeholder="🔍 搜尋指令名稱或功能關鍵字 (例如: /pc, 領地, 傳送)...">
+    <div style="display: flex; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap; align-items: center;">
+      <div style="flex: 1; min-width: 260px;">
+        <input type="text" id="command-search" class="card" style="width: 100%; padding: 0.65rem 1rem; border: 1px solid var(--border-color); font-size: 0.95rem; border-radius: var(--radius-md);" placeholder="🔍 搜尋指令語法、名稱或說明關鍵字 (例如: /home, 領地, 飛行)...">
       </div>
-      <div id="category-filters" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-        <button class="btn btn-primary active btn-sm" data-cat="all">全部</button>
-        <button class="btn btn-secondary btn-sm" data-cat="個人">個人</button>
-        <button class="btn btn-secondary btn-sm" data-cat="領地">領地</button>
-        <button class="btn btn-secondary btn-sm" data-cat="傳送">傳送</button>
-        <button class="btn btn-secondary btn-sm" data-cat="經濟">經濟</button>
-        <button class="btn btn-secondary btn-sm" data-cat="VIP專屬">VIP專屬</button>
+      <div style="display: flex; gap: 0.4rem;">
+        <button type="button" id="btn-expand-all" class="btn btn-secondary btn-sm">▼ 全部展開</button>
+        <button type="button" id="btn-collapse-all" class="btn btn-secondary btn-sm">▲ 全部收折</button>
       </div>
+    </div>
+
+    <div id="category-filters" style="display: flex; gap: 0.45rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+      <button class="btn btn-primary active btn-sm" data-cat="all">全部</button>
+      <button class="btn btn-secondary btn-sm" data-cat="個人功能">🎮 個人功能</button>
+      <button class="btn btn-secondary btn-sm" data-cat="社交">💬 社交</button>
+      <button class="btn btn-secondary btn-sm" data-cat="任務/獎勵">🎁 任務/獎勵</button>
+      <button class="btn btn-secondary btn-sm" data-cat="領地">🏕️ 領地</button>
+      <button class="btn btn-secondary btn-sm" data-cat="Home系統">🏠 Home系統</button>
+      <button class="btn btn-secondary btn-sm" data-cat="經濟">💰 經濟</button>
+      <button class="btn btn-secondary btn-sm" data-cat="傳送">🧭 傳送</button>
+      <button class="btn btn-secondary btn-sm" data-cat="VIP專屬">👑 VIP專屬</button>
     </div>
 
     <!-- Commands List Container -->

@@ -231,6 +231,100 @@ body {
   border-radius: var(--radius-md) !important;
 }
 
+/* ================= Command Accordion UI ================= */
+.cmd-accordion-group {
+  margin-bottom: 0.85rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.cmd-accordion-group:hover {
+  border-color: #cbd5e1;
+}
+
+.cmd-accordion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.35rem;
+  background: #ffffff;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease;
+}
+
+.cmd-accordion-header:hover {
+  background: #f8fafc;
+}
+
+.cmd-accordion-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.cmd-cat-icon {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.cmd-cat-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: 0.2px;
+}
+
+.cmd-accordion-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.cmd-count-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #2563eb;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  padding: 3px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.cmd-chevron {
+  display: inline-block;
+  font-size: 0.75rem;
+  color: #3b82f6;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cmd-accordion-group.open .cmd-chevron {
+  transform: rotate(180deg);
+}
+
+.cmd-accordion-body {
+  display: none;
+  padding: 0.85rem 1.25rem 1.25rem;
+  background: #f8fafc;
+  border-top: 1px solid var(--border-color);
+}
+
+.cmd-accordion-group.open .cmd-accordion-body {
+  display: block;
+}
+
+.cmd-accordion-body .command-card {
+  background: #ffffff !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
 .card-title {
   font-size: 1.15rem;
   font-weight: 700;
@@ -447,4 +541,63 @@ body {
 #reader-content strike {
   text-decoration: line-through;
   opacity: 0.75;
+}
+
+/* Keyboard Keycap & Mouse Indicator Badges */
+.keycap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 9px;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 0.95rem;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-bottom: 3px solid #94a3b8;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  color: #0f172a;
+  line-height: 1;
+  user-select: none;
+}
+
+.mouse-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-bottom: 3px solid #94a3b8;
+  border-radius: 6px;
+  padding: 3px 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  user-select: none;
+}
+.mouse-indicator svg {
+  display: block;
+}
+.mouse-indicator.mouse-right .btn-right {
+  fill: #0284c7;
+}
+.mouse-indicator.mouse-left .btn-left {
+  fill: #dc2626;
+}
+.mouse-indicator.mouse-right .mouse-label {
+  color: #0284c7;
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+.mouse-indicator.mouse-left .mouse-label {
+  color: #dc2626;
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+.keycap-combo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
 }
