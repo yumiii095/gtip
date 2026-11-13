@@ -15945,7 +15945,7 @@
   },
   {
     "no": 903,
-    "name": "大紐拉",
+    "name": "大狃拉",
     "drops": [
       {
         "item": "銳利之爪",
@@ -17306,7 +17306,7 @@
   },
   {
     "no": 993,
-    "name": "鐵脖子",
+    "name": "鐵脖頸",
     "drops": [],
     "drops_raw": "(無資料)",
     "biome_bonus": ""
@@ -17586,5 +17586,69 @@
     "drops": [],
     "drops_raw": "(無資料)",
     "biome_bonus": ""
+  },
+  {
+    "no": 9001,
+    "name": "棉悠悠",
+    "drops": [],
+    "drops_raw": "(無資料)",
+    "biome_bonus": "",
+    "note": "帕魯聯動角色 (Lamball)"
+  },
+  {
+    "no": 9003,
+    "name": "皮皮雞",
+    "drops": [],
+    "drops_raw": "(無資料)",
+    "biome_bonus": "",
+    "note": "帕魯聯動角色 (Chikipi)"
+  },
+  {
+    "no": 9016,
+    "name": "瞅什魔",
+    "drops": [],
+    "drops_raw": "(無資料)",
+    "biome_bonus": "",
+    "note": "帕魯聯動角色 (Depresso)"
+  },
+  {
+    "no": 9017,
+    "name": "企丸丸",
+    "drops": [],
+    "drops_raw": "(無資料)",
+    "biome_bonus": "",
+    "note": "帕魯聯動角色 (Pengullet)"
+  },
+  {
+    "no": 9033,
+    "name": "獵狼",
+    "drops": [],
+    "drops_raw": "(無資料)",
+    "biome_bonus": "",
+    "note": "帕魯聯動角色 (Direhowl)"
+  },
+  {
+    "no": 9069,
+    "name": "博愛蜥",
+    "drops": [],
+    "drops_raw": "(無資料)",
+    "biome_bonus": "",
+    "note": "帕魯聯動角色 (Lovander)"
+  },
+  {
+    "no": 9082,
+    "name": "秘斯媞雅",
+    "drops": [],
+    "drops_raw": "(無資料)",
+    "biome_bonus": "",
+    "note": "帕魯聯動角色 (Lunaris)"
+  },
+  {
+    "no": 9935,
+    "name": "炭小侍 Ⓛ",
+    "drops": [],
+    "drops_raw": "(無資料)",
+    "biome_bonus": "",
+    "note": "伺服器新增物種 (Charcadet Ⓛ)"
   }
 ]

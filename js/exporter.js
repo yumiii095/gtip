@@ -85,6 +85,11 @@ const Exporter = {
     } catch(e) {}
 
     try {
+      const spRes = await fetch('data/spawns.json?t=' + Date.now());
+      if (spRes.ok) zip.file('data/spawns.json', await spRes.text());
+    } catch(e) {}
+
+    try {
       const tcRes = await fetch('data/type_chart.json?t=' + Date.now());
       if (tcRes.ok) zip.file('data/type_chart.json', await tcRes.text());
     } catch (e) {}

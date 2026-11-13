@@ -86,7 +86,7 @@
   <main class="main-content">
     <div class="page-header">
       <h1 class="page-title">📖 Cobblemon 精靈與掉落物圖鑑</h1>
-      <p class="page-desc">支援寶可夢名稱、全國編號與「掉落物品」即時關鍵字查詢（例如搜尋：烈焰粉、終界珍珠、西瓜種子）。</p>
+      <p class="page-desc">支援寶可夢名稱、全國編號、「掉落物品」與「刷新生態域」即時關鍵字查詢（例如搜尋：烈焰粉、終界珍珠、叢林），並可依稀有度、出現方式與世界篩選。</p>
     </div>
 
     <!-- Search & Filter Controls -->
@@ -99,6 +99,30 @@
           <option value="all">所有寶可夢</option>
           <option value="has_drops">僅顯示有掉落物</option>
           <option value="no_drops">僅顯示無掉落物</option>
+        </select>
+      </div>
+      <div>
+        <select id="rarity-filter" class="card" style="padding: 0.75rem 1rem; border: 1px solid var(--border-color); font-size: 0.95rem; border-radius: var(--radius-md); background: #ffffff;">
+          <option value="all">所有稀有度</option>
+          <option value="common">常見</option>
+          <option value="uncommon">不常見</option>
+          <option value="rare">稀有</option>
+          <option value="ultra-rare">極稀有</option>
+        </select>
+      </div>
+      <div>
+        <select id="method-filter" class="card" style="padding: 0.75rem 1rem; border: 1px solid var(--border-color); font-size: 0.95rem; border-radius: var(--radius-md); background: #ffffff;">
+          <option value="all">所有出現方式</option>
+          <option value="grounded">地面</option>
+          <option value="fishing">釣魚</option>
+          <option value="surface">水面</option>
+          <option value="submerged">水下</option>
+          <option value="seafloor">水底</option>
+        </select>
+      </div>
+      <div>
+        <select id="world-filter" class="card" style="padding: 0.75rem 1rem; border: 1px solid var(--border-color); font-size: 0.95rem; border-radius: var(--radius-md); background: #ffffff;">
+          <option value="all">所有世界</option>
         </select>
       </div>
     </div>
@@ -140,7 +164,8 @@
     <p>© Cobblemon Community. Minecraft is copyright Mojang AB.</p>
   </footer>
 
-  <script src="data/database.js"></script>`n  <script src="js/core.js"></script>
+  <script src="data/database.js"></script>
+  <script src="js/core.js"></script>
   <script src="js/pokedex.js"></script>
 </body>
 </html>

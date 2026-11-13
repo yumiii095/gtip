@@ -66,24 +66,172 @@ window.INITIAL_DATABASE = {
     {
       "name": "究極洞穴",
       "icon": "🌀"
+    },
+    {
+      "name": "雕塑版權保護",
+      "icon": "🛡️"
+    },
+    {
+      "name": "展示",
+      "icon": "📦"
     }
   ]
 },
   announcements: [],
   commands: [
   {
-    "name": "/newcmd",
-    "category": "經濟",
+    "name": "/res tp",
+    "category": "領地",
     "permission": "所有玩家",
-    "syntax": "/newcmd",
-    "description": "請在此輸入指令說明與用途"
+    "syntax": "/res tp",
+    "description": "傳送到指定領地（例如 /res tp home）"
+  },
+  {
+    "name": "[i]",
+    "category": "展示",
+    "permission": "所有玩家",
+    "syntax": "[i]",
+    "description": "展示手上目前持有的物品"
+  },
+  {
+    "name": "/spawn",
+    "category": "傳送",
+    "permission": "所有玩家",
+    "syntax": "/spawn",
+    "description": "傳送回主城出生點"
+  },
+  {
+    "name": "/tpa",
+    "category": "傳送",
+    "permission": "所有玩家",
+    "syntax": "/tpa",
+    "description": "申請傳送到指定玩家的位置"
+  },
+  {
+    "name": "/tpahere",
+    "category": "傳送",
+    "permission": "所有玩家",
+    "syntax": "/tpahere",
+    "description": "申請將指定玩家傳送到你身邊"
+  },
+  {
+    "name": "/tpaccept",
+    "category": "傳送",
+    "permission": "所有玩家",
+    "syntax": "/tpaccept",
+    "description": "接受其他玩家申請傳送到你的位置"
+  },
+  {
+    "name": "/back",
+    "category": "傳送",
+    "permission": "所有玩家",
+    "syntax": "/back",
+    "description": "返回上一個地點（死亡或傳送前的位置）"
+  },
+  {
+    "name": "/cb trustlist",
+    "category": "雕塑版權保護",
+    "permission": "所有玩家",
+    "syntax": "/cb trustlist",
+    "description": "查看你的授權列表"
+  },
+  {
+    "name": "/cb untrust",
+    "category": "雕塑版權保護",
+    "permission": "所有玩家",
+    "syntax": "/cb untrust",
+    "description": "撤銷授權（例如 /cb untrust player1）"
+  },
+  {
+    "name": "/cb trust",
+    "category": "雕塑版權保護",
+    "permission": "所有玩家",
+    "syntax": "/cb trust",
+    "description": "授權其他玩家編輯你的所有版權聲明作品（例如 /cb trust player1）"
+  },
+  {
+    "name": "/cb setcopyable true/false",
+    "category": "雕塑版權保護",
+    "permission": "所有玩家",
+    "syntax": "/cb setcopyable true/false",
+    "description": "設定作品是否允許他人（所有人）編輯或複製，預設不允許"
+  },
+  {
+    "name": "/cb claimhand",
+    "category": "雕塑版權保護",
+    "permission": "所有玩家",
+    "syntax": "/cb claimhand",
+    "description": "認領手中的雕塑方塊"
+  },
+  {
+    "name": "/cb claim",
+    "category": "雕塑版權保護",
+    "permission": "所有玩家",
+    "syntax": "/cb claim",
+    "description": "認領你正在看的雕塑方塊"
+  },
+  {
+    "name": "/pokegift [玩家名][隊伍槽位]",
+    "category": "個人功能",
+    "permission": "所有玩家",
+    "syntax": "/pokegift [玩家名][隊伍槽位]",
+    "description": "贈送寶可夢給指定玩家"
+  },
+  {
+    "name": "/homes",
+    "category": "個人功能",
+    "permission": "所有玩家",
+    "syntax": "/homes",
+    "description": "查看所有已設定的紀錄點（同 /homelist）"
+  },
+  {
+    "name": "/sethome",
+    "category": "Home系統",
+    "permission": "所有玩家",
+    "syntax": "/sethome",
+    "description": "在目前站立位置設定紀錄點（不同VIP等級可設相對應數量）"
+  },
+  {
+    "name": "/home",
+    "category": "Home系統",
+    "permission": "所有玩家",
+    "syntax": "/home",
+    "description": "傳送回指定名稱的紀錄點"
+  },
+  {
+    "name": "/homelist",
+    "category": "Home系統",
+    "permission": "所有玩家",
+    "syntax": "/homelist",
+    "description": "查看所有已設定的紀錄點（同 /homes）"
+  },
+  {
+    "name": "/delhome",
+    "category": "Home系統",
+    "permission": "所有玩家",
+    "syntax": "/delhome",
+    "description": "刪除指定名稱的紀錄點"
   },
   {
     "name": "/money",
     "category": "經濟",
     "permission": "所有玩家",
     "syntax": "/money",
-    "description": "查詢玩家錢包餘額"
+    "description": "查看玩家錢包餘額"
+  },
+  {
+    "name": "/money top",
+    "category": "經濟",
+    "permission": "所有玩家",
+    "syntax": "/money top",
+    "description": "查看玩家經濟排名"
+  },
+  {
+    "name": "/money history",
+    "category": "經濟",
+    "permission": "所有玩家",
+    "syntax": "/money history",
+    "description": "查看玩家收支紀錄"
   },
   {
     "name": "/r",
@@ -135,10 +283,10 @@ window.INITIAL_DATABASE = {
     "description": "治療整個隊伍的寶可夢（消耗藥品＋1 遺跡硬幣）"
   },
   {
-    "name": "/pokeheal 1~6",
+    "name": "/pokeheal [隊伍槽位]",
     "category": "VIP專屬",
     "permission": "VIP專屬",
-    "syntax": "/pokeheal 1~6",
+    "syntax": "/pokeheal [隊伍槽位]",
     "description": "治療隊伍中第 1~6 號位的寶可夢（消耗藥品＋1 遺跡硬幣）"
   },
   {

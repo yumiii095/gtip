@@ -21,11 +21,72 @@ document.addEventListener('DOMContentLoaded', async () => {
     rawList = await Core.loadJSON('pokemon', 'data/pokemon.json') || [];
   }
 
+  // 刷新資料（data/spawns.json，由 tools/build-spawns.ps1 產生）；缺少時圖鑑其餘功能照常運作
+  const spawnData = await Core.loadJSON('spawns', 'data/spawns.json');
+  const spawnMap = (spawnData && spawnData.spawns) || {};
+
+  const RARITY_ORDER = ['ultra-rare', 'rare', 'uncommon', 'common'];
+  const RARITY_LABEL = { 'ultra-rare': '極稀有', rare: '稀有', uncommon: '不常見', common: '常見' };
+  const RARITY_STYLE = {
+    'ultra-rare': 'background:#fce7f3;color:#9d174d;',
+    rare: 'background:#ede9fe;color:#5b21b6;',
+    uncommon: 'background:#dbeafe;color:#1e40af;',
+    common: 'background:#dcfce7;color:#166534;'
+  };
+  const METHOD_LABEL = { grounded: '地面', fishing: '釣魚', surface: '水面', submerged: '水下', seafloor: '水底' };
+
+  function biomeNamesOf(setIdx) {
+    if (!spawnData || !spawnData.sets || !spawnData.sets[setIdx]) return [];
+    return spawnData.sets[setIdx].map(i => spawnData.biomes[i]);
+  }
+
+  // 預先整理每隻的搜尋文字，加速篩選
+  const spawnSearchText = {};
+  Object.keys(spawnMap).forEach(no => {
+    const parts = [];
+    spawnMap[no].forEach(r => {
+      if (r.p) parts.push(r.p);
+      if (r.d) parts.push(r.d);
+      parts.push(...biomeNamesOf(r.s));
+    });
+    spawnSearchText[no] = parts.join(' ').toLowerCase();
+  });
+
+  const worldFilter = document.getElementById('world-filter');
+  const rarityFilter = document.getElementById('rarity-filter');
+  const methodFilter = document.getElementById('method-filter');
+  if (worldFilter && spawnData && spawnData.worlds) {
+    Object.entries(spawnData.worlds).forEach(([key, label]) => {
+      const opt = document.createElement('option');
+      opt.value = key;
+      opt.textContent = label;
+      worldFilter.appendChild(opt);
+    });
+  }
+  if (!spawnData) {
+    [worldFilter, rarityFilter, methodFilter].forEach(el => { if (el) el.style.display = 'none'; });
+  }
+
   const PAGE_SIZE = 36;
   let currentPage = 1;
   let filteredList = [...rawList];
   let searchQuery = '';
   let selectedDropFilter = 'all';
+  let selectedRarity = 'all';
+  let selectedMethod = 'all';
+  let selectedWorld = 'all';
+
+  function matchSpawnFilters(pNo) {
+    if (selectedRarity === 'all' && selectedMethod === 'all' && selectedWorld === 'all') return true;
+    const rows = spawnMap[String(pNo)];
+    if (!rows) return false;
+    // 同一筆刷新規則必須同時符合所有已選條件
+    return rows.some(r =>
+      (selectedRarity === 'all' || r.r === selectedRarity) &&
+      (selectedMethod === 'all' || r.m === selectedMethod) &&
+      (selectedWorld === 'all' || !r.w || r.w.includes(selectedWorld))
+    );
+  }
 
   function applyFilters() {
     filteredList = rawList.filter(p => {
@@ -41,7 +102,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                       pNo.padStart(3, '0').includes(searchQuery) ||
                       pName.includes(searchQuery) ||
                       pDropsRaw.includes(searchQuery) ||
-                      pBiome.includes(searchQuery);
+                      pBiome.includes(searchQuery) ||
+                      (spawnSearchText[pNo] || '').includes(searchQuery);
       }
 
       // Drop filter
@@ -53,7 +115,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         matchDrop = !hasDrops;
       }
 
-      return matchSearch && matchDrop;
+      return matchSearch && matchDrop && matchSpawnFilters(pNo);
     });
 
     currentPage = 1;
@@ -99,6 +161,49 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  function spawnTagsHTML(pNo) {
+    const rows = spawnMap[String(pNo)];
+    if (!rows || rows.length === 0) return '';
+    const present = RARITY_ORDER.filter(k => rows.some(r => r.r === k));
+    return `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:0.35rem;">${present.map(k =>
+      `<span style="font-size:0.72rem;font-weight:700;padding:2px 6px;border-radius:var(--radius-sm);${RARITY_STYLE[k] || ''}">${RARITY_LABEL[k] || escapeHTML(k)}</span>`
+    ).join('')}</div>`;
+  }
+
+  function spawnDetailHTML(pNo) {
+    if (!spawnData) return '';
+    const rows = spawnMap[String(pNo)];
+    const title = '<div style="font-weight: 800; font-size: 0.95rem; margin-bottom: 0.5rem;">🌍 刷新地點：</div>';
+    if (!rows || rows.length === 0) {
+      return `<div style="margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">${title}<div style="color: var(--text-muted); font-size: 0.88rem;">無刷新資料</div></div>`;
+    }
+    const chip = (text, style) => `<span style="font-size:0.75rem;padding:1px 6px;border-radius:var(--radius-sm);background:var(--bg-subtle);border:1px solid var(--border-color);${style || ''}">${escapeHTML(text)}</span>`;
+    const groups = RARITY_ORDER.map(k => ({ k, list: rows.filter(r => r.r === k) })).filter(g => g.list.length > 0);
+    const body = groups.map(g => `
+      <div style="margin-bottom: 0.75rem;">
+        <span style="font-size:0.8rem;font-weight:700;padding:2px 8px;border-radius:var(--radius-sm);${RARITY_STYLE[g.k] || ''}">${RARITY_LABEL[g.k] || escapeHTML(g.k)}</span>
+        ${g.list.map(r => {
+          const worlds = r.w ? r.w.map(w => (spawnData.worlds && spawnData.worlds[w]) || w).join('、') : '';
+          const biomes = biomeNamesOf(r.s);
+          return `
+          <div style="padding: 0.5rem 0.75rem; background: var(--bg-page); border: 1px solid var(--border-color); border-radius: var(--radius-sm); margin-top: 0.4rem; font-size: 0.88rem;">
+            <div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;">
+              ${chip(METHOD_LABEL[r.m] || r.m)}
+              ${chip('Lv.' + r.l)}
+              ${worlds ? chip('世界：' + worlds) : ''}
+              ${r.v ? chip(r.v + ' 型態', 'background:#e0f2fe;color:#075985;') : ''}
+              ${r.d ? chip(r.d) : ''}
+              ${r.g ? chip('可成群', 'background:#fef3c7;color:#92400e;') : ''}
+            </div>
+            <div style="margin-top:4px;font-weight:600;">${escapeHTML(r.p || '依條件刷新')}</div>
+            ${r.q && r.q.length ? `<div style="margin-top:2px;color:var(--text-muted);">條件：${r.q.map(escapeHTML).join('；')}</div>` : ''}
+            ${biomes.length ? `<details style="margin-top:4px;"><summary style="cursor:pointer;color:var(--text-muted);">包含生態域（${biomes.length}）</summary><div style="margin-top:2px;">${biomes.map(escapeHTML).join('、')}</div></details>` : ''}
+          </div>`;
+        }).join('')}
+      </div>`).join('');
+    return `<div style="margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">${title}${body}</div>`;
+  }
+
   function createPokemonCard(p) {
     const card = document.createElement('div');
     card.className = 'poke-card-large';
@@ -133,6 +238,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
     ` : '';
 
+    const noteHTML = p.note ? `
+      <div style="font-size: 0.75rem; background: #e0f2fe; color: #075985; padding: 2px 6px; border-radius: var(--radius-sm); margin-top: 0.25rem;">
+        ${escapeHTML(p.note)}
+      </div>
+    ` : '';
+
     card.innerHTML = `
       <div>
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
@@ -145,6 +256,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
 
         ${biomeHTML}
+        ${noteHTML}
+        ${spawnTagsHTML(pNo)}
       </div>
 
       <div style="border-top: 1px solid var(--border-color); padding-top: 0.75rem; margin-top: 0.5rem;">
@@ -185,10 +298,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div>
           <h2 style="font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.25rem;">${escapeHTML(p.name || '')}</h2>
           ${p.biome_bonus ? `<div style="font-size: 0.88rem; color: #92400e; background: #fef3c7; padding: 4px 8px; border-radius: var(--radius-sm); display: inline-block; margin-bottom: 0.75rem;">群系加成：${escapeHTML(p.biome_bonus)}</div>` : ''}
+          ${p.note ? `<div style="font-size: 0.88rem; color: #075985; background: #e0f2fe; padding: 4px 8px; border-radius: var(--radius-sm); display: inline-block; margin-bottom: 0.75rem;">${escapeHTML(p.note)}</div>` : ''}
           <div style="margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
             <div style="font-weight: 800; font-size: 0.95rem; margin-bottom: 0.5rem;">擊敗/捕獲掉落物詳情：</div>
             ${dropsDetailHTML}
           </div>
+          ${spawnDetailHTML(pNo)}
         </div>
       </div>
     `;
@@ -222,6 +337,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       selectedDropFilter = e.target.value;
       applyFilters();
     });
+  }
+
+  if (rarityFilter) {
+    rarityFilter.addEventListener('change', (e) => { selectedRarity = e.target.value; applyFilters(); });
+  }
+  if (methodFilter) {
+    methodFilter.addEventListener('change', (e) => { selectedMethod = e.target.value; applyFilters(); });
+  }
+  if (worldFilter) {
+    worldFilter.addEventListener('change', (e) => { selectedWorld = e.target.value; applyFilters(); });
   }
 
   if (btnLoadMore) {
