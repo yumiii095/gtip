@@ -80,6 +80,13 @@ window.INITIAL_DATABASE = {
   announcements: [],
   commands: [
   {
+    "name": "/crate keys",
+    "category": "經濟",
+    "permission": "所有玩家",
+    "syntax": "/crate keys",
+    "description": "查看自身擁有的各種抽獎箱鑰匙"
+  },
+  {
     "name": "/res tp",
     "category": "領地",
     "permission": "所有玩家",
@@ -365,9 +372,9 @@ window.INITIAL_DATABASE = {
     "title": "Daycare 培育屋與孵蛋新規則指南",
     "category": "新手教學",
     "author": "管理員",
-    "updatedAt": "2026-11-09",
+    "updatedAt": "2026-11-15",
     "summary": "詳解 Daycare 培育屋核心法則！包含天然 6V 繁殖禁令、王冠特訓不遺傳判定，以及全新上線的疊蛋系統與欄位擴充說明。",
-    "content": "<h2>培育屋核心</h2><h3><span style=\"font-size: 1rem;\">1. 天然 6V 強制禁止繁殖</span></h3><div><ul><li>任一親代寶可夢只要「個體值（IV）六項皆為 31」，即強制無法放入培育屋繁殖（此規則包含百變怪）。</li><li>繁育時請保留至少一項非 31 的個體進行配種。</li></ul></div><div><br></div><h3>2. 極限特訓（王冠）數值不遺傳</h3><div><ul><li>透過金色／銀色王冠進行「極限特訓」拉滿的個體值屬於後天數值，系統判定為人工數值，完全不計入遺傳計算。</li><li>繁殖時只會遺傳寶可夢最初的天然野生個體值。</li></ul></div><div><br></div><div><hr id=\"null\"></div><div><br></div><h3>每欄「多重疊蛋」</h3><div><br></div><div>現在每個培育欄位不再只能存放一顆蛋，支援孵化與待領取的疊蛋功能：</div><div><br></div><div>【疊蛋容量上限】：</div><div><ul><li>普通玩家／Super VIP：每欄可堆疊 2 枚蛋。</li><li>Hyper VIP：每欄可堆疊 3 枚蛋。</li><li>Master VIP：每欄可堆疊 4 枚蛋。</li></ul></div><div>【運作方式】：每顆蛋獨立計時孵化並按順序領取。當欄位滿額後會暫停產蛋，待玩家領取騰出空間後自動繼續生產。</div><div><br></div><div><hr id=\"null\"></div><h3>培育欄位上限與擴充費用</h3><div><br></div><div>輸入指令 【/daycare】 即可打開介面進行欄位管理：</div><div><br></div><div>* 普通玩家 / Super VIP：預設免費 1 格，額外可購 2 格（總上限 3 格）。</div><div>* Hyper VIP：預設免費 1 格，額外可購 4 格（總上限 5 格）。</div><div>* Master VIP：預設免費 1 格，額外可購 5 格（總上限 6 格）。</div><div>* 【解鎖費用】：擴充價格依序為 1萬 ➔ 3萬 ➔ 6萬 ➔ 10萬 ➔ 15萬 遊戲幣（購買後為永久解鎖，降檔不會回收已購欄位）。</div>",
+    "content": "<h2>培育屋核心</h2><h3><span style=\"font-size: 1rem;\">1. 天然 6V 強制禁止繁殖</span></h3><div><ul><li>任一親代寶可夢只要「個體值（IV）六項皆為 31」，即強制無法放入培育屋繁殖（此規則包含百變怪）。</li><li>繁育時請保留至少一項非 31 的個體進行配種。</li></ul></div><div><br></div><h3>2. 極限特訓（王冠）數值不遺傳</h3><div><ul><li>透過金色／銀色王冠進行「極限特訓」拉滿的個體值屬於後天數值，系統判定為人工數值，完全不計入遺傳計算。</li><li>繁殖時只會遺傳寶可夢最初的天然野生個體值。</li></ul></div><div><br></div><div><hr id=\"null\"></div><div><br></div><h3>每欄「多重疊蛋」</h3><div><br></div><div>現在每個培育欄位不再只能存放一顆蛋，支援孵化與待領取的疊蛋功能：</div><div><br></div><div>【疊蛋容量上限】：</div><div><ul><li>普通玩家／Super VIP：每欄可堆疊 2 枚蛋。</li><li>Hyper VIP：每欄可堆疊 3 枚蛋。</li><li>Master VIP：每欄可堆疊 4 枚蛋。</li></ul></div><div>【運作方式】：每顆蛋獨立計時孵化並按順序領取。當欄位滿額後會暫停產蛋，待玩家領取騰出空間後自動繼續生產。</div><div><br></div><div><hr id=\"null\"></div><h3>培育欄位上限與擴充費用</h3><div><br></div><div>輸入指令 【/daycare】 即可打開介面進行欄位管理：</div><div><br></div><div>* 普通玩家 / Super VIP：預設免費 1 格，額外可購 2 格（總上限 3 格）。</div><div>* Hyper VIP：預設免費 1 格，額外可購 4 格（總上限 5 格）。</div><div>* Master VIP：預設免費 1 格，額外可購 5 格（總上限 6 格）。</div><div>* 【解鎖費用】：擴充價格依序為 1萬 ➔ 3萬 ➔ 6萬 ➔ 10萬 ➔ 15萬 遊戲幣（購買後為永久解鎖，降檔不會回收已購欄位）。</div><div><p><img src=\"images/guides/guide_1794739455935.png\" alt=\"圖片\" style=\"border-radius: 8px; margin: 8px 0px; width: 75%;\" class=\"\"></p><p><br></p></div>",
     "coverImage": ""
   }
 ],
@@ -463,77 +470,86 @@ window.INITIAL_DATABASE = {
   ],
   "steps": [
     {
-      "badge": "第 1 步 · 初入世界",
-      "title": "選擇你的第一隻夥伴（御三家推薦）",
-      "desc": "初次登入伺服器時，畫面會彈出御三家精靈選擇視窗。建議初學者可以選擇：",
+      "badge": "出乍到來",
+      "title": "選擇第一隻夥伴",
+      "desc": "初次登入伺服器時，按 <span class=\"keycap\">M</span> 畫面會彈出御三家精靈選擇視窗。",
       "points": [
-        "🌿 草系（如妙蛙種子、新葉喵、草苗龜）：前期防禦高、自帶催眠或寄生種子，在抓捕野生精靈時控場極其優秀。",
-        "🔥 火系（如小火龍、火球鼠、呆火鱷）：早期高爆發輸出，推圖刷野怪升級效率極快。",
-        "💧 水系（如傑尼龜、水躍魚、潤水鴨）：抗性全面，水躍魚（巨沼怪）更擁有水+地面雙屬性，克制環境大部分敵手。"
+        "新玩家首次進入大廳時會自動獲得新手禮包。",
+        "禮包內容：精靈球、學習裝置、基礎藥品、新手工具、食物。",
+        "<mark style=\"background-color: #fef08a; padding: 2px 5px; border-radius: 4px;\">每位玩家全伺服器僅發放一次。</mark>"
       ]
     },
     {
-      "badge": "第 2 步 · 物資自給",
-      "title": "採集天然毬果與精靈球製作",
-      "desc": "野外樹上自然生長著各種顏色的毬果（Apricorns），手持右鍵採摘後毬果還會繼續生長：",
+      "badge": "探索世界",
+      "title": "伺服器區域說明",
+      "desc": "按 <span class=\"keycap\">C</span>  可以選擇去到各個世界。",
       "points": [
-        "紅毬果 / 黑毬果 / 藍毬果：採集後放入熔爐烤熟，獲得熟毬果。",
-        "工作台合成球蓋：使用 3 個熟毬果合成精靈球蓋（如紅球蓋、超球蓋）。",
-        "金屬球底合成：使用 3 個鐵錠（或銅錠）合成球底。",
-        "組裝精靈球：在工作台將球蓋 + 球底 + 石製按鈕合成，即可得到專屬的精靈球！"
+        "【主城／首都】❌ 完全不生成野生寶可夢：純粹的公共安全區，用於接任務、NPC 對戰、進活動、使用主城設施（換球機、商店等），不會有任何野生寶可夢刷新。",
+        "【地區（家園一區、家園二區）】僅有少量野生寶可夢：這裡是給玩家建立城鎮、領地、開商店的地方。",
+        "【資源區】✅ 全量正常生成，刷新率最高：這裡是官方專門給玩家打怪、練等、抓寶與探寶的世界（每週定期換圖重置）。",
+        "<img src=\"images/beginner/beginner_1794725400992.png\" alt=\"圖片\" style=\"max-width: 100%; border-radius: 8px; margin: 6px 0; width: 50%\">"
       ]
     },
     {
-      "badge": "第 3 步 · 生命續航",
-      "title": "免費回血與醫療站",
-      "desc": "外出冒險或切磋時，身上寶可夢生命值低下或瀕死時不用慌張：",
+      "badge": "生命續航",
+      "title": "免費回血&醫療站",
+      "desc": "在資源世界冒險時寶可夢生命值低下或瀕死不用慌張",
       "points": [
-        "輸入指令 /spawn 可以隨時免費傳送回伺服器主城。",
-        "主城寶可夢中心設有全自動治療機（Healer）與寶可夢電腦（PC），右鍵即可瞬間滿血復活全隊。",
-        "累積足夠鐵錠、紅石與鑽石後，也可在自己的基地合成專屬治療機。"
+        "輸入指令 <code>/spawn</code> 可以隨時傳送回伺服器主城。",
+        "主城寶可夢中心設有治療機與寶可夢電腦，<span class=\"mouse-indicator mouse-right\" contenteditable=\"false\" style=\"margin: 0 4px; vertical-align: middle; user-select: all;\" title=\"滑鼠右鍵點擊\">\n        <svg viewBox=\"0 0 24 34\" width=\"16\" height=\"22\" style=\"display:inline-block; vertical-align:middle;\">\n          <rect x=\"1\" y=\"1\" width=\"22\" height=\"32\" rx=\"11\" fill=\"#f8fafc\" stroke=\"#94a3b8\" stroke-width=\"2\"></rect>\n          <line x1=\"12\" y1=\"1\" x2=\"12\" y2=\"15\" stroke=\"#94a3b8\" stroke-width=\"1.5\"></line>\n          <path class=\"btn-left\" d=\"M1 12 C1 6 6 1 12 1 L12 15 L1 15 Z\" fill=\"transparent\"></path>\n          <path class=\"btn-right\" d=\"M12 1 C18 1 23 6 23 12 L23 15 L12 15 Z\" fill=\"#0284c7\"></path>\n          <rect x=\"10.5\" y=\"6\" width=\"3\" height=\"5\" rx=\"1.5\" fill=\"#64748b\"></rect>\n        </svg>\n        <span class=\"mouse-label\" style=\"font-size: 0.78rem;\">右鍵</span>\n      </span> <span style=\"font-family: inherit; font-size: 0.95rem;\">即可復活全隊。</span>",
+        "收集足夠材料也可在自己的領地合成治療機。",
+        "<img src=\"images/beginner/beginner_1794726494440.png\" alt=\"圖片\" style=\"max-width: 100%; border-radius: 8px; margin: 6px 0; width: 50%\">"
       ]
     },
     {
-      "badge": "第 4 步 · 狩獵捕捉",
+      "badge": "技巧教學",
       "title": "野外對戰與捕捉技巧",
       "desc": "捕捉野生寶可夢需要掌握兩個核心法則：",
       "points": [
-        "壓低血量：野生寶可夢血量壓到紅血區（約 20% 以下）時，捕捉率會倍增。",
-        "套上異常狀態：使用催眠粉、麻痺粉等技能讓目標陷入睡眠或麻痺狀態，能大幅降低掙脫概率。",
-        "直接投擲（偷襲）：在野生寶可夢背面潛行丟球，有機會觸發背後偷襲突襲捕捉！"
+        "<strong>1️⃣ 把血量壓低：</strong>將寶可夢打到紅血或黃血，血量越低捕捉成功率越高。建議招式：催眠、麻痺、冰凍、睡眠（成功率最高）",
+        "<strong>2️⃣ 善用異常狀態：</strong>📌 捕捉成功率加成（由高到低）😴 睡眠🧊 冰凍⚡麻痺🔥灼傷 / ☠中毒（不推薦，會扣血）<mark style=\"background-color: #fef08a; padding: 2px 5px; border-radius: 4px;\">👉 睡眠 + 紅血 = 最好抓</mark>",
+        "<strong>3️⃣ 選對精靈球很重要常用捕捉球建議：</strong>🟡 先機球：<mark style=\"background-color: #fef08a; padding: 2px 5px; border-radius: 4px;\">第一回合5倍高倍機率</mark>，一回合後就是1倍。 <mark style=\"background-color: #fef08a; padding: 2px 5px; border-radius: 4px;\"><b>退出戰鬥再次戰鬥就可以刷新</b></mark>",
+        "<strong>4️⃣新手推薦抓寶配置：</strong>1 隻能 催眠 / 麻痺 的寶可夢、1 隻能 點到為止 的寶可夢",
+        "最佳寶可夢 <mark style=\"background-color: rgb(254, 240, 138); padding: 2px 5px; border-radius: 4px; font-weight: 600;\">斗笠菇</mark>  可以學習 <b>蘑菇胞子 </b>和 <b>點到為止</b>",
+        "斗笠菇本身學不到<b>點到為止</b>&nbsp;可以用空白技能碟學習點到為止給他",
+        "可以讓對方睡眠又殘血的寶可夢"
       ]
     }
   ],
   "safety": [
     {
-      "title": "🚩 金鋤頭劃定邊界",
-      "desc": "使用金鋤頭右鍵點選對角線兩點，即可圈起矩形保護區，防止破壞與箱子被開。"
+      "title": "🚩 使用城鎮功能",
+      "desc": "一般玩家要取得新土地，請走城鎮圈地。初始36個區塊可以使用，自行選擇保護區塊即可圈起保護區，防止破壞與箱子被開。<div><img src=\"images/beginner/beginner_1794731400626.png\" alt=\"圖片\" style=\"margin: 6px 0px; width: 75%;\" class=\"img-size-selected\"></div>"
     },
     {
-      "title": "🏠 設立永久傳送點",
-      "desc": "輸入 /sethome [家名稱] 即可標記家園，隨時可用 /home 瞬間返回。"
+      "title": "🏠 設立家園傳送點",
+      "desc": "輸入 <code>/sethome [名稱]</code> 即可標記家園點，隨時可用 <code>/home</code> 瞬間返回。<div><img src=\"images/beginner/beginner_1794736985752.png\" alt=\"圖片\" style=\"margin: 6px 0px; width: 75%;\" class=\"img-size-selected\"></div>"
     },
     {
       "title": "👥 好友權限共享",
-      "desc": "輸入 /trust [好友ID] 可授予信任同伴在領地內開箱與建築協作權限。"
+      "desc": "加入同一城鎮可在領地內開箱與建築協作。"
     }
   ],
   "faq": [
     {
-      "q": "寶可夢卡在石頭或牆壁裡了怎麼辦？",
-      "a": "按兩次鍵盤 R 收回後再次釋放即可重新擺放位置；或是按 X 呼出輪盤點擊召回。"
+      "q": "寶可夢卡住了怎麼辦？",
+      "a": "按<span class=\"keycap\" contenteditable=\"false\" style=\"margin: 0px 3px; vertical-align: middle; user-select: all;\">R</span>收回後再次釋放就好了。"
     },
     {
-      "q": "如何跟好友傳送組隊？",
-      "a": "輸入 /tpa 好友名稱 發送傳送請求；好友收到提示後在聊天室點擊或輸入 /tpaccept 即可瞬間傳送到好友身邊。"
+      "q": "如何傳送到好友身邊？",
+      "a": "輸入 <code>/tpa</code>&nbsp;[好友名稱] 發送傳送請求；好友收到提示後在聊天室點擊或輸入 <code>/tpaccept</code> 即可瞬間傳送到好友身邊。"
     },
     {
-      "q": "如何知道某隻寶可夢在哪個生態系或會掉落什麼？",
-      "a": "點擊上方導航進入「Cobblemon 圖鑑」，支援直接搜尋寶可夢名稱或物品名稱（如「烈焰粉」、「西瓜種子」）。"
+      "q": "我想抓特定的寶可夢，要怎麼知道它會出現在哪裡？",
+      "a": "<h3><strong>方法1️⃣</strong></h3><h3><span style=\"font-weight: normal;\"><span style=\"font-family: inherit; font-size: 0.95rem;\">點擊上方導航進入</span><span style=\"font-family: inherit; font-size: 0.95rem;\"><mark style=\"background-color: rgb(187, 247, 208); padding: 2px 5px; border-radius: 4px;\">圖鑑</mark></span><span style=\"font-family: inherit; font-size: 0.95rem;\">，支援直接搜尋寶可夢名稱或掉落物名稱，或至Oasis官方Wiki搜尋。</span></span></h3><div><div><h3>方法2️⃣</h3><h3><span style=\"font-size: 16px; font-weight: normal; font-family: inherit;\">使用寶可雷達，在各種地形上 <span class=\"mouse-indicator mouse-right\" contenteditable=\"false\" style=\"margin: 0 4px; vertical-align: middle; user-select: all;\" title=\"滑鼠右鍵點擊\">\n        <svg viewBox=\"0 0 24 34\" width=\"16\" height=\"22\" style=\"display:inline-block; vertical-align:middle;\">\n          <rect x=\"1\" y=\"1\" width=\"22\" height=\"32\" rx=\"11\" fill=\"#f8fafc\" stroke=\"#94a3b8\" stroke-width=\"2\"></rect>\n          <line x1=\"12\" y1=\"1\" x2=\"12\" y2=\"15\" stroke=\"#94a3b8\" stroke-width=\"1.5\"></line>\n          <path class=\"btn-left\" d=\"M1 12 C1 6 6 1 12 1 L12 15 L1 15 Z\" fill=\"transparent\"></path>\n          <path class=\"btn-right\" d=\"M12 1 C18 1 23 6 23 12 L23 15 L12 15 Z\" fill=\"#0284c7\"></path>\n          <rect x=\"10.5\" y=\"6\" width=\"3\" height=\"5\" rx=\"1.5\" fill=\"#64748b\"></rect>\n        </svg>\n        <span class=\"mouse-label\" style=\"font-size: 0.78rem;\">右鍵</span>\n      </span> </span><span style=\"font-family: inherit; font-size: 0.95rem; font-weight: normal;\">使用可以看到當前位置可能生成的寶可夢。</span></h3><div><div><img src=\"images/beginner/beginner_1794732638610.png\" alt=\"圖片\" style=\"font-family: inherit; font-size: 0.95rem; margin: 6px 0px;\" class=\"\"></div></div></div></div>"
     },
     {
       "q": "遇到不懂的規則或指令要去哪裡發問？",
-      "a": "可以在遊戲中於公開聊天室詢問管理員與熱心玩家，或是查閱 指令查詢 與 攻略專區 獲取詳細步驟。"
+      "a": "可以在遊戲中於公開聊天室詢問管理員與熱心玩家，或是查閱 <b>指令查詢</b> 與 <b>攻略專區</b> 獲取詳細步驟。"
+    },
+    {
+      "q": "要怎麼把寶可夢給別人？",
+      "a": "<h3><span style=\"font-family: inherit; font-size: 0.95rem;\"><span style=\"font-size: 18px; line-height: 1.4;\">方法1️⃣</span></span>：交換</h3><div><span style=\"font-family: inherit; font-size: 0.95rem;\">面對玩家按 </span><span class=\"keycap\" contenteditable=\"false\" style=\"margin: 0px 3px; vertical-align: middle; user-select: all;\">R</span><span style=\"font-family: inherit; font-size: 0.95rem;\">&nbsp;</span><span style=\"font-family: inherit; font-size: 0.95rem;\">點擊「交換」按鈕</span></div><div><h3>方法2️⃣：指令贈送</h3></div><div>輸入指令 /pokegift [隊伍欄位] 即可送至對方郵箱</div>"
     }
   ]
 },

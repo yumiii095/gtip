@@ -114,7 +114,6 @@ foreach ($sp in $d.species) {
     $no = 9000 + [int]$sp.no
   } else {
     $no = [int]$sp.no
-    if ($dupNo.ContainsKey($no)) { $skippedDup += "$no $($sp.name)"; continue }
     if ($seenNo.ContainsKey($no)) { $skippedRepeat += "$no $($sp.name)"; continue }
   }
   if (-not $pokeNo.ContainsKey($no)) { $skippedNoPoke += "$no $($sp.name)"; continue }

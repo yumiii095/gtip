@@ -88,9 +88,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     );
   }
 
+  // 同編號有多筆時（本體＋地區型態），Wiki 的刷新資料不分型態：型態也沿用同編號資料，並在詳情標註
+  function spawnKeyOf(p) {
+    return String(p.no || p.id || '');
+  }
+  let baseNoSet = null;
+  function isFormEntry(p) {
+    if (!baseNoSet) {
+      baseNoSet = new Set(rawList.filter(q => !/[(（]/.test(q.name || '')).map(q => String(q.no || q.id || '')));
+    }
+    return /[(（][^)）]+[)）]\s*$/.test(p.name || '') && baseNoSet.has(spawnKeyOf(p));
+  }
+
   function applyFilters() {
     filteredList = rawList.filter(p => {
       const pNo = String(p.no || p.id || '');
+      const sKey = spawnKeyOf(p);
       const pName = (p.name || '').toLowerCase();
       const pDropsRaw = (p.drops_raw || '').toLowerCase();
       const pBiome = (p.biome_bonus || '').toLowerCase();
@@ -103,7 +116,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                       pName.includes(searchQuery) ||
                       pDropsRaw.includes(searchQuery) ||
                       pBiome.includes(searchQuery) ||
-                      (spawnSearchText[pNo] || '').includes(searchQuery);
+                      (spawnSearchText[sKey] || '').includes(searchQuery);
       }
 
       // Drop filter
@@ -115,7 +128,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         matchDrop = !hasDrops;
       }
 
-      return matchSearch && matchDrop && matchSpawnFilters(pNo);
+      return matchSearch && matchDrop && matchSpawnFilters(sKey);
     });
 
     currentPage = 1;
@@ -170,7 +183,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     ).join('')}</div>`;
   }
 
-  function spawnDetailHTML(pNo) {
+  function spawnDetailHTML(pNo, isForm) {
     if (!spawnData) return '';
     const rows = spawnMap[String(pNo)];
     const title = '<div style="font-weight: 800; font-size: 0.95rem; margin-bottom: 0.5rem;">🌍 刷新地點：</div>';
@@ -201,7 +214,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>`;
         }).join('')}
       </div>`).join('');
-    return `<div style="margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">${title}${body}</div>`;
+    const formNote = isForm ? '<div style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.5rem;">※ Wiki 刷新資料不分地區型態，此為同編號寶可夢的資料，僅供參考。</div>' : '';
+    return `<div style="margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">${title}${formNote}${body}</div>`;
   }
 
   function createPokemonCard(p) {
@@ -257,7 +271,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         ${biomeHTML}
         ${noteHTML}
-        ${spawnTagsHTML(pNo)}
+        ${spawnTagsHTML(spawnKeyOf(p))}
       </div>
 
       <div style="border-top: 1px solid var(--border-color); padding-top: 0.75rem; margin-top: 0.5rem;">
@@ -303,7 +317,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div style="font-weight: 800; font-size: 0.95rem; margin-bottom: 0.5rem;">擊敗/捕獲掉落物詳情：</div>
             ${dropsDetailHTML}
           </div>
-          ${spawnDetailHTML(pNo)}
+          ${spawnDetailHTML(spawnKeyOf(p), isFormEntry(p))}
         </div>
       </div>
     `;

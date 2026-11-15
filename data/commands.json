@@ -1,5 +1,12 @@
 [
   {
+    "name": "/crate keys",
+    "category": "經濟",
+    "permission": "所有玩家",
+    "syntax": "/crate keys",
+    "description": "查看自身擁有的各種抽獎箱鑰匙"
+  },
+  {
     "name": "/res tp",
     "category": "領地",
     "permission": "所有玩家",

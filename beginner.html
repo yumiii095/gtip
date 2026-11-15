@@ -126,11 +126,7 @@
           在伺服器中建立家園前，第一件事就是<strong>圈立領地（Claim）</strong>，領地能百分之百保護你的建築不被破壞、箱子不被偷竊、牧場精靈不被他人攻擊：
         </p>
 
-        <div id="beginner-safety-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;"></div>
-
-        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 0.85rem 1rem; border-radius: var(--radius-md); font-size: 0.9rem; color: #166534;">
-          💡 更多領地擴展、子領地劃分與個人指令，請點擊上方導覽前往 <strong><a href="commands.html" style="color: #15803d; font-weight: 800; text-decoration: underline;">「指令速查手冊」</a></strong> 查看！
-        </div>
+        <div id="beginner-safety-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;"></div>
       </div>
     </section>
 
@@ -286,31 +282,9 @@
       return `<div class="keycap-combo">${parts.join('')}</div>`;
     }
 
+    // 文字轉換規則集中在 js/core.js 的 Core.renderRichText（後台所見即所得編輯框共用同一套）
     function renderRichText(str) {
-      if (!str) return '';
-      // If string already contains formatted HTML tags, return directly
-      if (/<(span|mark|strong|b|em|i|del|s|code|h2|h3|svg|div|p|ul|ol|li)[^>]*>/i.test(str)) {
-        return str;
-      }
-      let res = escapeHTML(str);
-      // Colon label bolding (e.g., 草系：說明)
-      const colonParts = res.split('：');
-      if (colonParts.length > 1 && colonParts[0].length < 25) {
-        res = `<strong>${colonParts[0]}：</strong>${colonParts.slice(1).join('：')}`;
-      }
-      // Markdown bold
-      res = res.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      // Markdown italic
-      res = res.replace(/\*(.*?)\*/g, '<em>$1</em>');
-      // Markdown strikethrough
-      res = res.replace(/~~(.*?)~~/g, '<del>$1</del>');
-      // Markdown highlight ==text==
-      res = res.replace(/==(.*?)==/g, '<mark style="background:#fef08a; padding:2px 5px; border-radius:4px;">$1</mark>');
-      // Markdown keys [W] -> 3D keycap
-      res = res.replace(/\[([A-Za-z0-9\s\/\+\-]+)\]/g, '<span class="keycap" style="min-width:24px; height:24px; font-size:0.8rem; padding:0 6px;">$1</span>');
-      // Command code formatting
-      res = res.replace(/(\/[a-zA-Z0-9_-]+(\s+\[.*?\]|\s+&lt;.*?&gt;)?)/g, '<code>$1</code>');
-      return res;
+      return Core.renderRichText(str);
     }
 
     function escapeHTML(str) {

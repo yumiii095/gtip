@@ -199,9 +199,36 @@ const FS = {
     }
   },
 
-  async saveGuideImage(file) {
+  // 貼上圖片時自動縮放：寬度超過 MAX_IMAGE_WIDTH 就等比例縮小（GIF / SVG 不處理；縮完反而更大就沿用原檔）
+  MAX_IMAGE_WIDTH: 1280,
+
+  async resizeImage(file) {
+    try {
+      if (!file || !/^image\/(png|jpeg|webp)$/i.test(file.type)) return file;
+      const bmp = await createImageBitmap(file);
+      if (bmp.width <= this.MAX_IMAGE_WIDTH) { bmp.close && bmp.close(); return file; }
+
+      const scale = this.MAX_IMAGE_WIDTH / bmp.width;
+      const canvas = document.createElement('canvas');
+      canvas.width = this.MAX_IMAGE_WIDTH;
+      canvas.height = Math.round(bmp.height * scale);
+      canvas.getContext('2d').drawImage(bmp, 0, 0, canvas.width, canvas.height);
+      bmp.close && bmp.close();
+
+      const blob = await new Promise(res => canvas.toBlob(res, file.type, 0.88));
+      if (!blob || blob.size >= file.size) return file;
+
+      const ext = file.type === 'image/jpeg' ? 'jpg' : file.type.split('/')[1];
+      return new File([blob], (file.name && /\.[a-z0-9]+$/i.test(file.name)) ? file.name : `image.${ext}`, { type: file.type });
+    } catch (err) {
+      console.warn('圖片縮放失敗，改用原圖:', err);
+      return file;
+    }
+  },
+
+  async saveGuideImage(file, folder = 'guides', prefix = 'guide') {
     if (!this.dirHandle) {
-      const want = confirm('尚未連結本機專案資料夾！\n\n是否立即選取您的網站資料夾（例如 Desktop/gtip）？\n連結後圖片將會自動存入 images/guides 資料夾！');
+      const want = confirm(`尚未連結本機專案資料夾！\n\n是否立即選取您的網站資料夾（例如 Desktop/gtip）？\n連結後圖片將會自動存入 images/${folder} 資料夾！`);
       if (want) {
         const ok = await this.connect();
         if (!ok) return null;
@@ -211,14 +238,15 @@ const FS = {
     }
 
     try {
+      file = await this.resizeImage(file);
       const extMatch = file.name ? file.name.split('.').pop().toLowerCase() : 'png';
       const ext = ['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(extMatch) ? extMatch : 'png';
-      const filename = `guide_${Date.now()}.${ext}`;
-      const pathParts = ['images', 'guides', filename];
+      const filename = `${prefix}_${Date.now()}.${ext}`;
+      const pathParts = ['images', folder, filename];
 
       const ok = await this.writeFile(pathParts, file);
       if (ok) {
-        return `images/guides/${filename}`;
+        return `images/${folder}/${filename}`;
       }
       return null;
     } catch (err) {
@@ -1488,12 +1516,25 @@ const Admin = {
     }
   },
 
-  restoreSelection() {
-    if (this._savedRange) {
-      const sel = window.getSelection();
+  // 還原游標位置。傳入 editor 時，只會還原「確實在該欄位內」的游標；
+  // 沒有有效位置時把游標放到內容最後面（而不是讓瀏覽器預設跳到最前面）。
+  restoreSelection(editor) {
+    const sel = window.getSelection();
+    if (this._savedRange && (!editor || editor.contains(this._savedRange.commonAncestorContainer))) {
       sel.removeAllRanges();
       sel.addRange(this._savedRange);
+      return true;
     }
+    if (editor && editor.isContentEditable) {
+      const r = document.createRange();
+      // 多行欄位（每行一個 <div>）：放到最後一行的行尾
+      const lastLine = editor.lastElementChild && /^(DIV|P|LI)$/.test(editor.lastElementChild.nodeName) ? editor.lastElementChild : editor;
+      r.selectNodeContents(lastLine);
+      r.collapse(false);
+      sel.removeAllRanges();
+      sel.addRange(r);
+    }
+    return false;
   },
 
   getSelectionInfo() {
@@ -1661,6 +1702,71 @@ const Admin = {
     this.triggerTargetInput(editor);
   },
 
+  // 清除螢光底色（可直接編輯的區塊）：把選取範圍內的 <mark> 與背景色移除；
+  // 若選取範圍只是某個螢光標記的一部分，會把標記從選取處切開，只清掉選到的那段。
+  clearHighlightIn(editor) {
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0 || !editor) return;
+    const range = sel.getRangeAt(0);
+    if (!editor.contains(range.commonAncestorContainer)) return;
+
+    const hasBg = (n) => n.nodeType === 1 && (n.tagName === 'MARK' || (n.style && (n.style.backgroundColor || n.style.background)));
+    const unwrap = (el) => {
+      const p = el.parentNode;
+      while (el.firstChild) p.insertBefore(el.firstChild, el);
+      p.removeChild(el);
+    };
+    const clearBg = (n) => {
+      n.style.removeProperty('background-color');
+      n.style.removeProperty('background');
+      if (!(n.getAttribute('style') || '').trim()) n.removeAttribute('style');
+    };
+    const strip = (root) => {
+      root.querySelectorAll('mark').forEach(unwrap);
+      root.querySelectorAll('[style]').forEach(clearBg);
+    };
+    const findAnc = (node) => {
+      let n = node && (node.nodeType === 1 ? node : node.parentNode);
+      while (n && n !== editor && editor.contains(n)) {
+        if (hasBg(n)) return n;
+        n = n.parentNode;
+      }
+      return null;
+    };
+
+    // 游標停在螢光文字中（沒有選取）：清掉整段螢光
+    if (range.collapsed) {
+      const a = findAnc(range.startContainer);
+      if (a) { if (a.tagName === 'MARK') unwrap(a); else clearBg(a); }
+      return;
+    }
+
+    // 選取一段文字：先抽出來、去掉底色，再放回原位，最後從包住它的螢光標記裡「拉出來」
+    const mid = range.extractContents();
+    strip(mid);
+    const nodes = Array.from(mid.childNodes);
+    if (nodes.length === 0) return;
+    range.insertNode(mid);
+
+    let anc;
+    while ((anc = findAnc(nodes[0].parentNode))) {
+      const after = document.createRange();
+      after.setStartAfter(nodes[nodes.length - 1]);
+      after.setEnd(anc, anc.childNodes.length);
+      const afterEl = anc.cloneNode(false);
+      afterEl.appendChild(after.extractContents());
+      anc.parentNode.insertBefore(afterEl, anc.nextSibling);
+      nodes.forEach(n => anc.parentNode.insertBefore(n, afterEl));
+      [anc, afterEl].forEach(e => { if (!e.textContent && !e.querySelector('img,br,hr')) e.remove(); });
+    }
+
+    sel.removeAllRanges();
+    const r = document.createRange();
+    r.setStartBefore(nodes[0]);
+    r.setEndAfter(nodes[nodes.length - 1]);
+    sel.addRange(r);
+  },
+
   applyHighlight(colorHex) {
     const target = this.getLastEditTarget();
     if (!target) return;
@@ -1672,6 +1778,23 @@ const Admin = {
       const selected = el.value.substring(start, end);
       let rep = '';
       if (colorHex === 'transparent') {
+        // 清除螢光：只要選取範圍（或游標）碰到 <mark>…</mark>，就把那組標記拆掉、保留裡面的文字
+        const v = el.value;
+        const re = /<mark\b[^>]*>([\s\S]*?)<\/mark>/gi;
+        let out = '', last = 0, m, changed = false;
+        while ((m = re.exec(v))) {
+          const ms = m.index, me = ms + m[0].length;
+          const hit = start === end ? (start > ms && start < me) : (start < me && end > ms);
+          if (hit) { out += v.slice(last, ms) + m[1]; last = me; changed = true; }
+        }
+        if (changed) {
+          out += v.slice(last);
+          el.value = out;
+          el.selectionStart = el.selectionEnd = Math.min(start, out.length);
+          el.focus();
+          this.triggerTargetInput(el);
+          return;
+        }
         rep = selected.replace(/<\/?mark[^>]*>/gi, '');
       } else {
         rep = `<mark style="background-color: ${colorHex}; padding: 2px 5px; border-radius: 4px;">${selected || '重點文字'}</mark>`;
@@ -1686,23 +1809,22 @@ const Admin = {
     const editor = target.el;
     if (editor && editor.focus) editor.focus();
 
+    if (colorHex === 'transparent') {
+      this.clearHighlightIn(editor);
+      this.triggerTargetInput(editor);
+      return;
+    }
+
     const sel = window.getSelection();
     if (sel && sel.rangeCount > 0 && !sel.isCollapsed) {
       const range = sel.getRangeAt(0);
-      if (colorHex === 'transparent') {
-        const span = document.createElement('span');
-        span.style.backgroundColor = 'transparent';
-        span.appendChild(range.extractContents());
-        range.insertNode(span);
-      } else {
-        const mark = document.createElement('mark');
-        mark.style.backgroundColor = colorHex;
-        mark.style.padding = '2px 5px';
-        mark.style.borderRadius = '4px';
-        mark.style.fontWeight = '600';
-        mark.appendChild(range.extractContents());
-        range.insertNode(mark);
-      }
+      const mark = document.createElement('mark');
+      mark.style.backgroundColor = colorHex;
+      mark.style.padding = '2px 5px';
+      mark.style.borderRadius = '4px';
+      mark.style.fontWeight = '600';
+      mark.appendChild(range.extractContents());
+      range.insertNode(mark);
       sel.removeAllRanges();
     } else {
       document.execCommand('hiliteColor', false, colorHex);
@@ -1769,8 +1891,8 @@ const Admin = {
       return;
     }
 
-    this.restoreSelection();
     const editor = target.el;
+    this.restoreSelection(editor);
     if (editor && editor.focus) editor.focus();
 
     const sel = window.getSelection();
@@ -1833,8 +1955,8 @@ const Admin = {
       return;
     }
 
-    this.restoreSelection();
     const editor = target.el;
+    this.restoreSelection(editor);
     if (editor && editor.focus) editor.focus();
 
     const sel = window.getSelection();
@@ -1853,6 +1975,69 @@ const Admin = {
     this.saveSelection();
     this.triggerTargetInput(editor);
     Core.showToast(`🖱️ 已嵌入 [ ${isRight ? '滑鼠右鍵' : '滑鼠左鍵'} ] 動作！`);
+  },
+
+  // 黃色「小提醒」提示框：游標處插入；若有選取文字，就把選取的文字變成提示框內容。
+  // 樣式全部寫成行內樣式，前台（新手專區 / 攻略）不需要額外 CSS 就會一樣顯示。
+  insertTipBox() {
+    const target = this.getLastEditTarget();
+    if (!target) return;
+
+    const BOX_STYLE = 'background: #fef9c3; border: 1px solid #fde047; border-left: 4px solid #eab308; border-radius: 8px; padding: 0.6rem 0.9rem; margin: 0.5rem 0; color: #854d0e; font-size: 0.92rem; font-weight: 400; line-height: 1.7;';
+    const PLACEHOLDER = '請輸入提醒內容';
+
+    // textarea / 單行輸入框：直接插入 HTML 文字
+    if (target.type === 'input') {
+      const el = target.el;
+      const start = el.selectionStart, end = el.selectionEnd;
+      const selected = el.value.substring(start, end);
+      const html = `<div class="tip-box" style="${BOX_STYLE}">💡 <strong>小提醒：</strong>${selected || PLACEHOLDER}</div>`;
+      el.setRangeText(html, start, end, 'end');
+      el.focus();
+      this.triggerTargetInput(el);
+      Core.showToast('💡 已插入小提醒框');
+      return;
+    }
+
+    const editor = target.el;
+    this.restoreSelection(editor);
+    if (editor && editor.focus) editor.focus();
+
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return;
+    const range = sel.getRangeAt(0);
+
+    // 單行欄位（標題之類）不能放區塊元素，改用行內版本，避免換行被清掉
+    const inline = editor.dataset && editor.dataset.single === '1';
+    const box = document.createElement(inline ? 'span' : 'div');
+    box.className = 'tip-box';
+    box.setAttribute('style', BOX_STYLE + (inline ? ' display: inline-block;' : ''));
+    const label = document.createElement('strong');
+    label.textContent = '小提醒：';
+    box.appendChild(document.createTextNode('💡 '));
+    box.appendChild(label);
+
+    let bodyNode;
+    if (!range.collapsed) {
+      const frag = range.extractContents();
+      bodyNode = document.createElement('span');
+      bodyNode.appendChild(frag);
+    } else {
+      bodyNode = document.createTextNode(PLACEHOLDER);
+    }
+    box.appendChild(bodyNode);
+    range.insertNode(box);
+
+    // 選取提示文字，方便直接打字覆蓋
+    sel.removeAllRanges();
+    const r = document.createRange();
+    r.selectNodeContents(bodyNode.nodeType === 3 ? box : bodyNode);
+    if (bodyNode.nodeType === 3) { r.setStart(bodyNode, 0); r.setEnd(bodyNode, bodyNode.length); }
+    sel.addRange(r);
+
+    this.saveSelection();
+    this.triggerTargetInput(editor);
+    Core.showToast('💡 已插入小提醒框，直接輸入即可修改內容');
   },
 
   insertCustomKeycap(btnEl) {
@@ -1918,6 +2103,19 @@ const Admin = {
     };
 
     document.addEventListener('selectionchange', () => {
+      // 隨時記住「可直接編輯區塊」裡的游標位置（包含沒有選取文字、只是點一下的情況），
+      // 這樣按鍵位 / 滑鼠圖示等按鈕時才會插在游標處，而不是跑到最前面
+      const s = window.getSelection();
+      if (s && s.rangeCount > 0 && s.anchorNode) {
+        const host = s.anchorNode.nodeType === 1 ? s.anchorNode : s.anchorNode.parentElement;
+        const ed = host && host.closest && host.closest('[contenteditable="true"]');
+        if (ed) {
+          this._savedRange = s.getRangeAt(0).cloneRange();
+          if (!this.lastActiveTarget || this.lastActiveTarget.el !== ed) {
+            this.lastActiveTarget = { el: ed, type: 'contenteditable' };
+          }
+        }
+      }
       updateFloatingToolbar();
     });
 
@@ -2044,7 +2242,120 @@ const Admin = {
     }
   },
 
+  // 新手專區：在各輸入欄位（textarea / 單行輸入 / 可直接編輯的區塊）貼上或拖曳圖片，
+  // 圖片存到 images/beginner/，並在游標處插入 <img>（beginner.html 的 renderRichText 會直接顯示 HTML）
+  setupBeginnerImagePaste() {
+    const panel = document.getElementById('panel-beginner');
+    if (!panel || panel._hasImagePaste) return;
+    panel._hasImagePaste = true;
+
+    const isEditable = (el) => el && el.matches && (el.matches('textarea, input[type="text"]') || el.isContentEditable);
+    const pickImage = (files) => Array.from(files || []).find(f => f.type && f.type.startsWith('image/'));
+
+    panel.addEventListener('paste', async (e) => {
+      if (!isEditable(e.target)) return;
+      const cd = e.clipboardData || window.clipboardData;
+      const file = cd && pickImage(Array.from(cd.items || []).map(i => (i.kind === 'file' ? i.getAsFile() : null)).filter(Boolean));
+      if (!file) {
+        // 所見即所得欄位：貼上一律轉成純文字，避免帶入外部網頁的樣式（textarea / input 維持原本行為）
+        if (e.target.classList && e.target.classList.contains('wysiwyg-field') && cd) {
+          e.preventDefault();
+          let text = cd.getData('text/plain') || '';
+          if (e.target.dataset.single === '1') text = text.replace(/\s*\n\s*/g, ' ');
+          document.execCommand('insertText', false, text);
+        }
+        return;
+      }
+      e.preventDefault();
+      await Admin.insertBeginnerImage(e.target, file);
+    });
+
+    // 單行的所見即所得欄位不允許 Enter 換行
+    panel.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.target.classList && e.target.classList.contains('wysiwyg-single')) e.preventDefault();
+    });
+
+    panel.addEventListener('dragover', (e) => {
+      if (isEditable(e.target) && e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files')) e.preventDefault();
+    });
+    panel.addEventListener('drop', async (e) => {
+      if (!isEditable(e.target)) return;
+      const file = e.dataTransfer && pickImage(e.dataTransfer.files);
+      if (!file) return;
+      e.preventDefault();
+      await Admin.insertBeginnerImage(e.target, file);
+    });
+  },
+
+  async insertBeginnerImage(el, file) {
+    Core.showToast('⏳ 正在儲存圖片至本機 images/beginner/ ...');
+    const relPath = await FS.saveGuideImage(file, 'beginner', 'beginner');
+    if (!relPath) return;
+
+    const tag = `<img src="${relPath}" alt="圖片" style="max-width: 100%; border-radius: 8px; margin: 6px 0;">`;
+    if (el.isContentEditable) {
+      el.focus();
+      document.execCommand('insertHTML', false, tag);
+    } else {
+      const start = el.selectionStart != null ? el.selectionStart : el.value.length;
+      const end = el.selectionEnd != null ? el.selectionEnd : start;
+      el.value = el.value.slice(0, start) + tag + el.value.slice(end);
+      el.selectionStart = el.selectionEnd = start + tag.length;
+      el.focus();
+      // 觸發原本的 oninput，資料才會寫回並存草稿
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    Core.showToast(`✅ 圖片已存入 ${relPath}`);
+  },
+
+  // ---- 新手專區所見即所得欄位 ----
+  // 欄位內直接顯示粗體、螢光、圖片等排版效果（顯示規則與前台相同：Core.renderRichText），
+  // 儲存的是欄位內的 HTML；前台遇到 HTML 會直接輸出。
+  wysiwygField(value, onInputExpr, opts = {}) {
+    const single = opts.single !== false;
+    const ph = opts.placeholder || '';
+    return `<div class="form-control wysiwyg-field ${single ? 'wysiwyg-single' : 'wysiwyg-multi'}" contenteditable="true" spellcheck="false" data-single="${single ? 1 : 0}" data-placeholder="${escapeAttr(ph)}" oninput="${onInputExpr}">${Core.renderRichText(value || '')}</div>`;
+  },
+
+  // 取出欄位目前的 HTML（單行欄位會去掉換行；去掉結尾空白與多餘 <br>）
+  cleanHTML(el) {
+    let h = el.innerHTML;
+    if (el.dataset && el.dataset.single === '1') {
+      h = h.replace(/<br\s*\/?>/gi, ' ').replace(/<\/?(div|p)[^>]*>/gi, '');
+    }
+    return h.replace(/^(\s|&nbsp;)+/i, '').replace(/(<br\s*\/?>|\s|&nbsp;)+$/gi, '').trim();
+  },
+
+  // 多行欄位（每行一點）：每個 <div> 當成一行
+  readEditorLines(el) {
+    const lines = [];
+    let cur = '';
+    const flush = () => { if (cur.trim()) lines.push(cur.trim()); cur = ''; };
+    el.childNodes.forEach(n => {
+      if (n.nodeType === 3) {
+        cur += escapeHTML(n.textContent);
+      } else if (/^(DIV|P|LI)$/.test(n.nodeName)) {
+        flush();
+        lines.push(n.innerHTML);
+      } else if (n.nodeName === 'BR') {
+        flush();
+      } else {
+        cur += n.outerHTML;
+      }
+    });
+    flush();
+    return lines.map(s => s.replace(/(<br\s*\/?>|\s|&nbsp;)+$/gi, '').trim()).filter(s => s && s !== '<br>');
+  },
+
+  updateBeginnerStepPointsEl(idx, el) {
+    if (this.data.beginner.steps[idx]) {
+      this.data.beginner.steps[idx].points = this.readEditorLines(el);
+      Core.saveDraft('beginner', this.data.beginner);
+    }
+  },
+
   renderBeginnerPanel() {
+    this.setupBeginnerImagePaste();
     if (!this.data.beginner) {
       this.data.beginner = { shortcuts: [], steps: [], safety: [], faq: [] };
     }
@@ -2092,8 +2403,8 @@ const Admin = {
             ${this.renderAdminKeyMouseVisual(item)}
           </div>
           <div style="flex: 1;">
-            <div contenteditable="true" style="font-weight: 800; font-size: 1rem; color: var(--text-main); margin-bottom: 3px;" oninput="Admin.updateBeginnerShortcut(${idx}, 'title', this.innerHTML)" title="點擊直接修改操作名稱">${item.title || ''}</div>
-            <div contenteditable="true" style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;" oninput="Admin.updateBeginnerShortcut(${idx}, 'desc', this.innerHTML)" title="點擊直接修改操作說明">${item.desc || ''}</div>
+            <div contenteditable="true" style="font-weight: 800; font-size: 1rem; color: var(--text-main); margin-bottom: 3px;" oninput="Admin.updateBeginnerShortcut(${idx}, 'title', this.innerHTML)" title="點擊直接修改操作名稱">${Core.renderRichText(item.title || '')}</div>
+            <div contenteditable="true" style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;" oninput="Admin.updateBeginnerShortcut(${idx}, 'desc', this.innerHTML)" title="點擊直接修改操作說明">${Core.renderRichText(item.desc || '')}</div>
           </div>
         </div>
       `;
@@ -2245,7 +2556,7 @@ const Admin = {
       card.className = 'card';
       card.style.cssText = 'padding: 1.25rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: #ffffff;';
 
-      const pointsText = (step.points || []).join('\n');
+      const pointsHTML = (step.points || []).map(pt => `<div>${Core.renderRichText(pt)}</div>`).join('') || '<div><br></div>';
 
       card.innerHTML = `
         <div style="font-weight: 800; font-size: 1rem; color: var(--primary-text); margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
@@ -2255,20 +2566,20 @@ const Admin = {
         <div style="display: grid; grid-template-columns: 200px 1fr; gap: 0.75rem; margin-bottom: 0.65rem;">
           <div>
             <label class="form-label" style="font-size: 0.8rem;">階段徽章標籤 (Badge)</label>
-            <input type="text" class="form-control" value="${escapeAttr(step.badge || '')}" oninput="Admin.updateBeginnerStep(${idx}, 'badge', this.value)">
+            ${this.wysiwygField(step.badge, `Admin.updateBeginnerStep(${idx}, 'badge', Admin.cleanHTML(this))`)}
           </div>
           <div>
             <label class="form-label" style="font-size: 0.8rem;">步驟標題 (Title)</label>
-            <input type="text" class="form-control" value="${escapeAttr(step.title || '')}" oninput="Admin.updateBeginnerStep(${idx}, 'title', this.value)">
+            ${this.wysiwygField(step.title, `Admin.updateBeginnerStep(${idx}, 'title', Admin.cleanHTML(this))`)}
           </div>
         </div>
         <div class="form-group" style="margin-bottom: 0.65rem;">
           <label class="form-label" style="font-size: 0.8rem;">前言引導說明 (Description)</label>
-          <input type="text" class="form-control" value="${escapeAttr(step.desc || '')}" oninput="Admin.updateBeginnerStep(${idx}, 'desc', this.value)">
+          ${this.wysiwygField(step.desc, `Admin.updateBeginnerStep(${idx}, 'desc', Admin.cleanHTML(this))`)}
         </div>
         <div class="form-group" style="margin-bottom: 0;">
-          <label class="form-label" style="font-size: 0.8rem;">重點列點清單 (每行一點)</label>
-          <textarea class="form-control" style="min-height: 90px; font-size: 0.9rem;" oninput="Admin.updateBeginnerStepPoints(${idx}, this.value)">${escapeHTML(pointsText)}</textarea>
+          <label class="form-label" style="font-size: 0.8rem;">重點列點清單 (每行一點，按 Enter 換下一點)</label>
+          <div class="form-control wysiwyg-field wysiwyg-multi" contenteditable="true" spellcheck="false" data-single="0" data-placeholder="輸入重點，按 Enter 新增下一點" oninput="Admin.updateBeginnerStepPointsEl(${idx}, this)">${pointsHTML}</div>
         </div>
       `;
       container.appendChild(card);
@@ -2330,11 +2641,11 @@ const Admin = {
         </div>
         <div class="form-group" style="margin-bottom: 0.65rem;">
           <label class="form-label" style="font-size: 0.8rem;">指南標題</label>
-          <input type="text" class="form-control" value="${escapeAttr(s.title || '')}" oninput="Admin.updateBeginnerSafety(${idx}, 'title', this.value)">
+          ${this.wysiwygField(s.title, `Admin.updateBeginnerSafety(${idx}, 'title', Admin.cleanHTML(this))`)}
         </div>
         <div class="form-group" style="margin-bottom: 0;">
           <label class="form-label" style="font-size: 0.8rem;">防護教學詳細說明</label>
-          <textarea class="form-control" style="min-height: 60px;" oninput="Admin.updateBeginnerSafety(${idx}, 'desc', this.value)">${escapeHTML(s.desc || '')}</textarea>
+          ${this.wysiwygField(s.desc, `Admin.updateBeginnerSafety(${idx}, 'desc', Admin.cleanHTML(this))`, { single: false })}
         </div>
       `;
       container.appendChild(card);
@@ -2357,24 +2668,70 @@ const Admin = {
     faq.forEach((f, idx) => {
       const card = document.createElement('div');
       card.className = 'card';
-      card.style.cssText = 'padding: 1.25rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: #ffffff;';
+      card.style.cssText = 'padding: 1.25rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: #ffffff; transition: all 0.15s ease;';
+      card.classList.add('faq-drag-item');
+
+      // 上下拖曳排序（按住左上角 ⠿ 把手才會啟用拖曳，避免影響欄位內選取文字）
+      card.addEventListener('dragstart', (e) => {
+        Admin.draggedFaqIndex = idx;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', String(idx));
+        card.classList.add('dragging');
+      });
+      card.addEventListener('dragend', () => {
+        card.draggable = false;
+        card.classList.remove('dragging');
+        document.querySelectorAll('.faq-drag-item.drag-over').forEach(el => el.classList.remove('drag-over'));
+        Admin.draggedFaqIndex = null;
+      });
+      card.addEventListener('dragover', (e) => {
+        if (Admin.draggedFaqIndex === null || Admin.draggedFaqIndex === undefined) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        if (Admin.draggedFaqIndex !== idx) card.classList.add('drag-over');
+      });
+      card.addEventListener('dragleave', () => card.classList.remove('drag-over'));
+      card.addEventListener('drop', (e) => {
+        e.preventDefault();
+        card.classList.remove('drag-over');
+        const fromIdx = Admin.draggedFaqIndex;
+        if (fromIdx !== null && fromIdx !== undefined && fromIdx !== idx) {
+          Admin.reorderFaq(fromIdx, idx);
+        }
+      });
 
       card.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
-          <span style="font-weight: 800; font-size: 0.9rem; color: var(--primary-text);">問答 #${idx + 1}</span>
+          <span style="display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 800; font-size: 0.9rem; color: var(--primary-text);">
+            <span class="cmd-drag-handle" title="按住上下拖曳排序" onmouseenter="this.closest('.faq-drag-item').draggable=true" onmouseleave="this.closest('.faq-drag-item').draggable=false">⠿</span>
+            問答 #${idx + 1}
+          </span>
           <button type="button" class="btn btn-danger btn-sm" onclick="Admin.deleteBeginnerFaq(${idx})">🗑️ 刪除</button>
         </div>
         <div class="form-group" style="margin-bottom: 0.65rem;">
           <label class="form-label" style="font-size: 0.8rem;">問題 (Q)</label>
-          <input type="text" class="form-control" value="${escapeAttr(f.q || '')}" oninput="Admin.updateBeginnerFaq(${idx}, 'q', this.value)">
+          ${this.wysiwygField(f.q, `Admin.updateBeginnerFaq(${idx}, 'q', Admin.cleanHTML(this))`)}
         </div>
         <div class="form-group" style="margin-bottom: 0;">
           <label class="form-label" style="font-size: 0.8rem;">解答說明 (A)</label>
-          <textarea class="form-control" style="min-height: 60px;" oninput="Admin.updateBeginnerFaq(${idx}, 'a', this.value)">${escapeHTML(f.a || '')}</textarea>
+          ${this.wysiwygField(f.a, `Admin.updateBeginnerFaq(${idx}, 'a', Admin.cleanHTML(this))`, { single: false })}
         </div>
       `;
       container.appendChild(card);
     });
+  },
+
+  draggedFaqIndex: null,
+
+  reorderFaq(fromIdx, toIdx) {
+    const faq = this.data.beginner.faq || [];
+    if (fromIdx < 0 || fromIdx >= faq.length || toIdx < 0 || toIdx >= faq.length) return;
+    const [moved] = faq.splice(fromIdx, 1);
+    faq.splice(toIdx, 0, moved);
+    this.draggedFaqIndex = null;
+    Core.saveDraft('beginner', this.data.beginner);
+    this.renderAdminBeginnerFaq();
+    Core.showToast(`已移動問答順序至 #${toIdx + 1}`);
   },
 
   addBeginnerFaq() {
@@ -2540,11 +2897,199 @@ function escapeAttr(str) {
   return escapeHTML(str);
 }
 
+/* ================= 圖片顯示大小調整（攻略編輯框 + 新手專區各欄位）=================
+ * - 可直接編輯的區塊（contenteditable）：點選圖片 → 出現工具列 → 改圖片的 width（%）
+ * - textarea / 單行輸入框：游標放進 <img ...> 文字內 → 出現工具列 → 改該標籤 style 裡的 width（%）
+ * 只改「頁面上顯示的寬度」，圖片檔本身不變。前台圖片本來就有 max-width: 100%。 */
+const ImageResize = {
+  bar: null,
+  slider: null,
+  readout: null,
+  target: null, // { type: 'dom', img } 或 { type: 'text', el, start, end }
+  PRESETS: [25, 50, 75, 100],
+
+  init() {
+    if (this.bar) return;
+    const bar = document.createElement('div');
+    bar.className = 'img-size-bar';
+    bar.style.display = 'none';
+    bar.innerHTML = `
+      <span class="img-size-title">🖼️ 圖片大小</span>
+      ${this.PRESETS.map(p => `<button type="button" class="img-size-btn" data-pct="${p}">${p}%</button>`).join('')}
+      <button type="button" class="img-size-btn" data-pct="0" title="移除寬度設定，依原圖大小顯示（最大不超過版面寬度）">原始</button>
+      <input type="range" class="img-size-slider" min="10" max="100" step="5" value="100" title="拖曳微調寬度">
+      <span class="img-size-readout">100%</span>
+    `;
+    document.body.appendChild(bar);
+    this.bar = bar;
+    this.slider = bar.querySelector('.img-size-slider');
+    this.readout = bar.querySelector('.img-size-readout');
+
+    // 點工具列按鈕時不要搶走編輯框的焦點 / 選取範圍
+    bar.addEventListener('mousedown', (e) => {
+      if (!e.target.classList.contains('img-size-slider')) e.preventDefault();
+    });
+    bar.addEventListener('click', (e) => {
+      const btn = e.target.closest('.img-size-btn');
+      if (!btn) return;
+      const pct = Number(btn.dataset.pct);
+      this.apply(pct > 0 ? pct : null);
+    });
+    this.slider.addEventListener('input', () => this.apply(Number(this.slider.value)));
+
+    // 點到可編輯區塊裡的圖片
+    document.addEventListener('click', (e) => {
+      const img = e.target;
+      if (img && img.tagName === 'IMG' && img.closest('[contenteditable="true"]')) {
+        this.selectDom(img);
+        return;
+      }
+      this.checkTextCaret(e.target);
+    });
+    document.addEventListener('keyup', (e) => {
+      if (e.key === 'Escape') { this.hide(); return; }
+      this.checkTextCaret(e.target);
+    });
+    // 點到別處就收起工具列
+    document.addEventListener('mousedown', (e) => {
+      if (this.bar.contains(e.target)) return;
+      if (e.target && e.target.tagName === 'IMG' && e.target.closest('[contenteditable="true"]')) return;
+      if (e.target && e.target.matches && e.target.matches('textarea, input[type="text"]')) return; // 由 click 判斷
+      this.hide();
+    });
+    window.addEventListener('scroll', () => this.reposition(), true);
+    window.addEventListener('resize', () => this.reposition());
+  },
+
+  hide() {
+    if (!this.bar) return;
+    this.bar.style.display = 'none';
+    if (this.target && this.target.type === 'dom' && this.target.img) {
+      this.target.img.classList.remove('img-size-selected');
+    }
+    this.target = null;
+  },
+
+  selectDom(img) {
+    if (this.target && this.target.type === 'dom' && this.target.img !== img) {
+      this.target.img.classList.remove('img-size-selected');
+    }
+    img.classList.add('img-size-selected');
+    this.target = { type: 'dom', img };
+    this.show(this.currentPct());
+  },
+
+  // textarea / input：游標（或選取範圍）是否落在某個 <img ...> 標籤內
+  checkTextCaret(el) {
+    if (!el || !el.matches || !el.matches('textarea, input[type="text"]')) { return; }
+    const v = el.value || '';
+    if (v.indexOf('<img') === -1) { if (this.target && this.target.type === 'text' && this.target.el === el) this.hide(); return; }
+    const pos = el.selectionStart, posEnd = el.selectionEnd;
+    const re = /<img\b[^>]*>/gi;
+    let m;
+    while ((m = re.exec(v))) {
+      if (pos >= m.index && posEnd <= m.index + m[0].length) {
+        this.target = { type: 'text', el, start: m.index, end: m.index + m[0].length };
+        this.show(this.currentPct());
+        return;
+      }
+    }
+    if (this.target && this.target.type === 'text' && this.target.el === el) this.hide();
+  },
+
+  tagText() {
+    const t = this.target;
+    return t.el.value.slice(t.start, t.end);
+  },
+
+  // 目前設定的寬度 %，沒有設定則回傳 null（原始）
+  currentPct() {
+    const t = this.target;
+    if (!t) return null;
+    let w = '';
+    if (t.type === 'dom') {
+      w = t.img.style.width || '';
+    } else {
+      const sm = this.tagText().match(/style\s*=\s*(["'])(.*?)\1/i);
+      const wm = sm && sm[2].match(/(?:^|;)\s*width\s*:\s*([^;]+)/i);
+      w = wm ? wm[1].trim() : '';
+    }
+    const pm = w.match(/^(\d+(?:\.\d+)?)%$/);
+    return pm ? Math.round(Number(pm[1])) : null;
+  },
+
+  show(pct) {
+    this.bar.style.display = 'flex';
+    this.slider.value = pct || 100;
+    this.readout.textContent = pct ? pct + '%' : '原始';
+    this.bar.querySelectorAll('.img-size-btn').forEach(b => {
+      const p = Number(b.dataset.pct);
+      b.classList.toggle('active', pct ? p === pct : p === 0);
+    });
+    this.reposition();
+  },
+
+  reposition() {
+    if (!this.bar || !this.target || this.bar.style.display === 'none') return;
+    const t = this.target;
+    const anchor = t.type === 'dom' ? t.img : t.el;
+    if (!anchor || !anchor.isConnected) { this.hide(); return; }
+    const r = anchor.getBoundingClientRect();
+    const bh = this.bar.offsetHeight || 40, bw = this.bar.offsetWidth || 360;
+    let top = r.top - bh - 8;
+    if (top < 8) top = Math.min(r.bottom + 8, window.innerHeight - bh - 8);
+    let left = Math.max(8, Math.min(r.left, window.innerWidth - bw - 8));
+    this.bar.style.top = top + 'px';
+    this.bar.style.left = left + 'px';
+  },
+
+  // 產生套用新寬度後的 style 字串（pct 為 null 表示移除寬度）
+  withWidth(style, pct) {
+    const decls = (style || '').split(';').map(s => s.trim()).filter(Boolean).filter(d => !/^width\s*:/i.test(d));
+    if (pct) decls.push(`width: ${pct}%`);
+    return decls.join('; ');
+  },
+
+  apply(pct) {
+    const t = this.target;
+    if (!t) return;
+    if (t.type === 'dom') {
+      if (!t.img.isConnected) { this.hide(); return; }
+      t.img.style.width = pct ? pct + '%' : '';
+      t.img.removeAttribute('width');
+      const host = t.img.closest('[contenteditable="true"]');
+      if (host) host.dispatchEvent(new Event('input', { bubbles: true })); // 讓原本的儲存邏輯更新資料 / 草稿
+    } else {
+      const el = t.el;
+      if (!el.isConnected) { this.hide(); return; }
+      const oldTag = this.tagText();
+      let newTag;
+      const sm = oldTag.match(/style\s*=\s*(["'])(.*?)\1/i);
+      if (sm) {
+        const ns = this.withWidth(sm[2], pct);
+        newTag = ns
+          ? oldTag.replace(sm[0], `style="${ns}"`)
+          : oldTag.replace(sm[0], '').replace(/\s{2,}/g, ' ').replace(/\s+(\/?>)$/, '$1');
+      } else if (pct) {
+        newTag = oldTag.replace(/\s*(\/?>)$/, ` style="width: ${pct}%"$1`);
+      } else {
+        newTag = oldTag;
+      }
+      el.value = el.value.slice(0, t.start) + newTag + el.value.slice(t.end);
+      t.end = t.start + newTag.length;
+      el.selectionStart = el.selectionEnd = Math.min(t.start + 1, el.value.length); // 游標留在標籤內，工具列才不會消失
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    this.show(pct || null);
+  }
+};
+
 window.Admin = Admin;
 window.FS = FS;
 window.escapeHTML = escapeHTML;
 window.escapeAttr = escapeAttr;
 
 document.addEventListener('DOMContentLoaded', () => {
+  ImageResize.init();
   Admin.init();
 });

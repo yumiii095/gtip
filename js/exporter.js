@@ -127,6 +127,51 @@ const Exporter = {
       }
     } catch(e) {}
 
+    // images 資料夾：包含後台貼上的攻略與新手專區圖片（images/guides、images/beginner 等）
+    let imageCount = 0;
+
+    // (a) 已連結本機專案資料夾：直接走訪整個 images 資料夾
+    try {
+      if (typeof FS !== 'undefined' && FS.dirHandle) {
+        let perm = await FS.dirHandle.queryPermission({ mode: 'read' });
+        if (perm !== 'granted') {
+          try { perm = await FS.dirHandle.requestPermission({ mode: 'read' }); } catch (e) {}
+        }
+        if (perm === 'granted') {
+          const imagesDir = await FS.dirHandle.getDirectoryHandle('images');
+          const walk = async (dir, prefix) => {
+            for await (const [name, handle] of dir.entries()) {
+              if (handle.kind === 'directory') {
+                await walk(handle, prefix + name + '/');
+              } else {
+                zip.file(prefix + name, await handle.getFile());
+                imageCount++;
+              }
+            }
+          };
+          await walk(imagesDir, 'images/');
+        }
+      }
+    } catch (e) {
+      console.warn('走訪 images 資料夾失敗，改用資料引用掃描:', e);
+    }
+
+    // (b) 補充：掃描資料中引用到的圖片路徑並逐一抓取（沒連結資料夾、或資料夾內缺檔時也能補上）
+    try {
+      const refText = JSON.stringify(currentData || {});
+      const refs = new Set((refText.match(/images\/[^"'\s)\\<>]+?\.(?:png|jpe?g|gif|webp|svg)/gi) || []));
+      for (const path of refs) {
+        if (zip.file(path)) continue; // 已經打包
+        try {
+          const res = await fetch(path + '?t=' + Date.now());
+          if (res.ok) {
+            zip.file(path, await res.blob());
+            imageCount++;
+          }
+        } catch (e) {}
+      }
+    } catch (e) {}
+
     // Uploaded Images
     for (const [path, blob] of Object.entries(this.uploadedFiles)) {
       zip.file(path, blob);
@@ -144,7 +189,7 @@ const Exporter = {
       document.body.removeChild(a);
       URL.revokeObjectURL(a.href);
 
-      Core.showToast('✅ 全站已成功打包下載！');
+      Core.showToast(`✅ 全站已成功打包下載！（含 ${Object.keys(zip.files).filter(n => n.startsWith('images/') && !n.endsWith('/')).length} 個圖片檔）`);
     } catch (err) {
       alert('打包失敗：' + err.message);
     }

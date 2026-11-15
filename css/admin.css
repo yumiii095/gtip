@@ -999,3 +999,74 @@ textarea.form-control {
 
 
 
+
+/* ===== 圖片顯示大小調整工具列（js/admin.js 的 ImageResize）===== */
+.img-size-bar {
+  position: fixed;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-color, #dbe2ea);
+  border-radius: var(--radius-md, 8px);
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.12));
+  font-size: 0.82rem;
+  color: var(--text-main, #1e293b);
+  max-width: calc(100vw - 16px);
+  flex-wrap: wrap;
+}
+.img-size-title { font-weight: 700; margin-right: 2px; white-space: nowrap; }
+.img-size-btn {
+  border: 1px solid var(--border-color, #dbe2ea);
+  background: var(--bg-surface, #ffffff);
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: inherit;
+}
+.img-size-btn:hover { background: var(--primary-light, #dcfce7); }
+.img-size-btn.active {
+  background: var(--primary, #15803d);
+  border-color: var(--primary, #15803d);
+  color: #ffffff;
+}
+.img-size-slider { width: 110px; accent-color: var(--primary, #15803d); }
+.img-size-readout { min-width: 2.6em; text-align: right; font-weight: 700; font-family: var(--font-mono, monospace); }
+img.img-size-selected { outline: 2px solid var(--primary, #15803d); outline-offset: 2px; }
+/* ===== 後台所見即所得欄位（新手專區的步驟 / 安全提示 / 問答）===== */
+.wysiwyg-field {
+  display: block;
+  width: 100%;
+  min-height: 38px;
+  height: auto;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+  cursor: text;
+}
+.wysiwyg-multi { min-height: 64px; }
+.wysiwyg-field:focus {
+  outline: none;
+  border-color: var(--primary, #15803d);
+  box-shadow: 0 0 0 3px var(--primary-light, #dcfce7);
+}
+.wysiwyg-field:empty::before {
+  content: attr(data-placeholder);
+  color: #94a3b8;
+  pointer-events: none;
+}
+.wysiwyg-field img { max-width: 100%; border-radius: 8px; }
+.wysiwyg-field > div { min-height: 1.7em; }
+/* 新手專區問答的拖曳排序（沿用指令列表的拖曳樣式）*/
+.faq-drag-item.dragging {
+  opacity: 0.45;
+  background: #f8fafc !important;
+  border: 1.5px dashed var(--primary) !important;
+}
+.faq-drag-item.drag-over {
+  border-top: 3px solid var(--primary) !important;
+  transform: translateY(-2px);
+}

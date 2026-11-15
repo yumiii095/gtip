@@ -43,6 +43,46 @@ const Core = {
     return null;
   },
 
+  // 新手專區文字轉換（前台 beginner.html 與後台所見即所得編輯框共用同一套規則）
+  renderRichText(str) {
+    if (!str) return '';
+    const esc = (s) => String(s || '').replace(/[&<>'"]/g,
+      tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+
+    // 內容已含 HTML（例如螢光標記、圖片）：其餘維持原樣，只補上「冒號前的文字」自動粗體。
+    // 冒號前有任何標籤（例如已手動加 <strong>）就不處理，避免重複加粗。
+    if (/<(span|mark|strong|b|em|i|del|s|code|h2|h3|svg|div|p|ul|ol|li)[^>]*>/i.test(str)) {
+      const ci = str.indexOf('：');
+      if (ci > 0 && ci < 25) {
+        const head = str.slice(0, ci);
+        if (!/[<>]/.test(head)) {
+          return `<strong>${head}：</strong>${str.slice(ci + 1)}`;
+        }
+      }
+      return str;
+    }
+
+    let res = esc(str);
+    // Colon label bolding (e.g., 草系：說明)
+    const colonParts = res.split('：');
+    if (colonParts.length > 1 && colonParts[0].length < 25) {
+      res = `<strong>${colonParts[0]}：</strong>${colonParts.slice(1).join('：')}`;
+    }
+    // Markdown bold
+    res = res.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // Markdown italic
+    res = res.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    // Markdown strikethrough
+    res = res.replace(/~~(.*?)~~/g, '<del>$1</del>');
+    // Markdown highlight ==text==
+    res = res.replace(/==(.*?)==/g, '<mark style="background:#fef08a; padding:2px 5px; border-radius:4px;">$1</mark>');
+    // Markdown keys [W] -> 3D keycap
+    res = res.replace(/\[([A-Za-z0-9\s\/\+\-]+)\]/g, '<span class="keycap" style="min-width:24px; height:24px; font-size:0.8rem; padding:0 6px;">$1</span>');
+    // Command code formatting（(?<!<) 避開 </strong> 等結尾標籤裡的斜線，否則 /strong 會被當成指令）
+    res = res.replace(/((?<!<)\/[a-zA-Z0-9_-]+(\s+\[.*?\]|\s+&lt;.*?&gt;)?)/g, '<code>$1</code>');
+    return res;
+  },
+
   saveDraft(key, data) {
     localStorage.setItem('draft_' + key, JSON.stringify(data));
   },
