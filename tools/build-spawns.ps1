@@ -161,3 +161,4 @@ $json = ConvertTo-Json -InputObject $out -Depth 10 -Compress
 "略過（Wiki 無編號）: $($skippedNoNum.Count) $($skippedNoNum -join ', ')"
 "略過（Wiki 內重複編號）: $($skippedRepeat.Count) $($skippedRepeat -join ', ')"
 "生態域數: $($biomeNames.Count)  清單組數: $($sets.Count)"
+"提示：改完 poke.json 或重新產生 spawns.json 後，請再執行 tools\build-offline.ps1 更新離線檔。"

@@ -90,6 +90,11 @@ const Exporter = {
     } catch(e) {}
 
     try {
+      const offRes = await fetch('data/offline-pokedex.js?t=' + Date.now());
+      if (offRes.ok) zip.file('data/offline-pokedex.js', await offRes.text());
+    } catch(e) {}
+
+    try {
       const tcRes = await fetch('data/type_chart.json?t=' + Date.now());
       if (tcRes.ok) zip.file('data/type_chart.json', await tcRes.text());
     } catch (e) {}

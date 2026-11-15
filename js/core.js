@@ -141,3 +141,33 @@ const Core = {
 document.addEventListener('DOMContentLoaded', () => {
   Core.setupCommonUI();
 });
+
+// 頁面切換淡出：點擊站內連結時先淡出（0.3 秒）再跳轉；淡入由 css/main.css 的 body 動畫負責
+(function setupPageTransition() {
+  const FADE_OUT_MS = 300;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  document.addEventListener('click', (e) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const a = e.target.closest && e.target.closest('a[href]');
+    if (!a || (a.target && a.target !== '_self') || a.hasAttribute('download')) return;
+
+    const href = a.getAttribute('href');
+    if (!href || href.startsWith('#') || /^(mailto:|tel:|javascript:)/i.test(href)) return;
+
+    let url;
+    try { url = new URL(a.href, window.location.href); } catch (err) { return; }
+    if (url.origin !== window.location.origin && url.protocol !== 'file:') return;
+    // 同一頁僅 hash 變化時不做動畫
+    if (url.pathname === window.location.pathname && url.search === window.location.search && url.hash) return;
+
+    e.preventDefault();
+    document.body.classList.add('page-leaving');
+    setTimeout(() => { window.location.href = url.href; }, FADE_OUT_MS);
+  });
+
+  // 從瀏覽器上一頁/下一頁（bfcache）回來時，還原淡出狀態
+  window.addEventListener('pageshow', (e) => {
+    if (e.persisted) document.body.classList.remove('page-leaving');
+  });
+})();

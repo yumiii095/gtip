@@ -20,7 +20,7 @@ window.INITIAL_DATABASE = {
     {
       "icon": "📖",
       "title": "Cobblemon 圖鑑",
-      "desc": "查詢 1,000+ 隻寶可夢擊敗掉落物機率、群系加成與立繪。",
+      "desc": "查詢 1,000+ 隻寶可夢擊敗掉落物機率與生成群系。",
       "link": "pokedex.html"
     },
     {

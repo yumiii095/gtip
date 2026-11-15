@@ -601,3 +601,28 @@ body {
   gap: 6px;
   flex-wrap: wrap;
 }
+
+/* ===== 頁面切換淡入淡出（總長 < 1 秒：淡入 0.4s、淡出 0.3s）===== */
+@keyframes pageFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+/* 導覽列（.site-header）不參與動畫，只有內容區與頁尾淡入淡出 */
+.main-content,
+.site-footer {
+  animation: pageFadeIn 0.4s ease-out;
+}
+body.page-leaving .main-content,
+body.page-leaving .site-footer {
+  opacity: 0;
+  transition: opacity 0.3s ease-in;
+}
+body.page-leaving {
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .main-content,
+  .site-footer { animation: none; }
+  body.page-leaving .main-content,
+  body.page-leaving .site-footer { transition: none; }
+}
