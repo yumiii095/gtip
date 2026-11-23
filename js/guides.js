@@ -157,4 +157,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   renderList();
+
+  // 從首頁搜尋跳轉過來（?g=攻略標題）：直接開啟該篇
+  const gParam = new URLSearchParams(location.search).get('g');
+  if (gParam) {
+    const target = guides.find(g => (g.title || '') === gParam);
+    if (target) openGuide(target);
+  }
 });

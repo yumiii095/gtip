@@ -98,7 +98,7 @@
     <!-- Section 1: Keybindings & Controls -->
     <section style="margin-bottom: 3.5rem;">
       <h2 style="font-size: 1.45rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-        <span>🎮</span> 核心鍵盤與滑鼠操作對照表
+        <span>🎮</span> 主要快捷鍵一覽
       </h2>
       <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.25rem;">
         Cobblemon 擁有獨創的戰鬥與精靈互動控制，滑鼠左右鍵高亮與鍵帽圖示助你一眼看懂操作：
@@ -111,7 +111,7 @@
     <!-- Section 2: Beginner 4 Steps -->
     <section style="margin-bottom: 3.5rem;">
       <h2 style="font-size: 1.45rem; font-weight: 800; color: var(--text-main); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-        <span>🌱</span> 新手開局第一天：從零開始拓荒指南
+        <span>🌱</span> 新手開局指南
       </h2>
       <div id="beginner-steps-container"></div>
     </section>
@@ -119,7 +119,7 @@
     <!-- Section 3: Territory & Home Safety -->
     <section style="margin-bottom: 3.5rem;">
       <h2 style="font-size: 1.45rem; font-weight: 800; color: var(--text-main); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-        <span>🛡️</span> 家園與領地防護教學（防偷防拆）
+        <span>🛡️</span> 家園與領地防護
       </h2>
       <div class="card" style="padding: 1.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-lg);">
         <p style="color: var(--text-main); line-height: 1.8; margin-bottom: 1rem;">
@@ -151,7 +151,7 @@
       <a href="guides.html">攻略</a>
       <a href="donate.html">贊助支持</a>
     </div>
-    <p>© 2026 魚米。本站由玩家自發性維護，非官方（伺服器管理團隊）直接運營。</p>
+    <p>© 2026 本站由玩家自發性維護，非官方（伺服器管理團隊）直接運營。</p>
   </footer>
 
   <script src="data/database.js"></script>
@@ -222,6 +222,19 @@
             <div class="faq-a">${renderRichText(f.a || '')}</div>
           </div>
         `).join('');
+      }
+
+      // 5. 從首頁搜尋跳轉過來（?h=標題）：捲到該區塊並短暫標示
+      const hParam = new URLSearchParams(location.search).get('h');
+      if (hParam) {
+        const norm = (s) => String(s || '').replace(/\s+/g, ' ').trim();
+        const want = norm(hParam);
+        const cards = document.querySelectorAll('.shortcut-card, .step-card, .faq-card, #beginner-safety-grid > div');
+        const hit = Array.from(cards).find(el => norm(el.textContent).includes(want));
+        if (hit) {
+          hit.classList.add('ss-flash-target');
+          setTimeout(() => hit.scrollIntoView({ block: 'center', behavior: 'smooth' }), 150);
+        }
       }
     });
 

@@ -371,4 +371,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   applyFilters();
+
+  // 從首頁搜尋跳轉過來（?q=寶可夢名稱）：帶入搜尋，名稱完全相符時直接開啟詳情
+  const qParam = new URLSearchParams(location.search).get('q');
+  if (qParam && searchInput) {
+    searchInput.value = qParam;
+    searchQuery = qParam.trim().toLowerCase();
+    applyFilters();
+    const exact = rawList.find(p => (p.name || '') === qParam);
+    if (exact) openModal(exact);
+  }
 });

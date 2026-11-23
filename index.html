@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CobblemonOasis 綠洲 - 官方百科與指南</title>
   <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/search.css">
   <style>
     /* Full Page Cherry Blossom Wallpaper */
     body {
@@ -164,6 +165,17 @@
       <p id="hero-tagline" class="hero-tagline">
         在全新的方塊世界中，踏上專屬於你的寶可夢冒險旅程！
       </p>
+
+      <!-- 全站搜尋 -->
+      <div class="site-search" role="search">
+        <div class="site-search-bar">
+          <span class="ss-icon" aria-hidden="true">🔎</span>
+          <input id="site-search-input" type="text" enterkeyhint="search" autocomplete="off" spellcheck="false" aria-label="搜尋全站" aria-expanded="false" placeholder="搜尋指令、攻略、新手教學、寶可夢…">
+          <span class="ss-kbd" title="按 / 快速搜尋">/</span>
+          <button type="button" class="ss-clear" id="site-search-clear" aria-label="清除" title="清除">✕</button>
+        </div>
+        <div id="site-search-results" class="site-search-results"></div>
+      </div>
     </section>
 
     <!-- Quick Navigation Hub (Frosted Glass Cards) -->
@@ -214,9 +226,7 @@
       <!-- Empty State -->
       <div id="announcement-empty" class="card" style="display: none; text-align: center; padding: 2.75rem 1.5rem; color: var(--text-muted); background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(14px);">
         <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">📌</div>
-        <div style="font-weight: 700; font-size: 1.05rem; color: var(--text-main);">目前尚無最新公告</div>
-        <div style="font-size: 0.88rem; margin-top: 4px;">管理員可於後台新增伺服器更新、活動與維護通知。</div>
-      </div>
+        <div style="font-weight: 700; font-size: 1.05rem; color: var(--text-main);">目前尚無最新公告</div>      </div>
     </section>
 
   </main>
@@ -232,11 +242,13 @@
       <a href="guides.html">攻略</a>
       <a href="donate.html">贊助支持</a>
     </div>
-    <p>© 2026 魚米。本站由玩家自發性維護，非官方（伺服器管理團隊）直接運營。</p>
+    <p>© 2026 本站由玩家自發性維護，非官方（伺服器管理團隊）直接運營。</p>
   </footer>
 
   <script src="data/database.js"></script>
   <script src="js/core.js"></script>
+  <script src="js/vendor/fuse.min.js"></script>
+  <script src="js/search.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const cfg = await Core.loadJSON('config', 'data/config.json');
@@ -277,7 +289,7 @@
 
       if (!announcements || announcements.length === 0) {
         if (annEmpty) annEmpty.style.display = 'block';
-        if (annCountInfo) annCountInfo.textContent = '暫無公告';
+        if (annCountInfo) annCountInfo.textContent = '';
       } else {
         if (annEmpty) annEmpty.style.display = 'none';
         if (annCountInfo) annCountInfo.textContent = `共 ${announcements.length} 則動態`;

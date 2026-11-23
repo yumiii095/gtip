@@ -626,3 +626,7 @@ body.page-leaving {
   body.page-leaving .main-content,
   body.page-leaving .site-footer { transition: none; }
 }
+
+/* 從首頁搜尋跳轉過來時，目標區塊短暫標示 */
+@keyframes ss-flash { 0%, 60% { box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.85); } 100% { box-shadow: 0 0 0 4px rgba(250, 204, 21, 0); } }
+.ss-flash-target { animation: ss-flash 2.4s ease-out 1; }

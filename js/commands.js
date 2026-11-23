@@ -247,4 +247,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderFilterButtons();
   render();
+
+  // 從首頁搜尋跳轉過來（?q=指令）：自動帶入搜尋並展開結果
+  const qParam = new URLSearchParams(location.search).get('q');
+  if (qParam && searchInput) {
+    searchInput.value = qParam;
+    searchQuery = qParam.trim().toLowerCase();
+    render();
+    const first = container.querySelector('.command-card');
+    if (first) {
+      first.classList.add('ss-flash-target');
+      first.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+  }
 });

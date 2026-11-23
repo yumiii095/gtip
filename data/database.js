@@ -2,7 +2,7 @@
 window.INITIAL_DATABASE = {
   config: {
   "serverName": "CobblemonOasis 綠洲",
-  "tagline": "在全新的世界中，踏上專屬於你的寶可夢冒險旅程！",
+  "tagline": "重製後的方可夢 全新版本 全新攻略",
   "description": "這是一個提供純淨、流暢且充滿社群活力的 Cobblemon 伺服器，期待與你一同建立家園與冒險。",
   "quickNav": [
     {
@@ -78,6 +78,22 @@ window.INITIAL_DATABASE = {
     {
       "name": "釣魚",
       "icon": "🎣"
+    },
+    {
+      "name": "道館",
+      "icon": "⚔️"
+    },
+    {
+      "name": "郵件",
+      "icon": "📬"
+    },
+    {
+      "name": "排位對戰",
+      "icon": "🏆"
+    },
+    {
+      "name": "團體戰",
+      "icon": "🐉"
     }
   ]
 },
@@ -95,21 +111,21 @@ window.INITIAL_DATABASE = {
     "category": "領地",
     "permission": "所有玩家",
     "syntax": "/town setspawn",
-    "description": "設定城鎮傳送點"
+    "description": "在已認領的土地上設定城鎮傳送點"
   },
   {
     "name": "/town spawn",
     "category": "領地",
     "permission": "所有玩家",
     "syntax": "/town spawn",
-    "description": "回到城鎮傳送點"
+    "description": "回到城鎮傳送點（市長須先在已認領領地內設定）"
   },
   {
     "name": "/town claim",
     "category": "領地",
     "permission": "所有玩家",
     "syntax": "/town claim",
-    "description": "認領腳下的區塊"
+    "description": "認領腳下 16×16 的區塊（限市長、副市長、領地管理員）"
   },
   {
     "name": "/town unclaim",
@@ -137,14 +153,14 @@ window.INITIAL_DATABASE = {
     "category": "領地",
     "permission": "所有玩家",
     "syntax": "/town leave",
-    "description": "退出城鎮"
+    "description": "退出城鎮（有未處理的地產或市長繼任事項需先處理）"
   },
   {
     "name": "/town invite [玩家名]",
     "category": "領地",
     "permission": "所有玩家",
     "syntax": "/town invite [玩家名]",
-    "description": "邀請玩家加入城鎮"
+    "description": "邀請在線玩家加入城鎮（需有招募權限）"
   },
   {
     "name": "/town invitations",
@@ -221,7 +237,7 @@ window.INITIAL_DATABASE = {
     "category": "傳送",
     "permission": "所有玩家",
     "syntax": "/tpaccept",
-    "description": "接受其他玩家申請傳送到你的位置"
+    "description": "接受傳送申請（多人同時申請時可指定玩家：/tpaccept [玩家名]）"
   },
   {
     "name": "/back",
@@ -277,7 +293,7 @@ window.INITIAL_DATABASE = {
     "category": "個人功能",
     "permission": "所有玩家",
     "syntax": "/pokegift [玩家名][隊伍槽位]",
-    "description": "贈送寶可夢給指定玩家"
+    "description": "贈送隊伍中指定槽位的寶可夢給玩家（同 /pokemongift，對方到郵箱領取）"
   },
   {
     "name": "/homes",
@@ -319,7 +335,7 @@ window.INITIAL_DATABASE = {
     "category": "經濟",
     "permission": "所有玩家",
     "syntax": "/money",
-    "description": "查看玩家錢包餘額"
+    "description": "查看玩家錢包餘額（可加幣種，如 /money [幣種]）"
   },
   {
     "name": "/money top",
@@ -459,15 +475,302 @@ window.INITIAL_DATABASE = {
     "category": "任務/獎勵",
     "permission": "所有玩家",
     "syntax": "/onlinereward",
-    "description": "領取在線獎勵（閃光幸運方塊會寄送至信箱）"
+    "description": "查看今天的在線獎勵進度（達到檔位後系統會自動寄出獎勵，每檔每天一次）"
+  },
+  {
+    "name": "/edithome",
+    "category": "Home系統",
+    "permission": "所有玩家",
+    "syntax": "/edithome [名稱]",
+    "description": "打開指定紀錄點的編輯選項（例如 /edithome base）"
+  },
+  {
+    "name": "/tpdeny",
+    "category": "傳送",
+    "permission": "所有玩家",
+    "syntax": "/tpdeny [玩家名]",
+    "description": "拒絕傳送申請（多人同時申請時可指定玩家）"
+  },
+  {
+    "name": "/tpignore",
+    "category": "傳送",
+    "permission": "所有玩家",
+    "syntax": "/tpignore",
+    "description": "開啟／關閉忽略傳送申請（開啟時自己也無法發送申請，再輸入一次切換回來）"
+  },
+  {
+    "name": "/rtp",
+    "category": "傳送",
+    "permission": "所有玩家",
+    "syntax": "/rtp",
+    "description": "在允許的範圍內隨機傳送到安全落點（受世界、區域限制，可能找不到落點）"
+  },
+  {
+    "name": "/gym setwarp VISITOR",
+    "category": "道館",
+    "permission": "所有玩家",
+    "syntax": "/gym setwarp VISITOR",
+    "description": "設定道館「訪客入口」點位（需在所屬城鎮已認領的領地內）"
+  },
+  {
+    "name": "/gym setwarp CHALLENGER",
+    "category": "道館",
+    "permission": "所有玩家",
+    "syntax": "/gym setwarp CHALLENGER",
+    "description": "設定道館「挑戰者位」點位"
+  },
+  {
+    "name": "/gym setwarp GYMLEADER",
+    "category": "道館",
+    "permission": "所有玩家",
+    "syntax": "/gym setwarp GYMLEADER",
+    "description": "設定道館「館主位」點位"
+  },
+  {
+    "name": "/gym recover",
+    "category": "道館",
+    "permission": "所有玩家",
+    "syntax": "/gym recover",
+    "description": "挑戰費用或結果有疑問時，用來核對並處理未完成的挑戰"
+  },
+  {
+    "name": "/friend",
+    "category": "社交",
+    "permission": "所有玩家",
+    "syntax": "/friend",
+    "description": "管理好友"
+  },
+  {
+    "name": "/friend add",
+    "category": "社交",
+    "permission": "所有玩家",
+    "syntax": "/friend add [玩家]",
+    "description": "發送好友申請"
+  },
+  {
+    "name": "/friend accept",
+    "category": "社交",
+    "permission": "所有玩家",
+    "syntax": "/friend accept [玩家]",
+    "description": "接受好友申請"
+  },
+  {
+    "name": "/party",
+    "category": "社交",
+    "permission": "所有玩家",
+    "syntax": "/party",
+    "description": "查看小隊"
+  },
+  {
+    "name": "/party create",
+    "category": "社交",
+    "permission": "所有玩家",
+    "syntax": "/party create",
+    "description": "建立小隊（隊長）"
+  },
+  {
+    "name": "/party invite",
+    "category": "社交",
+    "permission": "所有玩家",
+    "syntax": "/party invite [玩家]",
+    "description": "邀請玩家加入小隊"
+  },
+  {
+    "name": "/party accept",
+    "category": "社交",
+    "permission": "所有玩家",
+    "syntax": "/party accept [小隊ID]",
+    "description": "接受小隊邀請（也可點訊息中的接受按鈕）"
+  },
+  {
+    "name": "/mail",
+    "category": "郵件",
+    "permission": "所有玩家",
+    "syntax": "/mail",
+    "description": "開啟郵箱，跨服領取獎勵和玩家來信（同 /mailbox）"
+  },
+  {
+    "name": "/mailbox",
+    "category": "郵件",
+    "permission": "所有玩家",
+    "syntax": "/mailbox",
+    "description": "開啟郵箱，跨服領取獎勵和玩家來信（同 /mail）"
+  },
+  {
+    "name": "/pokemongift",
+    "category": "個人功能",
+    "permission": "所有玩家",
+    "syntax": "/pokemongift [玩家] [槽位]",
+    "description": "贈送隊伍中指定槽位的寶可夢給玩家（簡寫 /pokegift，對方到郵箱領取）"
+  },
+  {
+    "name": "/money help",
+    "category": "經濟",
+    "permission": "所有玩家",
+    "syntax": "/money help",
+    "description": "查看 /money 相關指令說明"
+  },
+  {
+    "name": "/oasisgts",
+    "category": "經濟",
+    "permission": "所有玩家",
+    "syntax": "/oasisgts",
+    "description": "打開 GTS，以金幣買賣物品與寶可夢（雙方不必同時在線）"
+  },
+  {
+    "name": "/shop",
+    "category": "經濟",
+    "permission": "所有玩家",
+    "syntax": "/shop",
+    "description": "開啟系統商店，購買精靈球、食物、建材等道具"
+  },
+  {
+    "name": "/exchange",
+    "category": "經濟",
+    "permission": "所有玩家",
+    "syntax": "/exchange",
+    "description": "進入兌換中心"
+  },
+  {
+    "name": "/crate",
+    "category": "經濟",
+    "permission": "所有玩家",
+    "syntax": "/crate",
+    "description": "查看收藏箱"
+  },
+  {
+    "name": "/crate preview",
+    "category": "經濟",
+    "permission": "所有玩家",
+    "syntax": "/crate preview [箱子]",
+    "description": "預覽箱子的獎品、機率與開啟方式（例如 /crate preview halloween），不扣鑰匙"
+  },
+  {
+    "name": "/crate open",
+    "category": "經濟",
+    "permission": "所有玩家",
+    "syntax": "/crate open [箱子]",
+    "description": "開啟箱子，每次消耗 1 把對應鑰匙（虛擬或實體）"
+  },
+  {
+    "name": "/raid",
+    "category": "團體戰",
+    "permission": "所有玩家",
+    "syntax": "/raid",
+    "description": "在首都開啟團戰頁面"
+  },
+  {
+    "name": "/raid capture",
+    "category": "團體戰",
+    "permission": "所有玩家",
+    "syntax": "/raid capture",
+    "description": "通關第 5 層後，隊長進入捕捉戰"
+  },
+  {
+    "name": "/bingo give",
+    "category": "任務/獎勵",
+    "permission": "所有玩家",
+    "syntax": "/bingo give",
+    "description": "打開代交選擇入口，為其他玩家代交寶可夢（進度與獎勵歸對方）"
+  },
+  {
+    "name": "/bingo give [玩家名]",
+    "category": "任務/獎勵",
+    "permission": "所有玩家",
+    "syntax": "/bingo give [玩家名]",
+    "description": "為指定玩家的 Bingo 棋盤代交寶可夢（消耗你選中的個體）"
+  },
+  {
+    "name": "/bingo top",
+    "category": "任務/獎勵",
+    "permission": "所有玩家",
+    "syntax": "/bingo top",
+    "description": "查看本期 Bingo 完成格數排行榜"
+  },
+  {
+    "name": "/bingo time",
+    "category": "任務/獎勵",
+    "permission": "所有玩家",
+    "syntax": "/bingo time",
+    "description": "查看本期 Bingo 重置時間"
+  },
+  {
+    "name": "/bingo recover",
+    "category": "任務/獎勵",
+    "permission": "所有玩家",
+    "syntax": "/bingo recover",
+    "description": "檢查尚未確認的 Bingo 提交或領獎"
+  },
+  {
+    "name": "/ranked",
+    "category": "排位對戰",
+    "permission": "所有玩家",
+    "syntax": "/ranked",
+    "description": "加入排位配對、查看戰績與排行榜"
+  },
+  {
+    "name": "/distortion claim",
+    "category": "任務/獎勵",
+    "permission": "所有玩家",
+    "syntax": "/distortion claim",
+    "description": "時空扭曲獎勵因背包滿而未領時，騰出空間後補領"
+  },
+  {
+    "name": "/terminal",
+    "category": "個人功能",
+    "permission": "所有玩家",
+    "syntax": "/terminal",
+    "description": "存取個人的跨服倉庫"
+  },
+  {
+    "name": "/terminal help",
+    "category": "個人功能",
+    "permission": "所有玩家",
+    "syntax": "/terminal help",
+    "description": "查看個人倉庫的指令說明"
+  },
+  {
+    "name": "/titles",
+    "category": "個人功能",
+    "permission": "所有玩家",
+    "syntax": "/titles",
+    "description": "查看稱號的描述、期限與附帶效果，並選擇要使用的稱號"
+  },
+  {
+    "name": "/sign",
+    "category": "個人功能",
+    "permission": "所有玩家",
+    "syntax": "/sign",
+    "description": "在主手物品（地圖畫或收藏品）署名；自己已署名時再輸入會取消署名。已有額外說明（Lore）的物品無法署名"
+  },
+  {
+    "name": "/sign info",
+    "category": "個人功能",
+    "permission": "所有玩家",
+    "syntax": "/sign info",
+    "description": "查看主手物品的署名者"
+  },
+  {
+    "name": "/owomap push",
+    "category": "個人功能",
+    "permission": "所有玩家",
+    "syntax": "/owomap push",
+    "description": "地圖署名跨服同步失敗時，主手持圖輸入重試"
+  },
+  {
+    "name": "/cb info",
+    "category": "雕塑版權保護",
+    "permission": "所有玩家",
+    "syntax": "/cb info",
+    "description": "對準雕塑方塊，查看作者與目前是否開放複製與編輯"
   }
 ],
   guides: [
   {
     "title": "城鎮(領地)系統教學",
     "category": "新手教學",
-    "author": "管理員",
-    "updatedAt": "2026-11-22",
+    "author": "",
+    "updatedAt": "2026-11-23",
     "summary": "本篇為「城鎮系統」快速入門指南，協助玩家從零設定城鎮。",
     "content": "<div><div class=\"tip-box\" style=\"background: #fef9c3; border: 1px solid #fde047; border-left: 4px solid #eab308; border-radius: 8px; padding: 0.6rem 0.9rem; margin: 0.5rem 0; color: #854d0e; font-size: 0.92rem; font-weight: 400; line-height: 1.7;\">💡 <span style=\"font-size: 0.92rem;\">建鎮前必看：<br><ol><li>必須在開放建鎮的世界進行</li><li>第一塊領地必須距離其他城鎮至少 30 個區塊（Chunks）。</li></ol></span></div><h3 dir=\"auto\" data-slug-base=\"一-如何建立自己的城鎮\"><b><span style=\"animation: 0.2s ease-out 70ms 1 normal both running fade-in;\">一、 </span><span style=\"animation: 0.2s ease-out 140ms 1 normal both running fade-in;\">建立城鎮</span></b></h3><h4 dir=\"auto\" data-slug-base=\"-建鎮-4-步驟\" class=\"\" id=\"user-content--建鎮-4-步驟\"><b><span style=\"animation: 0.2s ease-out 333ms 1 normal both running fade-in;\">📌 </span><span style=\"animation: 0.2s ease-out 334ms 1 normal both running fade-in;\">建鎮 </span><span style=\"animation: 0.2s ease-out 335ms 1 normal both running fade-in;\">4 </span><span style=\"animation: 0.2s ease-out 336ms 1 normal both running fade-in;\">步驟：</span></b></h4>\n  <ol>\n  <li dir=\"auto\" style=\"animation: 0.2s ease-out 338ms 1 normal both running fade-in;\"><span style=\"animation: 0.2s ease-out 169ms 1 normal both running fade-in;\"><strong>圈選區塊範圍</strong></span><span style=\"animation: 0.2s ease-out 191ms 1 normal both running fade-in;\">：主手手持</span><span style=\"animation: 0.2s ease-out 214ms 1 normal both running fade-in;\"><strong>木鋤</strong></span><span style=\"animation: 0.2s ease-out 236ms 1 normal both running fade-in;\">或</span><span style=\"animation: 0.2s ease-out 259ms 1 normal both running fade-in;\"><strong>金鏟</strong></span><span style=\"animation: 0.2s ease-out 281ms 1 normal both running fade-in;\">，介面會自動開啟。瞄準目標區塊，照著指示依序選定範圍</span><span style=\"animation: 0.2s ease-out 70ms 1 normal both running fade-in;\">。</span></li>\n  <li dir=\"auto\" style=\"animation: 0.2s ease-out 0ms 1 normal both running fade-in;\"><span style=\"animation: 0.2s ease-out 70ms 1 normal both running fade-in;\"><strong>預覽確認</strong></span><span style=\"animation: 0.2s ease-out 131ms 1 normal both running fade-in;\">：點擊「確認範圍」。系統會自動對齊完整區塊（16×16 </span><span style=\"animation: 0.2s ease-out 192ms 1 normal both running fade-in;\">格，涵蓋全部高度）。</span></li>\n  <li dir=\"auto\" style=\"animation: 0.2s ease-out 0ms 1 normal both running fade-in;\"><span style=\"animation: 0.2s ease-out 70ms 1 normal both running fade-in;\"><strong>命名與核對</strong></span><span style=\"animation: 0.2s ease-out 140ms 1 normal both running fade-in;\">：點「填寫鎮名」並在聊天室輸入名稱；接著點「查看費用」確認面積與總價。</span></li>\n  <li dir=\"auto\" style=\"animation: 0.2s ease-out 0ms 1 normal both running fade-in;\"><span style=\"animation: 0.2s ease-out 70ms 1 normal both running fade-in;\"><strong>付款完成</strong></span><span style=\"animation: 0.2s ease-out 140ms 1 normal both running fade-in;\">：點擊「付款建鎮」扣款完成創建，系統會自動開啟城鎮首頁。</span><span style=\"animation: 0.2s ease-out 169ms 1 normal both running fade-in;\">\n </span><span style=\"animation: 0.2s ease-out 226ms 1 normal both running fade-in;\"> </span><span style=\"animation: 0.2s ease-out 98ms 1 normal both running fade-in;\">\n </span><span style=\"animation: 0.2s ease-out 168ms 1 normal both running fade-in;\"> </span><ul>\n  <li dir=\"auto\" style=\"animation: 0.2s ease-out 238ms 1 normal both running fade-in;\"><b><span style=\"animation: 0.2s ease-out 314ms 1 normal both running fade-in;\">建鎮成功後，站在領地上輸入</span><mark style=\"background-color: rgb(254, 240, 138); padding: 2px 5px; border-radius: 4px; font-weight: 600;\"><span style=\"animation: 0.2s ease-out 314ms 1 normal both running fade-in;\"> </span><span style=\"animation: 0.2s ease-out 320ms 1 normal both running fade-in;\"><code dir=\"ltr\" class=\"whitespace-pre-wrap\" style=\"word-break: break-word;\">/town setspawn</code></span><span style=\"animation: 0.2s ease-out 326ms 1 normal both running fade-in;\"> </span></mark><span style=\"animation: 0.2s ease-out 326ms 1 normal both running fade-in;\"></span><span style=\"animation: 0.2s ease-out 331ms 1 normal both running fade-in;\">並確認，設定城鎮傳送點<br></span></b></li></ul></li></ol></div><div><h3 dir=\"auto\" data-slug-base=\"二-土地擴張與管理\"><hr id=\"null\"></h3><h3 dir=\"auto\" data-slug-base=\"二-土地擴張與管理\"><b><span style=\"animation: 0.2s ease-out 130ms 1 normal both running fade-in;\">二、 </span><span style=\"animation: 0.2s ease-out 200ms 1 normal both running fade-in;\">領地擴張管理</span></b></h3></div><div><span style=\"animation: 0.2s ease-out 200ms 1 normal both running fade-in;\"><div style=\"\">如果想擴張目前的領地範圍：</div><div style=\"\"><b>認領土地：</b>站在未認領的區塊上輸入<mark style=\"background-color: rgb(254, 240, 138); padding: 2px 5px; border-radius: 4px; font-weight: 600;\"> /town claim</mark>。</div><div style=\"\"><b>放棄土地：</b>站在要退回的區塊上輸入<mark style=\"background-color: rgb(254, 240, 138); padding: 2px 5px; border-radius: 4px; font-weight: 600;\"> /town unclaim</mark> 並確認。</div><div style=\"\"><h3 dir=\"auto\" data-slug-base=\"三-居民招募與互動\"><hr id=\"null\"></h3><h3 dir=\"auto\" data-slug-base=\"三-居民招募與互動\"><b><span style=\"animation: 0.2s ease-out 0ms 1 normal both running fade-in;\">三、 </span><span style=\"animation: 0.2s ease-out 70ms 1 normal both running fade-in;\">招募互動</span></b></h3><div><span style=\"animation: 0.2s ease-out 70ms 1 normal both running fade-in;\"><h3 style=\"\"><b><span style=\"font-size: 16px; line-height: 1.4;\">👥 邀請朋友</span></b></h3><div style=\"\"><b>邀請指令：</b>有招募權限者輸入<mark style=\"background-color: rgb(254, 240, 138); padding: 2px 5px; border-radius: 4px; font-weight: 600;\"> /town invite [玩家名]</mark>。</div><div style=\"\"><span style=\"font-weight: bold;\">受邀者接受：</span>朋友收到後輸入<mark style=\"background-color: rgb(254, 240, 138); padding: 2px 5px; border-radius: 4px; font-weight: 600;\"> /town invitations </mark>依提示接受。</div><div style=\"\"><span style=\"font-weight: bold;\">城鎮設定：</span>點擊城鎮首頁右下角「設定」，可設定是否公開招募、居民建造權限、是否開放傳送等。</div></span></div><div><p><img src=\"images/guides/guide_1795370116112.png\" alt=\"圖片\" style=\"border-radius: 8px; margin: 8px 0px; width: 50%;\" class=\"\"></p></div><div><b><span style=\"animation: 0.2s ease-out 70ms 1 normal both running fade-in;\"><br></span></b></div><div><span style=\"animation: 0.2s ease-out 70ms 1 normal both running fade-in;\"><div style=\"\"><b>🚪 加入 / 離開別人的城鎮</b></div><div style=\"\"><b>尋找城鎮：</b>按<span class=\"keycap\" contenteditable=\"false\" style=\"margin: 0px 3px; vertical-align: middle; user-select: all;\">C</span>打開城鎮目錄，申請加入開放招募的城鎮。</div><div style=\"\"><b>退出城鎮：</b>輸入 <mark style=\"background-color: rgb(254, 240, 138); padding: 2px 5px; border-radius: 4px; font-weight: 600;\">/town leave</mark> 並依提示確認。</div><div style=\"\"><div class=\"tip-box\" style=\"background: #fef9c3; border: 1px solid #fde047; border-left: 4px solid #eab308; border-radius: 8px; padding: 0.6rem 0.9rem; margin: 0.5rem 0; color: #854d0e; font-size: 0.92rem; font-weight: 400; line-height: 1.7;\">💡 每人同時只能加入一座城鎮；離鎮前請先處理名下地產或市長繼任</div></div><div style=\"\"><br></div><div style=\"\">詳細內容，請參考<a href=\"https://support.cobblemonoasis.com/wiki/towns/\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"color: #2563eb; text-decoration: underline; font-weight: 600;\">Oasis官方Wiki</a></div></span></div></div></span></div><div><br></div>",
     "coverImage": ""
@@ -475,8 +778,8 @@ window.INITIAL_DATABASE = {
   {
     "title": "Daycare 培育屋與孵蛋新規則",
     "category": "新手教學",
-    "author": "管理員",
-    "updatedAt": "2026-11-22",
+    "author": "",
+    "updatedAt": "2026-11-23",
     "summary": "Daycare 培育屋規則及系統與欄位擴充說明。",
     "content": "<h2>培育屋核心</h2><h3><span style=\"font-size: 1rem;\">1. 天然 6V 強制禁止繁殖</span></h3><div><ul><li>任一親代寶可夢只要「個體值（IV）六項皆為 31」，即強制無法放入培育屋繁殖（此規則包含百變怪）。</li><li>繁育時請保留至少一項非 31 的個體進行配種。</li></ul></div><div><br></div><h3>2. 極限特訓（王冠）數值不遺傳</h3><div><ul><li>透過金色／銀色王冠進行「極限特訓」拉滿的個體值屬於後天數值，系統判定為人工數值，完全不計入遺傳計算。</li><li>繁殖時只會遺傳寶可夢最初的天然野生個體值。</li></ul></div><div><br></div><div><hr id=\"null\"></div><div><br></div><h3>每欄「多重疊蛋」</h3><div><br></div><div>現在每個培育欄位不再只能存放一顆蛋，支援孵化與待領取的疊蛋功能：</div><div><br></div><div>【疊蛋容量上限】：</div><div><ul><li>普通玩家／Super VIP：每欄可堆疊 2 枚蛋。</li><li>Hyper VIP：每欄可堆疊 3 枚蛋。</li><li>Master VIP：每欄可堆疊 4 枚蛋。</li></ul></div><div>【運作方式】：每顆蛋獨立計時孵化並按順序領取。當欄位滿額後會暫停產蛋，待玩家領取騰出空間後自動繼續生產。</div><div><br></div><div><hr id=\"null\"></div><h3>培育欄位上限與擴充費用</h3><div><br></div><div>輸入指令 【/daycare】 即可打開介面進行欄位管理：</div><div><br></div><div>* 普通玩家 / Super VIP：預設免費 1 格，額外可購 2 格（總上限 3 格）。</div><div>* Hyper VIP：預設免費 1 格，額外可購 4 格（總上限 5 格）。</div><div>* Master VIP：預設免費 1 格，額外可購 5 格（總上限 6 格）。</div><div>* 【解鎖費用】：擴充價格依序為 1萬 ➔ 3萬 ➔ 6萬 ➔ 10萬 ➔ 15萬 遊戲幣（購買後為永久解鎖，降檔不會回收已購欄位）。</div><div><p><img src=\"images/guides/guide_1794739455935.png\" alt=\"圖片\" style=\"border-radius: 8px; margin: 8px 0px; width: 75%;\" class=\"\"></p><p><br></p></div>",
     "coverImage": ""
