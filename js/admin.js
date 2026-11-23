@@ -237,6 +237,22 @@ const FS = {
       }
     }
 
+    // 資料夾是上次記住的，但這次還沒授權寫入：先要求授權，否則寫檔會無聲失敗（看起來像「貼不上」）
+    try {
+      let perm = await this.dirHandle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') perm = await this.dirHandle.requestPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        this.updateStatus(false, '已記住專案資料夾，點擊按鈕授權連線');
+        Core.showToast('⚠️ 尚未授權寫入資料夾：請按上方「連結本機專案資料夾」授權後再貼一次');
+        return null;
+      }
+      this.updateStatus(true);
+    } catch (err) {
+      console.warn('Permission check failed:', err);
+      Core.showToast('⚠️ 無法存取已記住的資料夾：請按上方「連結本機專案資料夾」重新選取 gtip 資料夾');
+      return null;
+    }
+
     try {
       file = await this.resizeImage(file);
       const extMatch = file.name ? file.name.split('.').pop().toLowerCase() : 'png';
@@ -248,6 +264,7 @@ const FS = {
       if (ok) {
         return `images/${folder}/${filename}`;
       }
+      Core.showToast('⚠️ 圖片寫入資料夾失敗，請確認選的是 gtip 專案資料夾並已允許寫入');
       return null;
     } catch (err) {
       console.error('Save guide image error:', err);
@@ -384,6 +401,7 @@ const Admin = {
   async init() {
     this.setupTabs();
     this.setupFloatingToolbar();
+    this.setupCustomKeyInputs();
 
     // Clear stale drafts from previous mock data session
     if (localStorage.getItem('admin_draft_cleaned_v2') !== 'done') {
@@ -1540,7 +1558,8 @@ const Admin = {
   getSelectionInfo() {
     // 1. Check active input / textarea
     const active = document.activeElement;
-    if (active && (active.tagName === 'TEXTAREA' || (active.tagName === 'INPUT' && active.type === 'text'))) {
+    if (active && !(active.classList && active.classList.contains('wt-custom-key-input')) &&
+        (active.tagName === 'TEXTAREA' || (active.tagName === 'INPUT' && active.type === 'text'))) {
       const start = active.selectionStart;
       const end = active.selectionEnd;
       if (typeof start === 'number' && typeof end === 'number' && start !== end) {
@@ -1583,7 +1602,9 @@ const Admin = {
 
   getLastEditTarget() {
     const active = document.activeElement;
-    if (active && (active.isContentEditable || active.tagName === 'TEXTAREA' || (active.tagName === 'INPUT' && active.type === 'text'))) {
+    // 工具列自己的輸入框（自訂按鍵文字）不是編輯目標，否則按鍵會被插進輸入框裡
+    if (active && !(active.classList && active.classList.contains('wt-custom-key-input')) &&
+        (active.isContentEditable || active.tagName === 'TEXTAREA' || (active.tagName === 'INPUT' && active.type === 'text'))) {
       return {
         el: active,
         type: active.isContentEditable ? 'contenteditable' : 'input',
@@ -1883,7 +1904,7 @@ const Admin = {
       const el = target.el;
       const start = el.selectionStart;
       const end = el.selectionEnd;
-      const rep = `<span class="keycap">${keyText}</span> `;
+      const rep = `<span class="keycap">${escapeHTML(keyText)}</span> `;
       el.setRangeText(rep, start, end, 'end');
       el.focus();
       this.triggerTargetInput(el);
@@ -2040,6 +2061,163 @@ const Admin = {
     Core.showToast('💡 已插入小提醒框，直接輸入即可修改內容');
   },
 
+  // 超連結：選取文字後按「🔗 連結」，輸入網址。沒選取文字時，以網址本身當連結文字。
+  // 游標在既有連結內再按一次，可修改網址；網址留空則移除連結。
+  insertLink() {
+    const target = this.getLastEditTarget();
+    if (!target) return;
+
+    const LINK_STYLE = 'color: #2563eb; text-decoration: underline; font-weight: 600;';
+    const normalize = (raw) => {
+      let u = String(raw || '').trim();
+      if (!u) return '';
+      if (/^(javascript|data|vbscript):/i.test(u)) return null;
+      if (/^(https?:|mailto:|tel:|\/|\.\/|\.\.\/|#)/i.test(u)) return u;
+      if (/^[\w-]+\.html?(#.*)?$/i.test(u)) return u;
+      return 'https://' + u.replace(/^\/+/, '');
+    };
+    const external = (u) => /^https?:\/\//i.test(u);
+    const askUrl = (def) => {
+      const v = window.prompt('請輸入連結網址（例如 https://example.com 或 commands.html）：\n留空 = 移除連結', def || 'https://');
+      if (v === null) return undefined; // 取消
+      const n = normalize(v === 'https://' ? '' : v);
+      if (n === null) { Core.showToast('⚠️ 不允許這種網址'); return undefined; }
+      return n;
+    };
+
+    // textarea / 單行輸入框：插入 <a> 標籤文字
+    if (target.type === 'input') {
+      const el = target.el;
+      const start = el.selectionStart, end = el.selectionEnd;
+      const selected = el.value.substring(start, end);
+      const url = askUrl('');
+      if (url === undefined || url === '') return;
+      const attrs = external(url) ? ' target="_blank" rel="noopener noreferrer"' : '';
+      const html = `<a href="${url.replace(/"/g, '%22')}"${attrs} style="${LINK_STYLE}">${selected || url}</a>`;
+      el.setRangeText(html, start, end, 'end');
+      el.focus();
+      this.triggerTargetInput(el);
+      Core.showToast('🔗 已插入連結');
+      return;
+    }
+
+    const editor = target.el;
+    this.restoreSelection(editor);
+    if (editor && editor.focus) editor.focus();
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return;
+    const range = sel.getRangeAt(0);
+
+    // 游標或選取範圍在既有連結內：修改網址／移除
+    let node = range.commonAncestorContainer;
+    if (node.nodeType === 3) node = node.parentNode;
+    const existing = node && node.closest ? node.closest('a') : null;
+    if (existing && editor.contains(existing)) {
+      const url = askUrl(existing.getAttribute('href'));
+      if (url === undefined) return;
+      if (url === '') {
+        const parent = existing.parentNode;
+        while (existing.firstChild) parent.insertBefore(existing.firstChild, existing);
+        parent.removeChild(existing);
+        Core.showToast('🔗 已移除連結');
+      } else {
+        existing.setAttribute('href', url);
+        if (external(url)) { existing.setAttribute('target', '_blank'); existing.setAttribute('rel', 'noopener noreferrer'); }
+        else { existing.removeAttribute('target'); existing.removeAttribute('rel'); }
+        Core.showToast('🔗 已更新連結');
+      }
+      this.saveSelection();
+      this.triggerTargetInput(editor);
+      return;
+    }
+
+    const url = askUrl('');
+    if (url === undefined || url === '') return;
+    // prompt 之後游標可能被收走，改用先前保存的範圍
+    this.restoreSelection(editor);
+    const r = (sel.rangeCount ? sel.getRangeAt(0) : range);
+
+    const a = document.createElement('a');
+    a.setAttribute('href', url);
+    if (external(url)) { a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener noreferrer'); }
+    a.setAttribute('style', LINK_STYLE);
+    if (!r.collapsed) {
+      a.appendChild(r.extractContents());
+    } else {
+      a.textContent = url;
+    }
+    r.insertNode(a);
+
+    // 游標移到連結後面，避免繼續輸入的文字被吃進連結
+    sel.removeAllRanges();
+    const after = document.createRange();
+    after.setStartAfter(a);
+    after.collapse(true);
+    sel.addRange(after);
+
+    this.saveSelection();
+    this.triggerTargetInput(editor);
+    Core.showToast('🔗 已插入連結');
+  },
+
+  // 把目前框選的文字直接變成鍵位（例如選取「C」→ 立體 C 鍵）
+  convertSelectionToKeycap() {
+    const target = this.getLastEditTarget();
+    if (!target) return;
+
+    // textarea / 單行輸入框
+    if (target.type === 'input') {
+      const el = target.el;
+      const start = el.selectionStart, end = el.selectionEnd;
+      const text = el.value.substring(start, end).trim();
+      if (!text || /\n/.test(text)) { Core.showToast('⚠️ 請先框選一小段文字（單行）'); return; }
+      el.setRangeText(`<span class="keycap">${escapeHTML(text)}</span>`, start, end, 'end');
+      el.focus();
+      this.triggerTargetInput(el);
+      Core.showToast(`⌨️ 已把「${text}」變成鍵位`);
+      return;
+    }
+
+    const editor = target.el;
+    this.restoreSelection(editor);
+    if (editor && editor.focus) editor.focus();
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0 || sel.getRangeAt(0).collapsed) {
+      Core.showToast('⚠️ 請先框選要變成鍵位的文字');
+      return;
+    }
+    const range = sel.getRangeAt(0);
+    const text = range.toString().replace(/ /g, ' ').trim();
+    if (!text) { Core.showToast('⚠️ 請先框選要變成鍵位的文字'); return; }
+    if (text.length > 20 || /[\n\r]/.test(range.toString())) {
+      Core.showToast('⚠️ 鍵位文字請框選短一點（單行、20 字內）');
+      return;
+    }
+
+    range.deleteContents();
+    const keySpan = document.createElement('span');
+    keySpan.className = 'keycap';
+    keySpan.setAttribute('contenteditable', 'false');
+    keySpan.textContent = text;
+    keySpan.style.margin = '0 3px';
+    keySpan.style.verticalAlign = 'middle';
+    keySpan.style.userSelect = 'all';
+    range.insertNode(keySpan);
+
+    const space = document.createTextNode(' ');
+    keySpan.parentNode.insertBefore(space, keySpan.nextSibling);
+
+    const after = document.createRange();
+    after.setStartAfter(space);
+    after.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(after);
+
+    this.saveSelection();
+    this.triggerTargetInput(editor);
+    Core.showToast(`⌨️ 已把「${text}」變成鍵位`);
+  },
+
   insertCustomKeycap(btnEl) {
     let input = null;
     if (btnEl && btnEl.parentElement) {
@@ -2058,6 +2236,18 @@ const Admin = {
     input.value = '';
   },
 
+  // 自訂按鍵輸入框按 Enter 也能插入（不會換行或送出表單）
+  setupCustomKeyInputs() {
+    document.querySelectorAll('.wt-custom-key-input').forEach(input => {
+      input.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' || e.isComposing) return;
+        e.preventDefault();
+        const btn = input.parentElement && input.parentElement.querySelector('button');
+        this.insertCustomKeycap(btn || input);
+      });
+    });
+  },
+
   setupFloatingToolbar() {
     const floatBar = document.getElementById('floating-word-toolbar');
     if (!floatBar) return;
@@ -2065,7 +2255,8 @@ const Admin = {
     // Track focused inputs & contenteditable across the whole page
     document.addEventListener('focusin', (e) => {
       const el = e.target;
-      if (el && (el.isContentEditable || el.tagName === 'TEXTAREA' || (el.tagName === 'INPUT' && el.type === 'text'))) {
+      if (el && !(el.classList && el.classList.contains('wt-custom-key-input')) &&
+          (el.isContentEditable || el.tagName === 'TEXTAREA' || (el.tagName === 'INPUT' && el.type === 'text'))) {
         this.lastActiveTarget = {
           el: el,
           type: el.isContentEditable ? 'contenteditable' : 'input'
@@ -2193,7 +2384,22 @@ const Admin = {
     if (editor) {
       editor.focus();
       const imgHTML = `<p><img src="${relPath}" alt="圖片" style="max-width: 100%; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin: 8px 0;"></p><p><br></p>`;
-      document.execCommand('insertHTML', false, imgHTML);
+      let inserted = false;
+      try { inserted = document.execCommand('insertHTML', false, imgHTML); } catch (e) {}
+      if (!inserted || !editor.querySelector(`img[src="${relPath}"]`)) {
+        // execCommand 失敗（編輯框沒有焦點等）：改直接插入到游標處，沒有游標就接在最後面
+        const tpl = document.createElement('template');
+        tpl.innerHTML = imgHTML;
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount && editor.contains(sel.getRangeAt(0).commonAncestorContainer)) {
+          const r = sel.getRangeAt(0);
+          r.collapse(false);
+          r.insertNode(tpl.content);
+        } else {
+          editor.appendChild(tpl.content);
+        }
+        Admin.triggerTargetInput && Admin.triggerTargetInput(editor);
+      }
       Core.showToast(`✅ 圖片已存入 ${relPath} 並即時顯示於編輯框！`);
     }
   },

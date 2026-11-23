@@ -213,6 +213,7 @@
             <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('strikethrough')" title="刪除線 (選取文字後點擊)"><del>S</del> 刪除線</button>
             <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('hr')" title="插入水平分隔線">― 分隔線</button>
             <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.insertTipBox()" title="在游標處插入黃色「小提醒」提示框（選取文字再按，會把選取的文字變成提醒框）">💡 小提醒</button>
+            <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.insertLink()" title="把選取的文字變成超連結（游標在連結內再按，可修改或移除）">🔗 連結</button>
             <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('h2')" title="插入大標題">H2 大標</button>
             <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('h3')" title="插入次標題">H3 次標</button>
             <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('list')" title="項目符號清單">• 列點</button>
@@ -264,6 +265,7 @@
             <div class="wt-dropdown">
               <button type="button" class="wt-btn" onmousedown="event.preventDefault();" style="color: var(--primary-text); font-weight: 800;" title="在游標處插入立體 3D 鍵帽或滑鼠動作">⌨️ 嵌入鍵位 ▾</button>
               <div class="wt-dropdown-menu" style="min-width: 290px; padding: 10px;">
+                <button type="button" class="btn btn-primary btn-sm" style="width: 100%; margin-bottom: 8px; padding: 5px 8px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.convertSelectionToKeycap()" title="把目前框選的文字直接變成立體鍵位">✨ 把選取的字變成鍵位</button>
                 <div style="font-size: 0.78rem; font-weight: 800; color: var(--text-muted); margin-bottom: 6px;">常用按鍵 (點擊直接插入)：</div>
                 <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px;">
                   <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('W')">W</span>
@@ -490,6 +492,7 @@
             <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('strikethrough')" title="刪除線 (選取文字後點擊)"><del>S</del> 刪除線</button>
             <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('hr')" title="插入水平分隔線">― 分隔線</button>
             <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.insertTipBox()" title="在游標處插入黃色「小提醒」提示框（選取文字再按，會把選取的文字變成提醒框）">💡 小提醒</button>
+            <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.insertLink()" title="把選取的文字變成超連結（游標在連結內再按，可修改或移除）">🔗 連結</button>
             <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('h2')" title="插入大標題">H2 大標</button>
             <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('h3')" title="插入次標題">H3 次標</button>
             <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('list')" title="項目符號清單">• 列點</button>
@@ -541,6 +544,7 @@
             <div class="wt-dropdown">
               <button type="button" class="wt-btn" onmousedown="event.preventDefault();" style="color: var(--primary-text); font-weight: 800;" title="在游標處插入立體 3D 鍵帽或滑鼠動作">⌨️ 嵌入鍵位 ▾</button>
               <div class="wt-dropdown-menu" style="min-width: 290px; padding: 10px;">
+                <button type="button" class="btn btn-primary btn-sm" style="width: 100%; margin-bottom: 8px; padding: 5px 8px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.convertSelectionToKeycap()" title="把目前框選的文字直接變成立體鍵位">✨ 把選取的字變成鍵位</button>
                 <div style="font-size: 0.78rem; font-weight: 800; color: var(--text-muted); margin-bottom: 6px;">常用按鍵 (點擊直接插入)：</div>
                 <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px;">
                   <span class="keycap" style="cursor: pointer; min-width: 26px; height: 26px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('W')">W</span>
@@ -568,8 +572,8 @@
                 </div>
                 <div style="font-size: 0.78rem; font-weight: 800; color: var(--text-muted); margin-bottom: 4px;">自訂按鍵文字：</div>
                 <div style="display: flex; gap: 4px;">
-                  <input type="text" id="wt-custom-key-input" class="form-control" style="font-size: 0.82rem; padding: 3px 6px;" placeholder="如 Shift + 右鍵">
-                  <button type="button" class="btn btn-primary btn-sm" style="padding: 2px 10px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertCustomKeycap()">插入</button>
+                  <input type="text" id="wt-custom-key-input" class="form-control wt-custom-key-input" style="font-size: 0.82rem; padding: 3px 6px;" placeholder="如 Shift + 右鍵">
+                  <button type="button" class="btn btn-primary btn-sm" style="padding: 2px 10px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.insertCustomKeycap(this)">插入</button>
                 </div>
               </div>
             </div>
@@ -611,6 +615,7 @@
     <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('h2')" title="H2 大標題"><strong>H2 大標</strong></button>
     <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.applyWordFormat('h3')" title="H3 次標題"><strong>H3 次標</strong></button>
     <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.insertTipBox()" title="把選取的文字變成黃色「小提醒」提示框">💡 小提醒</button>
+    <button type="button" class="wt-btn" onmousedown="event.preventDefault();" onclick="Admin.insertLink()" title="把選取的文字變成超連結">🔗 連結</button>
     <div class="wt-divider"></div>
     <div class="wt-dropdown">
       <button type="button" class="wt-btn" onmousedown="event.preventDefault();" title="字型大小">A▾ 字級</button>
@@ -636,6 +641,7 @@
     <div class="wt-dropdown">
       <button type="button" class="wt-btn" onmousedown="event.preventDefault();" style="font-weight: 800; color: var(--primary-text);" title="嵌入立體鍵位">⌨️ 鍵位 ▾</button>
       <div class="wt-dropdown-menu" style="min-width: 250px; padding: 8px;">
+        <button type="button" class="btn btn-primary btn-sm" style="width: 100%; margin-bottom: 8px; padding: 5px 8px; font-size: 0.8rem;" onmousedown="event.preventDefault();" onclick="Admin.convertSelectionToKeycap()" title="把目前框選的文字直接變成立體鍵位">✨ 把選取的字變成鍵位</button>
         <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); margin-bottom: 5px;">快速按鍵：</div>
         <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px;">
           <span class="keycap" style="cursor: pointer; min-width: 24px; height: 24px; font-size: 0.78rem;" onmousedown="event.preventDefault();" onclick="Admin.insertKeycap('W')">W</span>

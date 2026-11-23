@@ -1,6 +1,6 @@
 {
   "serverName": "CobblemonOasis 綠洲",
-  "tagline": "在全新的方塊世界中，踏上專屬於你的寶可夢冒險旅程！",
+  "tagline": "在全新的世界中，踏上專屬於你的寶可夢冒險旅程！",
   "description": "這是一個提供純淨、流暢且充滿社群活力的 Cobblemon 伺服器，期待與你一同建立家園與冒險。",
   "quickNav": [
     {
@@ -72,6 +72,10 @@
     {
       "name": "展示",
       "icon": "📦"
+    },
+    {
+      "name": "釣魚",
+      "icon": "🎣"
     }
   ]
 }

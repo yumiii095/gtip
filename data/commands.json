@@ -1,10 +1,94 @@
 [
   {
-    "name": "/crate keys",
-    "category": "經濟",
+    "name": "/town",
+    "category": "領地",
     "permission": "所有玩家",
-    "syntax": "/crate keys",
-    "description": "查看自身擁有的各種抽獎箱鑰匙"
+    "syntax": "/town",
+    "description": "查看領地指令"
+  },
+  {
+    "name": "/town setspawn",
+    "category": "領地",
+    "permission": "所有玩家",
+    "syntax": "/town setspawn",
+    "description": "設定城鎮傳送點"
+  },
+  {
+    "name": "/town spawn",
+    "category": "領地",
+    "permission": "所有玩家",
+    "syntax": "/town spawn",
+    "description": "回到城鎮傳送點"
+  },
+  {
+    "name": "/town claim",
+    "category": "領地",
+    "permission": "所有玩家",
+    "syntax": "/town claim",
+    "description": "認領腳下的區塊"
+  },
+  {
+    "name": "/town unclaim",
+    "category": "領地",
+    "permission": "所有玩家",
+    "syntax": "/town unclaim",
+    "description": "放棄腳下的區塊"
+  },
+  {
+    "name": "/oasisfishing research",
+    "category": "釣魚",
+    "permission": "所有玩家",
+    "syntax": "/oasisfishing research",
+    "description": "查看圖鑑研究總進度"
+  },
+  {
+    "name": "/town inspect",
+    "category": "領地",
+    "permission": "所有玩家",
+    "syntax": "/town inspect",
+    "description": "查看腳下的城鎮與地產"
+  },
+  {
+    "name": "/town leave",
+    "category": "領地",
+    "permission": "所有玩家",
+    "syntax": "/town leave",
+    "description": "退出城鎮"
+  },
+  {
+    "name": "/town invite [玩家名]",
+    "category": "領地",
+    "permission": "所有玩家",
+    "syntax": "/town invite [玩家名]",
+    "description": "邀請玩家加入城鎮"
+  },
+  {
+    "name": "/town invitations",
+    "category": "領地",
+    "permission": "所有玩家",
+    "syntax": "/town invitations",
+    "description": "查看城鎮邀請"
+  },
+  {
+    "name": "/town bank balance",
+    "category": "領地",
+    "permission": "所有玩家",
+    "syntax": "/town bank balance",
+    "description": "查看城鎮銀行餘額"
+  },
+  {
+    "name": "/town bank deposit [金額]",
+    "category": "領地",
+    "permission": "所有玩家",
+    "syntax": "/town bank deposit [金額]",
+    "description": "向城鎮銀行存入金幣"
+  },
+  {
+    "name": "/town bank withdraw [金額]",
+    "category": "領地",
+    "permission": "所有玩家",
+    "syntax": "/town bank withdraw [金額]",
+    "description": "向城鎮銀行提取金幣"
   },
   {
     "name": "/res tp",
@@ -12,6 +96,13 @@
     "permission": "所有玩家",
     "syntax": "/res tp",
     "description": "傳送到指定領地（例如 /res tp home）"
+  },
+  {
+    "name": "/crate keys",
+    "category": "經濟",
+    "permission": "所有玩家",
+    "syntax": "/crate keys",
+    "description": "查看自身擁有的各種抽獎箱鑰匙"
   },
   {
     "name": "[i]",

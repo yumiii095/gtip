@@ -51,7 +51,7 @@ const Core = {
 
     // 內容已含 HTML（例如螢光標記、圖片）：其餘維持原樣，只補上「冒號前的文字」自動粗體。
     // 冒號前有任何標籤（例如已手動加 <strong>）就不處理，避免重複加粗。
-    if (/<(span|mark|strong|b|em|i|del|s|code|h2|h3|svg|div|p|ul|ol|li)[^>]*>/i.test(str)) {
+    if (/<(span|mark|a|strong|b|em|i|del|s|code|h2|h3|svg|div|p|ul|ol|li)[^>]*>/i.test(str)) {
       const ci = str.indexOf('：');
       if (ci > 0 && ci < 25) {
         const head = str.slice(0, ci);
