@@ -25,6 +25,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       const card = document.createElement('div');
       card.className = 'card';
       card.style.cursor = 'pointer';
+      // 卡片等高、底部（分隔線／作者／日期）永遠貼齊在同一條線上
+      card.style.display = 'flex';
+      card.style.flexDirection = 'column';
       card.style.transition = 'transform 0.15s ease, box-shadow 0.15s ease';
 
       const coverHTML = guide.coverImage 
@@ -42,9 +45,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem;">
           ${escapeHTML(guide.summary || '')}
         </p>
-        <div style="font-size: 0.8rem; color: var(--text-light); display: flex; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
-          <span>作者：${escapeHTML(guide.author || '管理員')}</span>
-          <span>${escapeHTML(guide.updatedAt || '')}</span>
+        <div style="font-size: 0.8rem; color: var(--text-light); display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 0.75rem; margin-top: auto;">
+          ${guide.author ? `<span>作者：${escapeHTML(guide.author)}</span>` : ''}
+          <span style="margin-left: auto;">${escapeHTML(guide.updatedAt || '')}</span>
         </div>
       `;
 
@@ -61,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     readerContainer.style.display = 'block';
 
     document.getElementById('reader-title').textContent = guide.title || '';
-    document.getElementById('reader-meta').textContent = `${guide.category || '攻略'} · 作者: ${guide.author || '管理員'} · 更新於: ${guide.updatedAt || '近期'}`;
+    document.getElementById('reader-meta').textContent = [guide.category || '攻略', guide.author ? `作者: ${guide.author}` : '', `更新於: ${guide.updatedAt || '近期'}`].filter(Boolean).join(' · ');
     
     // Render content (paragraphs, formatted breaks, image tags)
     const contentEl = document.getElementById('reader-content');

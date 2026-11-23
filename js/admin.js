@@ -1235,7 +1235,7 @@ const Admin = {
             ${escapeAttr(g.summary || '（暫無簡介摘要）')}
           </div>
           <div style="font-size: 0.8rem; color: var(--text-light);">
-            作者: ${escapeAttr(g.author || '管理員')} ｜ 最後更新: ${escapeAttr(g.updatedAt || '剛剛')}
+            ${g.author ? `作者: ${escapeAttr(g.author)} ｜ ` : ''}最後更新: ${escapeAttr(g.updatedAt || '剛剛')}
           </div>
         </div>
         <div style="display: flex; gap: 0.5rem; align-items: center;">
@@ -1263,14 +1263,14 @@ const Admin = {
       if (modalTitle) modalTitle.textContent = `✏️ 編輯攻略文章`;
       if (inputTitle) inputTitle.value = g.title || '';
       if (inputCat) inputCat.value = g.category || '新手教學';
-      if (inputAuthor) inputAuthor.value = g.author || '管理員';
+      if (inputAuthor) inputAuthor.value = g.author || '';
       if (inputSummary) inputSummary.value = g.summary || '';
       if (editor) editor.innerHTML = this.convertMarkdownToHTML(g.content || '');
     } else {
       if (modalTitle) modalTitle.textContent = '📖 新增攻略文章';
       if (inputTitle) inputTitle.value = '';
       if (inputCat) inputCat.value = '新手教學';
-      if (inputAuthor) inputAuthor.value = '管理員';
+      if (inputAuthor) inputAuthor.value = '';
       if (inputSummary) inputSummary.value = '';
       if (editor) editor.innerHTML = '';
     }
@@ -1322,12 +1322,12 @@ const Admin = {
       // Update Top Review Summary Box
       const titleVal = document.getElementById('modal-input-title').value.trim() || '未命名攻略';
       const catVal = document.getElementById('modal-input-category').value.trim() || '新手教學';
-      const authorVal = document.getElementById('modal-input-author').value.trim() || '管理員';
+      const authorVal = document.getElementById('modal-input-author').value.trim();
       const summaryVal = document.getElementById('modal-input-summary').value.trim() || '（無簡介摘要）';
 
       document.getElementById('review-guide-title').textContent = titleVal;
       document.getElementById('review-guide-category').textContent = catVal;
-      document.getElementById('review-guide-author').textContent = `作者: ${authorVal}`;
+      document.getElementById('review-guide-author').textContent = authorVal ? `作者: ${authorVal}` : '';
       document.getElementById('review-guide-summary').textContent = summaryVal;
 
       this.switchGuideTab('write');
@@ -1366,7 +1366,7 @@ const Admin = {
 
     const titleVal = document.getElementById('modal-input-title').value.trim() || '未命名攻略文章';
     const catVal = document.getElementById('modal-input-category').value.trim() || '新手教學';
-    const authorVal = document.getElementById('modal-input-author').value.trim() || '管理員';
+    const authorVal = document.getElementById('modal-input-author').value.trim();
     const summaryVal = document.getElementById('modal-input-summary').value.trim() || '（此文章尚無簡介摘要說明）';
     const today = new Date().toISOString().slice(0, 10);
     const contentHTML = editor ? editor.innerHTML : '';
@@ -1415,8 +1415,8 @@ const Admin = {
               <div class="mock-guide-meta">
                 <span>${escapeAttr(catVal)}</span>
                 <span>•</span>
-                <span>作者: ${escapeAttr(authorVal)}</span>
-                <span>•</span>
+                ${authorVal ? `<span>作者: ${escapeAttr(authorVal)}</span>
+                <span>•</span>` : ''}
                 <span>更新於: ${today}</span>
               </div>
               <div class="mock-guide-body">
@@ -1438,8 +1438,8 @@ const Admin = {
                   ${escapeAttr(summaryVal)}
                 </p>
                 <div style="font-size: 0.8rem; color: var(--text-light); display: flex; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
-                  <span>作者: ${escapeAttr(authorVal)}</span>
-                  <span>${today}</span>
+                  ${authorVal ? `<span>作者: ${escapeAttr(authorVal)}</span>` : ''}
+                  <span style="margin-left: auto;">${today}</span>
                 </div>
               </div>
             </div>
@@ -1472,7 +1472,7 @@ const Admin = {
     }
 
     const category = document.getElementById('modal-input-category').value.trim() || '新手教學';
-    const author = document.getElementById('modal-input-author').value.trim() || '管理員';
+    const author = document.getElementById('modal-input-author').value.trim();
     const summary = document.getElementById('modal-input-summary').value.trim();
     const editor = document.getElementById('modal-guide-visual-editor');
     const content = editor ? editor.innerHTML : '';
